@@ -43,9 +43,7 @@ func main() {
 	handlers := handler.NewHandler(services)
 	srv := new(todo.Server)
 	go func() {
-		if err := srv.Run(viper.GetString("port"), handlers.InitRoutes()); err != nil {
-			logrus.Fatalf("error occured while running http server: %s", err.Error())
-		}
+		srv.Run(viper.GetString("port"), handlers.InitRoutes())
 	}()
 
 	logrus.Print("TodoApp Started")
