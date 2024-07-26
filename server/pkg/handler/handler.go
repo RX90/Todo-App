@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/RX90/Todo-App/pkg/service"
 	"github.com/gin-gonic/gin"
 )
@@ -14,12 +16,24 @@ func NewHandler(services *service.Service) *Handler {
 }
 
 func (h *Handler) InitRoutes() *gin.Engine {
-	router := gin.New()
+	router := gin.Default()
+
+	router.Static("/static", "../client/static")
+	router.LoadHTMLGlob("../client/templates/*.html")
+
+	router.GET("/", func(c *gin.Context) {})
 
 	auth := router.Group("/auth")
 	{
 		auth.POST("/sign-up", h.signUp)
 		auth.POST("/sign-in", h.signIn)
+
+		auth.GET("/sign-up", func(c *gin.Context) {
+			c.HTML(http.StatusOK, "sign-up.html", nil)
+		})
+		auth.GET("/sign-in", func(c *gin.Context) {
+			c.HTML(http.StatusOK, "sign-in.html", nil)
+		})
 	}
 
 	api := router.Group("/api", h.userIdentity)
