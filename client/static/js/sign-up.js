@@ -1,44 +1,61 @@
-document
-  .getElementById("signup-form")
-  .addEventListener("submit", async function (event) {
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("signup-form");
+  const messageDiv = document.getElementById("message");
+
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const name = document.getElementById("name").value;
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
 
-    const data = {
-      name: name,
-      username: username,
-      password: password,
-    };
-
     try {
-      const response = await fetch("/auth/sign-up", {
+      const signUpResponse = await fetch("/auth/sign-up", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ name, username, password }),
       });
 
-      const result = await response.json();
+      const signUpData = await signUpResponse.json();
 
-      if (response.ok) {
-        document.getElementById("message").textContent = "Registration successful!";
-        document.getElementById("message").style.color = "green";
-        document.getElementById("name").value = "";
-        document.getElementById("username").value = "";
-        document.getElementById("password").value = "";
+      if (signUpResponse.status === 200) {
+        try {
+          const signInResponse = await fetch("/auth/sign-in", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ username, password }),
+          });
+
+          const signInData = await signInResponse.json();
+
+          if (signInResponse.status === 200) {
+            const token = signInData.token;
+
+            localStorage.setItem("token", token);
+
+            window.location.href = "/";
+          } else {
+            messageDiv.textContent = "Sign-in failed: " + signInData.message;
+            messageDiv.style.color = "red";
+          }
+        } catch (signInError) {
+          messageDiv.textContent = "Sign-in failed: " + signInError.message;
+          messageDiv.style.color = "red";
+        }
       } else {
-        document.getElementById("message").textContent =
-          "Registration failed: " + result.message;
+        messageDiv.textContent = "Sign-up failed: " + signUpData.message;
+        messageDiv.style.color = "red";
       }
-    } catch (error) {
-      document.getElementById("message").textContent =
-        "An error occurred: " + error.message;
+    } catch (signUpError) {
+      messageDiv.textContent = "Sign-up failed: " + signUpError.message;
+      messageDiv.style.color = "red";
     }
   });
+});
 
 function show_hide_password(target) {
   var input = document.getElementById("password");

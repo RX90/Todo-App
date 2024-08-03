@@ -1,15 +1,12 @@
-document
-  .getElementById("signin-form")
-  .addEventListener("submit", async function (event) {
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("signin-form");
+  const messageDiv = document.getElementById("message");
+
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const username = document.getElementById("username").value;
     const password = document.getElementById("password").value;
-
-    const data = {
-      username: username,
-      password: password,
-    };
 
     try {
       const response = await fetch("/auth/sign-in", {
@@ -17,30 +14,31 @@ document
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ username, password }),
       });
 
-      const result = await response.json();
+      const data = await response.json();
 
-      if (response.ok) {
-        document.getElementById("message").textContent = "Sign In successful!";
-        document.getElementById("message").style.color = "green";
-        document.getElementById("username").value = "";
-        document.getElementById("password").value = "";
-        localStorage.setItem("bearerToken", result.token);
+      if (response.status === 200) {
+        const token = data.token;
+
+        localStorage.setItem("token", token);
+
+        window.location.href = "/";
       } else {
-        document.getElementById("message").textContent =
-          "Sign In failed: " + result.message;
+        messageDiv.textContent = "Sign-in failed: " + data.message;
+        messageDiv.style.color = "red";
       }
     } catch (error) {
-      document.getElementById("message").textContent =
-        "An error occurred: " + error.message;
+      messageDiv.textContent = "Sign-in failed: " + error.message;
+      messageDiv.style.color = "red";
     }
   });
+});
 
 function show_hide_password(target) {
-  var input = document.getElementById("password-input");
-  if (input.getAttribute("type") === "password") {
+  var input = document.getElementById("password");
+  if (input.getAttribute("type") == "password") {
     target.classList.add("view");
     input.setAttribute("type", "text");
   } else {
@@ -49,9 +47,3 @@ function show_hide_password(target) {
   }
   return false;
 }
-
-// fetch("/куда-то там", {
-//   headers: {
-//     Authorization: "Bearer " + localStorage.getItem("bearerToken"),
-//   },
-// });

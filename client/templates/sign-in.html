@@ -3,8 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="cache-control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
     <title>Sign In</title>
     <link rel="stylesheet" href="/static/css/auth.css" />
+    <style>
+      .signup-container {
+        margin-top: 20px;
+        text-align: center;
+      }
+
+      .signup-container p {
+        margin: 0;
+        display: inline;
+      }
+
+      .signup-link {
+        color: #0078d4;
+        text-decoration: none;
+      }
+
+      .signup-link:hover {
+        text-decoration: underline;
+      }
+    </style>
   </head>
   <body>
     <div class="container">
@@ -17,13 +40,19 @@
         <div class="form-group password">
           <label for="password">Password</label>
           <div class="password-input-container">
-            <input type="password" id="password" name="password" required/>
+            <input type="password" id="password" name="password" required />
             <a href="#" class="password-control" onclick="return show_hide_password(this);"></a>
           </div>
         </div>
         <button type="submit">Sign In</button>
       </form>
       <div id="message"></div>
+      <div class="signup-container">
+        <p>
+          Don't have an account?
+          <a href="/auth/sign-up" class="signup-link">Sign Up</a>
+        </p>
+      </div>
     </div>
     <script src="/static/js/sign-in.js"></script>
   </body>
