@@ -1,8 +1,9 @@
 package handler
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
-	"github.com/sirupsen/logrus"
 )
 
 type errorResponse struct {
@@ -14,6 +15,6 @@ type statusResponse struct {
 }
 
 func newErrorResponse(c *gin.Context, statusCode int, message string) {
-	logrus.Error(message)
+	log.Println(message)
 	c.AbortWithStatusJSON(statusCode, errorResponse{message})
 }

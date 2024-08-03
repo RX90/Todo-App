@@ -21,7 +21,9 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	router.Static("/static", "../client/static")
 	router.LoadHTMLGlob("../client/templates/*.html")
 
-	router.GET("/", func(c *gin.Context) {})
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "index.html", nil)
+	})
 
 	auth := router.Group("/auth")
 	{
@@ -34,6 +36,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.GET("/sign-in", func(c *gin.Context) {
 			c.HTML(http.StatusOK, "sign-in.html", nil)
 		})
+		
+		auth.POST("/validate", h.validateToken)
 	}
 
 	api := router.Group("/api", h.userIdentity)

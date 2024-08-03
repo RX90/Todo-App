@@ -10,28 +10,50 @@ import (
 
 const (
 	authorizationHeader = "Authorization"
-	userCtx = "userId"
+	userCtx             = "userId"
 )
 
 func (h *Handler) userIdentity(c *gin.Context) {
 	header := c.GetHeader(authorizationHeader)
 	if header == "" {
-		newErrorResponse(c, http.StatusUnauthorized, "empty auth header")
+		newErrorResponse(c, http.StatusUnauthorized, "token is empty")
 		return
 	}
 	headerParts := strings.Split(header, " ")
 	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
-		newErrorResponse(c, http.StatusUnauthorized, "invalid auth header")
+		newErrorResponse(c, http.StatusUnauthorized, "token is invalid")
 		return
 	}
 
 	userId, err := h.services.Authorization.ParseToken(headerParts[1])
 	if err != nil {
-		newErrorResponse(c, http.StatusUnauthorized, err.Error())
+		newErrorResponse(c, http.StatusUnauthorized, "token is invalid")
 		return
 	}
 
 	c.Set(userCtx, userId)
+	c.Next()
+}
+
+func (h *Handler) validateToken(c *gin.Context) {
+	header := c.GetHeader(authorizationHeader)
+	if header == "" {
+		newErrorResponse(c, http.StatusUnauthorized, "token is empty")
+		return
+	}
+	headerParts := strings.Split(header, " ")
+	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
+		newErrorResponse(c, http.StatusUnauthorized, "token is invalid")
+		return
+	}
+
+	userId, err := h.services.Authorization.ParseToken(headerParts[1])
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, "token is invalid")
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "token is valid", "user_id": userId})
 }
 
 func getUserId(c *gin.Context) (int, error) {
@@ -43,7 +65,7 @@ func getUserId(c *gin.Context) (int, error) {
 
 	idInt, ok := id.(int)
 	if !ok {
-		newErrorResponse(c, http.StatusInternalServerError, "user id is of invalid type")	
+		newErrorResponse(c, http.StatusInternalServerError, "user id is of invalid type")
 		return 0, errors.New("user id not found")
 	}
 
