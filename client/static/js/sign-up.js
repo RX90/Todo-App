@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded", () => {
           if (signInResponse.status === 200) {
             const token = signInData.token;
 
-            localStorage.setItem("token", token);
+            localStorage.setItem("accessToken", token);
 
             window.location.href = "/";
           } else {

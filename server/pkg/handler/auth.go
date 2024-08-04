@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"log"
 	"net/http"
+	"time"
 
 	todo "github.com/RX90/Todo-App"
 	"github.com/gin-gonic/gin"
@@ -21,7 +23,7 @@ func (h *Handler) signUp(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
+	c.JSON(http.StatusOK, gin.H{
 		"id": id,
 	})
 }
@@ -39,7 +41,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	token, err := h.services.Authorization.GenerateToken(input.Username, input.Password)
+	accessToken, err := h.services.Authorization.NewAccessToken(input.Username, input.Password)
 	if err != nil {
 		if err.Error() == "sql: no rows in result set" {
 			newErrorResponse(c, http.StatusInternalServerError, "User does not exist")
@@ -49,7 +51,26 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, map[string]interface{}{
-		"token": token,
+	refreshToken, err := h.services.Authorization.NewRefreshToken()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
+	cookie := &http.Cookie{
+		Name:     "refreshToken",
+		Value:    refreshToken,
+		Expires:  time.Now().Add(15 * time.Minute),
+		Path:     "/",
+		Domain:   "localhost",
+		HttpOnly: true,
+		SameSite: http.SameSiteStrictMode,
+	}
+
+	http.SetCookie(c.Writer, cookie)
+
+	c.JSON(http.StatusOK, gin.H{
+		"token": accessToken,
 	})
+
+	log.Print(cookie.Name, cookie.Value)
 }

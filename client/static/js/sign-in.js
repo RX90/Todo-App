@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (response.status === 200) {
         const token = data.token;
 
-        localStorage.setItem("token", token);
+        localStorage.setItem("accessToken", token);
 
         window.location.href = "/";
       } else {

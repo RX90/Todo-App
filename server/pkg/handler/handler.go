@@ -36,8 +36,6 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.GET("/sign-in", func(c *gin.Context) {
 			c.HTML(http.StatusOK, "sign-in.html", nil)
 		})
-		
-		auth.POST("/validate", h.validateToken)
 	}
 
 	api := router.Group("/api", h.userIdentity)
