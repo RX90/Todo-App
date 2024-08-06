@@ -50,3 +50,10 @@ func getUserId(c *gin.Context) (int, error) {
 
 	return idInt, nil
 }
+
+func contentSecurityPolicy() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Header("Content-Security-Policy", "default-src 'self'; img-src 'self' https://snipp.ru; script-src 'self' https://snipp.ru;")
+		c.Next()
+	}
+}

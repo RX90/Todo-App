@@ -30,10 +30,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth.POST("/sign-up", h.signUp)
 		auth.POST("/sign-in", h.signIn)
 
-		auth.GET("/sign-up", func(c *gin.Context) {
+		auth.GET("/sign-up", contentSecurityPolicy(), func(c *gin.Context) {
 			c.HTML(http.StatusOK, "sign-up.html", nil)
 		})
-		auth.GET("/sign-in", func(c *gin.Context) {
+		auth.GET("/sign-in", contentSecurityPolicy(), func(c *gin.Context) {
 			c.HTML(http.StatusOK, "sign-in.html", nil)
 		})
 	}

@@ -50,9 +50,12 @@ func (s *AuthService) NewAccessToken(username, password string) (string, error) 
 		return "", err
 	}
 
-	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.StandardClaims{
-		ExpiresAt: time.Now().Add(tokenTTL).Unix(),
-		Subject:   strconv.Itoa(user.Id),
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, tokenClaims{
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(tokenTTL).Unix(),
+			Subject:   strconv.Itoa(user.Id),
+		},
+		user.Id,
 	})
 
 	return accessToken.SignedString([]byte(signingKey))
