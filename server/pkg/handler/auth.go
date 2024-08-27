@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"log"
 	"net/http"
 	"time"
 
@@ -71,6 +70,4 @@ func (h *Handler) signIn(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"token": accessToken,
 	})
-
-	log.Print(cookie.Name, cookie.Value)
 }
