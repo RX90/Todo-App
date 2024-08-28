@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	todo "github.com/RX90/Todo-App"
@@ -40,17 +41,21 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	accessToken, err := h.services.Authorization.NewAccessToken(input.Username, input.Password)
+	accessToken, userId, err := h.services.Authorization.NewAccessToken(input.Username, input.Password)
 	if err != nil {
-		if err.Error() == "sql: no rows in result set" {
-			newErrorResponse(c, http.StatusInternalServerError, "User does not exist")
-		} else {
-			newErrorResponse(c, http.StatusInternalServerError, err.Error())
-		}
+		newErrorResponse(c, http.StatusInternalServerError, "User does not exist")
 		return
 	}
 
 	refreshToken, err := h.services.Authorization.NewRefreshToken()
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	exp := time.Now().Add(15 * time.Minute)
+
+	id, err := h.services.Authorization.CreateToken(refreshToken, exp, userId)
 	if err != nil {
 		newErrorResponse(c, http.StatusInternalServerError, err.Error())
 	}
@@ -58,7 +63,7 @@ func (h *Handler) signIn(c *gin.Context) {
 	cookie := &http.Cookie{
 		Name:     "refreshToken",
 		Value:    refreshToken,
-		Expires:  time.Now().Add(15 * time.Minute),
+		Expires:  exp,
 		Path:     "/",
 		Domain:   "localhost",
 		HttpOnly: true,
@@ -67,7 +72,22 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	http.SetCookie(c.Writer, cookie)
 
+	cookie = &http.Cookie{
+		Name:     "userId",
+		Value:    strconv.Itoa(userId),
+		Path:     "/",
+		Domain:   "localhost",
+		SameSite: http.SameSiteStrictMode,
+	}
+
+	http.SetCookie(c.Writer, cookie)
+
 	c.JSON(http.StatusOK, gin.H{
-		"token": accessToken,
+		"refresh_id": id,
+		"token":      accessToken,
 	})
+}
+
+func (h *Handler) refresh(c *gin.Context) {
+	// ЧЕ ДЕЛАТЬ??????????????? КАК ПРОВЕРЯТЬ REFRESH ТОКЕН?????????????
 }

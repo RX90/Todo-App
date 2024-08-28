@@ -1,15 +1,18 @@
 package service
 
 import (
+	"time"
+
 	todo "github.com/RX90/Todo-App"
 	"github.com/RX90/Todo-App/pkg/repository"
 )
 
 type Authorization interface {
 	CreateUser(user todo.User) (int, error)
-	NewAccessToken(username, password string) (string, error)
+	NewAccessToken(username, password string) (string, int, error)
 	NewRefreshToken() (string, error)
 	ParseToken(token string) (int, error)
+	CreateToken(token string, exp time.Time, userId int) (int, error)
 }
 
 type TodoList interface {
@@ -37,7 +40,7 @@ type Service struct {
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
-		TodoList: NewTodoListService(repos.TodoList),
-		TodoItem: NewTodoItemService(repos.TodoItem, repos.TodoList),
+		TodoList:      NewTodoListService(repos.TodoList),
+		TodoItem:      NewTodoItemService(repos.TodoItem, repos.TodoList),
 	}
 }

@@ -5,17 +5,51 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var modal = document.getElementById("myModal");
   var modalMessage = document.getElementById("modalMessage");
-  var span = document.getElementsByClassName("close")[0];
 
-  span.onclick = function () {
-    modal.style.display = "none";
-  };
+  function decodeJWT(token) {
+    var base64Url = token.split(".")[1];
+    var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    var jsonPayload = decodeURIComponent(
+      window
+        .atob(base64)
+        .split("")
+        .map(function (c) {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
+  }
 
-  window.onclick = function (event) {
-    if (event.target == modal) {
-      modal.style.display = "none";
+  function checkToken(token) {
+    const payload = decodeJWT(token);
+    if (payload && payload.exp * 1000 < Date.now()) {
+      try {
+        const response = fetch("/auth/refresh", {
+          method: "POST",
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+  
+        if (response.ok) {
+          const result = response.json();
+          const token = result.token;
+          localStorage.setItem("accessToken", token);
+        } else if (response.status === 401) {
+          showModalMessage(
+            "Please log in to view your lists. Redirecting to login page..."
+          );
+          setTimeout(() => {
+            window.location.href = "/auth/sign-in";
+          }, 2000);
+        }
+      } catch (error) {
+        console.error("There was a problem with the fetch operation:", error);
+      }
     }
-  };
+  }
 
   function showModalMessage(message) {
     modalMessage.textContent = message;
@@ -26,6 +60,8 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   async function loadLists() {
+    var accessToken = localStorage.getItem("accessToken");
+    checkToken(token)
     var accessToken = localStorage.getItem("accessToken");
 
     try {
@@ -68,6 +104,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (title) {
       var accessToken = localStorage.getItem("accessToken");
+      checkToken(token)
+      var accessToken = localStorage.getItem("accessToken");
+      
       var data = {
         title: title,
       };

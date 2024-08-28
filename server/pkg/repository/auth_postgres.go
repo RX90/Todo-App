@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"time"
 
 	todo "github.com/RX90/Todo-App"
 	"github.com/jmoiron/sqlx"
@@ -31,4 +32,29 @@ func (r *AuthPostgres) GetUser(username, password string) (todo.User, error) {
 	err := r.db.Get(&user, query, username, password)
 
 	return user, err
+}
+
+func (r *AuthPostgres) CreateToken(token string, exp time.Time, userId int) (int, error) {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return 0, err
+	}
+
+	var tokenId int
+
+	query := fmt.Sprintf("INSERT INTO %s (refresh_token, expires_in) values ($1, $2) RETURNING id", tokensTable)
+	row := tx.QueryRow(query, token, exp)
+	if err := row.Scan(&tokenId); err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+
+	query = fmt.Sprintf("INSERT INTO %s (user_id, token_id) values ($1, $2)", usersTokensTable)
+	_, err = tx.Exec(query, userId, tokenId)
+	if err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+
+	return tokenId, tx.Commit()
 }

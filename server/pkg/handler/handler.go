@@ -29,6 +29,7 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		auth.POST("/sign-up", h.signUp)
 		auth.POST("/sign-in", h.signIn)
+		auth.POST("/refresh", h.refresh)
 
 		auth.GET("/sign-up", contentSecurityPolicy(), func(c *gin.Context) {
 			c.HTML(http.StatusOK, "sign-up.html", nil)

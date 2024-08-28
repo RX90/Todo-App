@@ -33,3 +33,17 @@ CREATE TABLE lists_items
     item_id int references todo_items (id) on delete cascade not null,
     list_id int references todo_lists (id) on delete cascade not null
 );
+
+CREATE TABLE tokens
+(
+    id            serial      not null unique,
+    refresh_token varchar(64) not null,
+    expires_in    timestamptz not null
+);
+
+CREATE TABLE users_tokens 
+(
+    id       serial                                       not null unique,
+    user_id  int references users (id) on delete cascade  not null,
+    token_id int references tokens (id) on delete cascade not null
+);
