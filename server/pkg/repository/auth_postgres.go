@@ -58,3 +58,15 @@ func (r *AuthPostgres) CreateToken(token string, exp time.Time, userId int) (int
 
 	return tokenId, tx.Commit()
 }
+
+func (r *AuthPostgres) DeleteToken(userId string, token string) (error) {
+	var deletedTokenID int
+	query := fmt.Sprintf(`DELETE FROM %s WHERE id IN (SELECT t.id FROM %s t JOIN %s ut ON t.id = ut.token_id
+        				 WHERE ut.user_id = $1 AND t.refresh_token = $2) RETURNING id;`, 
+						 tokensTable, tokensTable, usersTokensTable)	
+	if err := r.db.Get(&deletedTokenID, query, userId, token); err != nil {
+		return err
+	} else {
+		return nil
+	}
+}
