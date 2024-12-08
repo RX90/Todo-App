@@ -1,19 +1,41 @@
 # Todo App
 
-**Для использования Todo-App надо:**
+## Инструкция по использованию
 
-**1. Поднять базу данных на PostgreSQL с помощью Docker**
+### 1. Настройка базы данных PostgreSQL с помощью Docker
 
-```
-docker run --name=todo-db -e POSTGRES_PASSWORD='qwerty' -p 5432:5432 -d postgres - создаём контейнер
+1. Создайте контейнер с базой данных:
+   ```
+   docker run --name=todo-db -e POSTGRES_PASSWORD='qwerty' -p 5432:5432 -d postgres
+   ```
+2. Запустите контейнер:
+   ```
+    docker start todo-db
+   ```
+3. Перейдите в директорию сервера:
+   ```
+   cd server
+   ```
+4. Примените миграции:
+   ```
+   migrate -path ./migrations -database "postgres://postgres:qwerty@localhost:5432/postgres?sslmode=disable" up
+   ```
 
-docker start todo-db - запускаем контейнер
+### 2. Работа с приложением через Makefile
 
-cd server - переходим в директорию сервера
+1. Запуск Todo-App:
+   ```
+   make
+   ```
+2. Применение миграций:
+   ```
+   make up
+   ```
+3. Откат миграций:
+   ```
+   make down
+   ```
 
-migrate -path ./migrations -database "postgres://postgres:qwerty@localhost:5432/postgres?sslmode=disable" up - применяем 000001_init.up.sql
-```
+### 3. Использование приложения
 
-**2. Находясь в основной директории Todo-App, используем команды make для запуска Todo-App, make up для применения миграций и make down для отката миграций**
-
-**3. Заходим в браузер и используем Todo-App по адресу localhost:8000**
+Откройте браузер и перейдите по адресу: http://localhost:8000
