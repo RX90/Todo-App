@@ -89,5 +89,20 @@ func (h *Handler) signIn(c *gin.Context) {
 }
 
 func (h *Handler) refresh(c *gin.Context) {
-	// ЧЕ ДЕЛАТЬ??????????????? КАК ПРОВЕРЯТЬ REFRESH ТОКЕН?????????????
+	userId, err := c.Cookie("userId")
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, "User ID is missing")
+		return
+	}
+
+	token, err := c.Cookie("accessToken")
+	if err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, "Access token is missing")
+		return
+	}
+
+	if err = h.services.Authorization.DeleteToken(userId, token); err != nil {
+		newErrorResponse(c, http.StatusUnauthorized, err.Error())
+		return
+	}
 }

@@ -104,3 +104,7 @@ func (s *AuthService) ParseToken(accessToken string) (int, error) {
 func (s *AuthService) CreateToken(token string, exp time.Time, userId int) (int, error) {
 	return s.repo.CreateToken(token, exp, userId)
 }
+
+func (s *AuthService) DeleteToken(userId string, token string) (error) {
+	return s.repo.DeleteToken(userId, token)
+}

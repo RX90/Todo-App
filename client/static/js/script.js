@@ -60,16 +60,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   async function loadLists() {
-    var accessToken = localStorage.getItem("accessToken");
+    var token = localStorage.getItem("accessToken");
     checkToken(token)
-    var accessToken = localStorage.getItem("accessToken");
+    var token = localStorage.getItem("accessToken");
 
     try {
       const response = await fetch("/api/lists/", {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + accessToken,
+          Authorization: "Bearer " + token,
         },
       });
 
@@ -103,9 +103,9 @@ document.addEventListener("DOMContentLoaded", function () {
     var title = newListTitle.value.trim();
 
     if (title) {
-      var accessToken = localStorage.getItem("accessToken");
+      var token = localStorage.getItem("accessToken");
       checkToken(token)
-      var accessToken = localStorage.getItem("accessToken");
+      var token = localStorage.getItem("accessToken");
       
       var data = {
         title: title,
@@ -116,7 +116,7 @@ document.addEventListener("DOMContentLoaded", function () {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + accessToken,
+            Authorization: "Bearer " + token,
           },
           body: JSON.stringify(data),
         });
