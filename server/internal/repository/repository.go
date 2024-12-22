@@ -1,8 +1,23 @@
 package repository
 
-import "github.com/jmoiron/sqlx"
+import (
+	"github.com/RX90/Todo-App/server/internal/user"
+	"github.com/jmoiron/sqlx"
+)
 
-type Authorization interface{}
+const (
+	usersTable       = "users"
+	todoListsTable   = "todo_lists"
+	usersListsTable  = "users_lists"
+	todoItemsTable   = "todo_items"
+	listsItemsTable  = "lists_items"
+	tokensTable      = "tokens"
+	usersTokensTable = "users_tokens"
+)
+
+type Authorization interface {
+	CreateUser(user user.User) error
+}
 
 type Repository struct {
 	Authorization

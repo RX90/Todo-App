@@ -1,8 +1,13 @@
 package service
 
-import "github.com/RX90/Todo-App/server/internal/repository"
+import (
+	"github.com/RX90/Todo-App/server/internal/repository"
+	"github.com/RX90/Todo-App/server/internal/user"
+)
 
-type Authorization interface{}
+type Authorization interface{
+	CreateUser(user user.User) (error)
+}
 
 type Service struct {
 	Authorization
