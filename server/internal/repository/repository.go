@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"time"
+
 	"github.com/RX90/Todo-App/server/internal/user"
 	"github.com/jmoiron/sqlx"
 )
@@ -17,6 +19,8 @@ const (
 
 type Authorization interface {
 	CreateUser(user user.User) error
+	GetUserId(username, password string) (string, error)
+	NewRefreshToken(token, userId string, expiresAt time.Time) error
 }
 
 type Repository struct {

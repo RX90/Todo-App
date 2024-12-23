@@ -1,19 +1,30 @@
 package service
 
 import (
+	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
+	"time"
 
 	"github.com/RX90/Todo-App/server/internal/repository"
 	"github.com/RX90/Todo-App/server/internal/user"
+	"github.com/dgrijalva/jwt-go"
 )
 
 const (
-	salt = "f3by1efb08y1f0b8"
+	salt       = "f3by1efb08y1f0b8"
+	signingKey = "vr3urn93u1dnwi00"
+	accessTTL  = 30 * time.Second // временно
+	RefreshTTL = 1 * time.Minute // временно
 )
 
 type AuthService struct {
 	repos repository.Authorization
+}
+
+type TokenClaims struct {
+	jwt.StandardClaims
+	UserId string `json:"user_id"`
 }
 
 func newAuthService(repos repository.Authorization) *AuthService {
@@ -65,4 +76,43 @@ func (s *AuthService) CreateUser(user user.User) error {
 
 	user.Password = generatePasswordHash(user.Password)
 	return s.repos.CreateUser(user)
+}
+
+func (s *AuthService) GetUserId(username, password string) (string, error) {
+	password = generatePasswordHash(password)
+	return s.repos.GetUserId(username, password)
+}
+
+func (s *AuthService) NewAccessToken(userId string) (string, error) {
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, TokenClaims{
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(accessTTL).Unix(),
+			Subject:   userId,
+		},
+		userId,
+	})
+
+	tokenString, err := accessToken.SignedString([]byte(signingKey))
+	if err != nil {
+		return "", err
+	}
+
+	return tokenString, nil
+}
+
+func (s *AuthService) NewRefreshToken(userId string) (string, error) {
+	b := make([]byte, 32)
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+
+	token := fmt.Sprintf("%x", b)
+	expiresAt := time.Now().Add(RefreshTTL)
+
+	if err := s.repos.NewRefreshToken(token, userId, expiresAt); err != nil {
+		return "", err
+	}
+
+	return token, nil
 }

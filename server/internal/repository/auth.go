@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/RX90/Todo-App/server/internal/user"
 	"github.com/jmoiron/sqlx"
@@ -43,4 +44,39 @@ func (r *AuthDB) CreateUser(user user.User) error {
 	}
 
 	return nil
+}
+
+func (r *AuthDB) GetUserId(username, password string) (string, error) {
+	var id string
+	query := fmt.Sprintf("SELECT id FROM %s WHERE username=$1 AND password_hash=$2", usersTable)
+
+	err := r.db.Get(&id, query, username, password)
+
+	return id, err
+}
+
+func (r *AuthDB) NewRefreshToken(token, userId string, expiresAt time.Time) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	query := fmt.Sprintf("INSERT INTO %s (refresh_token, expires_in) values ($1, $2) RETURNING id", tokensTable)
+	row := tx.QueryRow(query, token, expiresAt)
+
+	var tokenId string
+
+	if err := row.Scan(&tokenId); err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	query = fmt.Sprintf("INSERT INTO %s (user_id, token_id) values ($1, $2)", usersTokensTable)
+	_, err = tx.Exec(query, userId, tokenId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }
