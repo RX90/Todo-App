@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -77,11 +76,11 @@ func (a *App) Run() error {
 	log.Println("TodoApp Shutting Down")
 
 	if err := a.server.Shutdown(context.Background()); err != nil {
-		return errors.New(fmt.Sprintf("Error occurred on server shutting down: %s", err.Error()))
+		return fmt.Errorf("error occurred on server shutting down: %s", err.Error())
 	}
 
 	if err := a.db.Close(); err != nil {
-		return errors.New(fmt.Sprintf("Error occurred on db connection close: %s", err.Error()))
+		return fmt.Errorf("error occurred on db connection close: %s", err.Error())
 	}
 
 	return nil
