@@ -3,7 +3,9 @@ package service
 import (
 	"crypto/rand"
 	"crypto/sha256"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/RX90/Todo-App/server/internal/repository"
@@ -15,7 +17,7 @@ const (
 	salt       = "f3by1efb08y1f0b8"
 	signingKey = "vr3urn93u1dnwi00"
 	accessTTL  = 30 * time.Second // временно
-	RefreshTTL = 1 * time.Minute // временно
+	RefreshTTL = 1 * time.Minute  // временно
 )
 
 type AuthService struct {
@@ -74,11 +76,13 @@ func (s *AuthService) CreateUser(user user.User) error {
 		return err
 	}
 
+	user.Username = strings.ToLower(user.Username)
 	user.Password = generatePasswordHash(user.Password)
 	return s.repos.CreateUser(user)
 }
 
 func (s *AuthService) GetUserId(username, password string) (string, error) {
+	username = strings.ToLower(username)
 	password = generatePasswordHash(password)
 	return s.repos.GetUserId(username, password)
 }
@@ -115,4 +119,40 @@ func (s *AuthService) NewRefreshToken(userId string) (string, error) {
 	}
 
 	return token, nil
+}
+
+func (s *AuthService) ParseAccessToken(accessToken string) (string, error) {
+	token, err := jwt.ParseWithClaims(
+		accessToken,
+		&TokenClaims{},
+		func(t *jwt.Token) (interface{}, error) {
+			if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, errors.New("invalid signing method")
+			}
+			return []byte(signingKey), nil
+		})
+	if err != nil {
+		if ve, ok := err.(*jwt.ValidationError); ok {
+			if ve.Errors&jwt.ValidationErrorExpired != 0 {
+				if claims, ok := token.Claims.(*TokenClaims); ok {
+					return claims.UserId, errors.New("token has expired")
+				}
+			}
+		}
+		return "", err
+	}
+
+	claims, ok := token.Claims.(*TokenClaims)
+	if !ok {
+		return "", errors.New("token claims are not of type *TokenClaims")
+	}
+	if !token.Valid {
+		return "", errors.New("token is invalid")
+	}
+
+	return claims.UserId, nil
+}
+
+func (s *AuthService) CheckRefreshToken(userId, refreshToken string) error {
+	return s.repos.CheckRefreshToken(userId, refreshToken)
 }

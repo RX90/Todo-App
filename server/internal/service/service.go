@@ -10,6 +10,8 @@ type Authorization interface {
 	GetUserId(username, password string) (string, error)
 	NewAccessToken(userId string) (string, error)
 	NewRefreshToken(userId string) (string, error)
+	ParseAccessToken(token string) (string, error)
+	CheckRefreshToken(userId, refreshToken string) error
 }
 
 type Service struct {

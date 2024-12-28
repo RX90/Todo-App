@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"time"
 
@@ -48,7 +50,7 @@ func (r *AuthDB) CreateUser(user user.User) error {
 
 func (r *AuthDB) GetUserId(username, password string) (string, error) {
 	var id string
-	query := fmt.Sprintf("SELECT id FROM %s WHERE username=$1 AND password_hash=$2", usersTable)
+	query := fmt.Sprintf("SELECT id FROM %s WHERE username = $1 AND password_hash = $2", usersTable)
 
 	err := r.db.Get(&id, query, username, password)
 
@@ -61,22 +63,69 @@ func (r *AuthDB) NewRefreshToken(token, userId string, expiresAt time.Time) erro
 		return err
 	}
 
-	query := fmt.Sprintf("INSERT INTO %s (refresh_token, expires_in) values ($1, $2) RETURNING id", tokensTable)
-	row := tx.QueryRow(query, token, expiresAt)
-
-	var tokenId string
-
-	if err := row.Scan(&tokenId); err != nil {
+	var existingTokenId string
+	query := fmt.Sprintf("SELECT ut.token_id FROM %s ut INNER JOIN %s t ON ut.token_id = t.id WHERE ut.user_id = $1", usersTokensTable, usersTable)
+	err = tx.QueryRow(query, userId).Scan(&existingTokenId)
+	if err != nil && err != sql.ErrNoRows {
 		tx.Rollback()
 		return err
 	}
 
-	query = fmt.Sprintf("INSERT INTO %s (user_id, token_id) values ($1, $2)", usersTokensTable)
-	_, err = tx.Exec(query, userId, tokenId)
-	if err != nil {
-		tx.Rollback()
-		return err
+	if err == sql.ErrNoRows {
+		// Insert Refresh Token
+		query = fmt.Sprintf("INSERT INTO %s (refresh_token, expires_at) values ($1, $2) RETURNING id", tokensTable)
+		row := tx.QueryRow(query, token, expiresAt)
+
+		var tokenId string
+
+		if err := row.Scan(&tokenId); err != nil {
+			tx.Rollback()
+			return err
+		}
+
+		query = fmt.Sprintf("INSERT INTO %s (user_id, token_id) values ($1, $2)", usersTokensTable)
+		_, err = tx.Exec(query, userId, tokenId)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
+	} else {
+		// Update Refresh Token
+		query = fmt.Sprintf("UPDATE %s SET refresh_token = $1, expires_at = $2 WHERE id = $3", tokensTable)
+		_, err = tx.Exec(query, token, expiresAt, existingTokenId)
+		if err != nil {
+			tx.Rollback()
+			return err
+		}
 	}
 
 	return tx.Commit()
+}
+
+func (r *AuthDB) CheckRefreshToken(userId, refreshToken string) error {
+	var tokenId string
+	query := fmt.Sprintf("SELECT ut.token_id FROM %s ut WHERE ut.user_id = $1", usersTokensTable)
+	err := r.db.QueryRow(query, userId).Scan(&tokenId)
+	if err != nil {
+		return err
+	}
+
+	var storedToken string
+	var expiresAt time.Time
+
+	query = fmt.Sprintf("SELECT t.refresh_token, t.expires_at FROM %s t WHERE t.id = $1", tokensTable)
+	err = r.db.QueryRow(query, tokenId).Scan(&storedToken, &expiresAt)
+	if err != nil {
+		return err
+	}
+
+	if storedToken != refreshToken {
+		return errors.New("invalid refresh token")
+	}
+
+	if time.Now().After(expiresAt) {
+		return errors.New("refresh token has expired")
+	}
+
+	return nil
 }
