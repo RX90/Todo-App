@@ -38,7 +38,7 @@ CREATE TABLE tokens
 (
     id            serial      not null unique,
     refresh_token varchar(64) not null,
-    expires_in    timestamptz not null
+    expires_at    timestamptz not null
 );
 
 CREATE TABLE users_tokens 
