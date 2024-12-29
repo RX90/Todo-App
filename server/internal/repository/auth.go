@@ -38,9 +38,9 @@ func (r *AuthDB) CreateUser(user user.User) error {
 		return fmt.Errorf("username '%s' is already taken", user.Username)
 	}
 
-	query := fmt.Sprintf("INSERT INTO %s (name, username, password_hash) values ($1, $2, $3)", usersTable)
+	query := fmt.Sprintf("INSERT INTO %s (username, password_hash) values ($1, $2)", usersTable)
 
-	_, err = r.db.Exec(query, user.Name, user.Username, user.Password)
+	_, err = r.db.Exec(query, user.Username, user.Password)
 	if err != nil {
 		return err
 	}
@@ -48,11 +48,11 @@ func (r *AuthDB) CreateUser(user user.User) error {
 	return nil
 }
 
-func (r *AuthDB) GetUserId(username, password string) (string, error) {
+func (r *AuthDB) GetUserId(user user.User) (string, error) {
 	var id string
 	query := fmt.Sprintf("SELECT id FROM %s WHERE username = $1 AND password_hash = $2", usersTable)
 
-	err := r.db.Get(&id, query, username, password)
+	err := r.db.Get(&id, query, user.Username, user.Password)
 
 	return id, err
 }

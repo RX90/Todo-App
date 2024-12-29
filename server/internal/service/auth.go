@@ -16,8 +16,8 @@ import (
 const (
 	salt       = "f3by1efb08y1f0b8"
 	signingKey = "vr3urn93u1dnwi00"
-	accessTTL  = 30 * time.Second // временно
-	RefreshTTL = 1 * time.Minute  // временно
+	accessTTL  = 30 * time.Minute    // 30 Minutes
+	RefreshTTL = 30 * 24 * time.Hour // 30 Days
 )
 
 type AuthService struct {
@@ -81,10 +81,10 @@ func (s *AuthService) CreateUser(user user.User) error {
 	return s.repos.CreateUser(user)
 }
 
-func (s *AuthService) GetUserId(username, password string) (string, error) {
-	username = strings.ToLower(username)
-	password = generatePasswordHash(password)
-	return s.repos.GetUserId(username, password)
+func (s *AuthService) GetUserId(user user.User) (string, error) {
+	user.Username = strings.ToLower(user.Username)
+	user.Password = generatePasswordHash(user.Password)
+	return s.repos.GetUserId(user)
 }
 
 func (s *AuthService) NewAccessToken(userId string) (string, error) {

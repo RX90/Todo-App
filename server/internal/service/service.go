@@ -7,7 +7,7 @@ import (
 
 type Authorization interface {
 	CreateUser(user user.User) error
-	GetUserId(username, password string) (string, error)
+	GetUserId(user user.User) (string, error)
 	NewAccessToken(userId string) (string, error)
 	NewRefreshToken(userId string) (string, error)
 	ParseAccessToken(token string) (string, error)

@@ -19,7 +19,7 @@ const (
 
 type Authorization interface {
 	CreateUser(user user.User) error
-	GetUserId(username, password string) (string, error)
+	GetUserId(user user.User) (string, error)
 	NewRefreshToken(token, userId string, expiresAt time.Time) error
 	CheckRefreshToken(userId, refreshToken string) error
 }
