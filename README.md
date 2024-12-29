@@ -1,17 +1,20 @@
 <h1 align="center">Todo App</h1>
 
-<h1>Requirements:</h1>
+# Requirements:
 
-### • <a href="https://www.docker.com/products/docker-desktop/" target="_blank">Docker</a>
-### • <a href="https://github.com/golang-migrate/migrate/tree/master/cmd/migrate#installation" target="_blank">golang-migrate</a>
-### • <a href="https://www.gnu.org/software/make/#download" target="_blank">make</a>
+### • [Docker](https://www.docker.com/products/docker-desktop/)
 
-<h1>Launching:</h1>
+### • [golang-migrate](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate#installation)
+
+### • [make](https://www.gnu.org/software/make/#download)
+
+# Launching:
 
 ### First launch:
 
 ```
-$ make build && make run
+$ make build
+$ make run
 ```
 
 ### Re-launch:
