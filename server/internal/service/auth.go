@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/RX90/Todo-App/server/internal/repository"
-	"github.com/RX90/Todo-App/server/internal/user"
+	"github.com/RX90/Todo-App/server/internal/todo"
 	"github.com/dgrijalva/jwt-go"
 )
 
@@ -71,7 +71,7 @@ func isPasswordOK(password string) error {
 	return nil
 }
 
-func (s *AuthService) CreateUser(user user.User) error {
+func (s *AuthService) CreateUser(user todo.User) error {
 	if err := isPasswordOK(user.Password); err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func (s *AuthService) CreateUser(user user.User) error {
 	return s.repos.CreateUser(user)
 }
 
-func (s *AuthService) GetUserId(user user.User) (string, error) {
+func (s *AuthService) GetUserId(user todo.User) (string, error) {
 	user.Username = strings.ToLower(user.Username)
 	user.Password = generatePasswordHash(user.Password)
 	return s.repos.GetUserId(user)

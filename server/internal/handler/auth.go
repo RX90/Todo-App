@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/RX90/Todo-App/server/internal/service"
-	"github.com/RX90/Todo-App/server/internal/user"
+	"github.com/RX90/Todo-App/server/internal/todo"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,7 +19,7 @@ type Response struct {
 }
 
 func (h *Handler) signUp(c *gin.Context) {
-	var input user.User
+	var input todo.User
 
 	if err := c.BindJSON(&input); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
@@ -35,7 +35,7 @@ func (h *Handler) signUp(c *gin.Context) {
 }
 
 func (h *Handler) signIn(c *gin.Context) {
-	var input user.User
+	var input todo.User
 
 	if err := c.BindJSON(&input); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/RX90/Todo-App/server/internal/user"
+	"github.com/RX90/Todo-App/server/internal/todo"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -29,7 +29,7 @@ func (r *AuthDB) isUsernameTaken(username string) (bool, error) {
 	return exists, nil
 }
 
-func (r *AuthDB) CreateUser(user user.User) error {
+func (r *AuthDB) CreateUser(user todo.User) error {
 	isTaken, err := r.isUsernameTaken(user.Username)
 	if err != nil {
 		return err
@@ -48,7 +48,7 @@ func (r *AuthDB) CreateUser(user user.User) error {
 	return nil
 }
 
-func (r *AuthDB) GetUserId(user user.User) (string, error) {
+func (r *AuthDB) GetUserId(user todo.User) (string, error) {
 	var id string
 	query := fmt.Sprintf("SELECT id FROM %s WHERE username = $1 AND password_hash = $2", usersTable)
 
