@@ -20,13 +20,9 @@ func newAuthDB(db *sqlx.DB) *AuthDB {
 
 func (r *AuthDB) isUsernameTaken(username string) (bool, error) {
 	var exists bool
-	query := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s WHERE username = $1)", usersTable)
-
-	if err := r.db.QueryRow(query, username).Scan(&exists); err != nil {
-		return false, err
-	}
-
-	return exists, nil
+	query := fmt.Sprintf("SELECT EXISTS(SELECT 1 FROM %s WHERE LOWER(username) = LOWER($1))", usersTable)
+	err := r.db.QueryRow(query, username).Scan(&exists)
+	return exists, err
 }
 
 func (r *AuthDB) CreateUser(user todo.User) error {
@@ -53,6 +49,10 @@ func (r *AuthDB) GetUserId(user todo.User) (string, error) {
 	query := fmt.Sprintf("SELECT id FROM %s WHERE username = $1 AND password_hash = $2", usersTable)
 
 	err := r.db.Get(&id, query, user.Username, user.Password)
+
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", errors.New("user not found")
+	}
 
 	return id, err
 }

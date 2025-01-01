@@ -19,7 +19,7 @@ func (h *Handler) userIdentity(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"err": "access token is empty"})
 		return
 	}
-	
+
 	headerParts := strings.Split(header, " ")
 	if len(headerParts) != 2 || headerParts[0] != "Bearer" {
 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"err": "access token is invalid"})
@@ -36,7 +36,7 @@ func (h *Handler) userIdentity(c *gin.Context) {
 	c.Next()
 }
 
-func getUserId(c *gin.Context) (string, error) {
+func getUserCtx(c *gin.Context) (string, error) {
 	idAny, ok := c.Get(userCtx)
 	if !ok {
 		return "", errors.New("user id not found")

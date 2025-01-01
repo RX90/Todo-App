@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/RX90/Todo-App/server/internal/repository"
@@ -75,14 +74,11 @@ func (s *AuthService) CreateUser(user todo.User) error {
 	if err := isPasswordOK(user.Password); err != nil {
 		return err
 	}
-
-	user.Username = strings.ToLower(user.Username)
 	user.Password = generatePasswordHash(user.Password)
 	return s.repos.CreateUser(user)
 }
 
 func (s *AuthService) GetUserId(user todo.User) (string, error) {
-	user.Username = strings.ToLower(user.Username)
 	user.Password = generatePasswordHash(user.Password)
 	return s.repos.GetUserId(user)
 }
