@@ -25,8 +25,10 @@ type Authorization interface {
 }
 
 type TodoList interface {
-	Create(userId string, list todo.List) error
+	Create(userId string, list todo.List) (string, error)
 	GetAll(userId string) ([]todo.List, error)
+	Update(userId, listId string, list todo.List) error
+	Delete(userId, listId string) error
 }
 
 type Repository struct {

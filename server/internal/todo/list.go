@@ -1,7 +1,7 @@
 package todo
 
 type List struct {
-	Id    int    `json:"-" db:"id"`
+	Id    int    `json:"id" db:"id"`
 	Title string `json:"title" db:"title" binding:"required"`
 }
 
