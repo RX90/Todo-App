@@ -128,11 +128,26 @@ func (r *AuthDB) CheckRefreshToken(userId, refreshToken string) error {
 	}
 
 	if storedToken != refreshToken {
-		return errors.New("invalid refresh token")
+		return errors.New("tokens are different")
 	}
 
 	if time.Now().After(expiresAt) {
-		return errors.New("refresh token has expired")
+		return errors.New("token has expired")
+	}
+
+	return nil
+}
+
+func (r *AuthDB) DeleteRefreshToken(userId, refreshToken string) error {
+	query := fmt.Sprintf(`
+		DELETE FROM %s t
+		USING %s ut
+		WHERE t.id = ut.token_id AND ut.user_id = $1 AND t.refresh_token = $2`,
+		tokensTable, usersTokensTable,
+	)
+	_, err := r.db.Exec(query, userId, refreshToken)
+	if err != nil {
+		return err
 	}
 
 	return nil

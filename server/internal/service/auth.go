@@ -152,3 +152,7 @@ func (s *AuthService) ParseAccessToken(accessToken string) (string, error) {
 func (s *AuthService) CheckRefreshToken(userId, refreshToken string) error {
 	return s.repos.CheckRefreshToken(userId, refreshToken)
 }
+
+func (s *AuthService) DeleteRefreshToken(userId, refreshToken string) error {
+	return s.repos.DeleteRefreshToken(userId, refreshToken)
+}

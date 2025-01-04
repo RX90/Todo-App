@@ -71,7 +71,8 @@ func (r *TaskDB) GetAll(userId, listId string) ([]todo.Task, error) {
 		FROM %s t
 		INNER JOIN %s lt ON lt.task_id = t.id
 		INNER JOIN %s ul ON ul.list_id = lt.list_id
-		WHERE lt.list_id = $1 AND ul.user_id = $2`,
+		WHERE lt.list_id = $1 AND ul.user_id = $2
+		ORDER BY t.id`,
 		tasksTable, listsTasksTable, usersListsTable,
 	)
 	err := r.db.Select(&tasks, query, listId, userId)

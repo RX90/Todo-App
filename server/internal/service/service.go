@@ -12,6 +12,7 @@ type Authorization interface {
 	NewRefreshToken(userId string) (string, error)
 	ParseAccessToken(token string) (string, error)
 	CheckRefreshToken(userId, refreshToken string) error
+	DeleteRefreshToken(userId, refreshToken string) error
 }
 
 type TodoList interface {

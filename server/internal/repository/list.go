@@ -70,7 +70,8 @@ func (r *ListDB) GetAll(userId string) ([]todo.List, error) {
 		SELECT l.id, l.title
 		FROM %s l
 		INNER JOIN %s ul ON l.id = ul.list_id
-		WHERE ul.user_id = $1`,
+		WHERE ul.user_id = $1
+		ORDER BY l.id`,
 		listsTable, usersListsTable,
 	)
 	err := r.db.Select(&lists, query, userId)
@@ -115,13 +116,39 @@ func (r *ListDB) Update(userId, listId string, list todo.List) error {
 }
 
 func (r *ListDB) Delete(userId, listId string) error {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return err
+	}
+
+	// Deleting all tasks from list
 	query := fmt.Sprintf(`
+		DELETE FROM %s t
+		USING %s lt
+		INNER JOIN %s ul ON lt.list_id = ul.list_id
+		WHERE t.id = lt.task_id AND ul.user_id = $1 AND lt.list_id = $2`,
+		tasksTable, listsTasksTable, usersListsTable,
+	)
+
+	_, err = r.db.Exec(query, userId, listId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	// Deleting list
+	query = fmt.Sprintf(`
 		DELETE FROM %s l
 		USING %s ul
 		WHERE l.id = ul.list_id AND ul.user_id = $1 AND ul.list_id = $2`,
 		listsTable, usersListsTable,
 	)
-	_, err := r.db.Exec(query, userId, listId)
 
-	return err
+	_, err = r.db.Exec(query, userId, listId)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }
