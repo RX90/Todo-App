@@ -11,8 +11,8 @@ const (
 	usersTable       = "users"
 	listsTable       = "lists"
 	usersListsTable  = "users_lists"
-	itemsTable       = "items"
-	listsItemsTable  = "lists_items"
+	tasksTable       = "tasks"
+	listsTasksTable  = "lists_tasks"
 	tokensTable      = "tokens"
 	usersTokensTable = "users_tokens"
 )
@@ -27,18 +27,28 @@ type Authorization interface {
 type TodoList interface {
 	Create(userId string, list todo.List) (string, error)
 	GetAll(userId string) ([]todo.List, error)
+	GetById(userId, listId string) (todo.List, error)
 	Update(userId, listId string, list todo.List) error
+	Delete(userId, listId string) error
+}
+
+type TodoTask interface {
+	Create(listId string, task todo.Task) (string, error)
+	GetAll(userId, listId string) ([]todo.Task, error)
+	Update(userId, taskId string, task todo.Task) error
 	Delete(userId, listId string) error
 }
 
 type Repository struct {
 	Authorization
 	TodoList
+	TodoTask
 }
 
 func NewRepository(db *sqlx.DB) *Repository {
 	return &Repository{
 		Authorization: newAuthDB(db),
 		TodoList:      newListDB(db),
+		TodoTask:      newTaskDB(db),
 	}
 }

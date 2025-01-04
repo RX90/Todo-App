@@ -1,4 +1,4 @@
-DROP TABLE lists_items;
+DROP TABLE lists_tasks;
 
 DROP TABLE users_lists;
 
@@ -8,6 +8,6 @@ DROP TABLE lists;
 
 DROP TABLE users;
 
-DROP TABLE items;
+DROP TABLE tasks;
 
 DROP TABLE tokens;

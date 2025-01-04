@@ -18,7 +18,7 @@ CREATE TABLE users_lists
     list_id int references lists (id) on delete cascade not null
 );
 
-CREATE TABLE items
+CREATE TABLE tasks
 (
     id          serial       not null unique,
     title       varchar(255) not null,
@@ -26,10 +26,10 @@ CREATE TABLE items
 );
 
 
-CREATE TABLE lists_items
+CREATE TABLE lists_tasks
 (
     id      serial                                      not null unique,
-    item_id int references items (id) on delete cascade not null,
+    task_id int references tasks (id) on delete cascade not null,
     list_id int references lists (id) on delete cascade not null
 );
 
