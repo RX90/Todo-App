@@ -23,6 +23,11 @@ func (h *Handler) createList(c *gin.Context) {
 		return
 	}
 
+	if err := inputValidate(input.Title); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
+	}
+
 	listId, err := h.services.TodoList.Create(userId, input)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't create list: %s", err.Error())})
@@ -66,6 +71,11 @@ func (h *Handler) updateList(c *gin.Context) {
 
 	if err := c.BindJSON(&input); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't bind JSON: %s", err.Error())})
+		return
+	}
+
+	if err := inputValidate(input.Title); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
 

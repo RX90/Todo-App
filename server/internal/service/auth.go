@@ -41,30 +41,7 @@ func generatePasswordHash(password string) string {
 
 func isPasswordOK(password string) error {
 	if len(password) < 8 || len(password) > 32 {
-		return fmt.Errorf("invalid length of password")
-	}
-	var (
-		hasDigit, hasLowerCase, hasUpperCase bool
-	)
-
-	for _, char := range password {
-		if 'a' <= char && char <= 'z' {
-			hasLowerCase = true
-		} else if 'A' <= char && char <= 'Z' {
-			hasUpperCase = true
-		} else if '0' <= char && char <= '9' {
-			hasDigit = true
-		} else {
-			return fmt.Errorf("invalid character used in password: '%s'", string(char))
-		}
-	}
-
-	if !hasDigit {
-		return fmt.Errorf("no digits in password")
-	} else if !hasLowerCase {
-		return fmt.Errorf("no lowercase letters in password")
-	} else if !hasUpperCase {
-		return fmt.Errorf("no uppercase letters in password")
+		return errors.New("invalid length of password")
 	}
 
 	return nil

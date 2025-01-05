@@ -27,6 +27,11 @@ func (h *Handler) signUp(c *gin.Context) {
 		return
 	}
 
+	if err := inputValidate(input.Username, input.Password); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
+	}
+
 	if err := h.services.Authorization.CreateUser(input); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't create user: %s", err.Error())})
 		return
@@ -40,6 +45,11 @@ func (h *Handler) signIn(c *gin.Context) {
 
 	if err := c.BindJSON(&input); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't bind JSON: %s", err.Error())})
+		return
+	}
+
+	if err := inputValidate(input.Username, input.Password); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
 		return
 	}
 
