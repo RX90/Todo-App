@@ -2,8 +2,8 @@ let userid = document.getElementById("userid");
 let username = document.getElementById("window-input-username");
 let password = document.getElementById("window-input-password");
 let isDone = false;
-// const accessToken = "";
-// localStorage.setItem("accessToken", accessToken);
+const accessToken = "";
+localStorage.setItem("accessToken", accessToken);
 const apiURL = "http://localhost:8000/api/auth/sign-up";
 
 const User = {
