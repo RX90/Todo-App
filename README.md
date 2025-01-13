@@ -22,3 +22,4 @@ $ make run
 ```
 $ make run
 ```
+Made by [RX90](https://github.com/RX90) and [Mafiozich](https://github.com/Mafiozich)
