@@ -16,7 +16,7 @@ func (h *Handler) createTask(c *gin.Context) {
 		return
 	}
 
-	listId := c.Param("id")
+	listId := c.Param("listId")
 	_, err = strconv.Atoi(listId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get list id: %s", err.Error())})
@@ -51,7 +51,7 @@ func (h *Handler) getAllTasks(c *gin.Context) {
 		return
 	}
 
-	listId := c.Param("id")
+	listId := c.Param("listId")
 	_, err = strconv.Atoi(listId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get list id: %s", err.Error())})
@@ -74,26 +74,35 @@ func (h *Handler) updateTask(c *gin.Context) {
 		return
 	}
 
-	taskId := c.Param("id")
+	listId := c.Param("listId")
+	_, err = strconv.Atoi(listId)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get list id: %s", err.Error())})
+		return
+	}
+
+	taskId := c.Param("taskId")
 	_, err = strconv.Atoi(taskId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get task id: %s", err.Error())})
 		return
 	}
 
-	var input todo.Task
+	var input todo.UpdateTaskInput
 
 	if err := c.BindJSON(&input); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't bind JSON: %s", err.Error())})
 		return
 	}
 
-	if err := inputValidate(input.Title); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
-		return
+	if input.Title != nil {
+		if err := inputValidate(*input.Title); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+			return
+		}
 	}
 
-	if err := h.services.TodoTask.Update(userId, taskId, input); err != nil {
+	if err := h.services.TodoTask.Update(userId, listId, taskId, input); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't update task: %s", err.Error())})
 		return
 	}
@@ -108,14 +117,21 @@ func (h *Handler) deleteTask(c *gin.Context) {
 		return
 	}
 
-	taskId := c.Param("id")
+	listId := c.Param("listId")
+	_, err = strconv.Atoi(listId)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get list id: %s", err.Error())})
+		return
+	}
+
+	taskId := c.Param("taskId")
 	_, err = strconv.Atoi(taskId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get task id: %s", err.Error())})
 		return
 	}
 
-	err = h.services.TodoTask.Delete(userId, taskId)
+	err = h.services.TodoTask.Delete(userId, listId, taskId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't delete task: %s", err.Error())})
 		return

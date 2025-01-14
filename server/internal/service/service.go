@@ -25,8 +25,8 @@ type TodoList interface {
 type TodoTask interface {
 	Create(userId, listId string, task todo.Task) (string, error)
 	GetAll(userId, listId string) ([]todo.Task, error)
-	Update(userId, taskId string, task todo.Task) error
-	Delete(userId, listId string) error
+	Update(userId, listId, taskId string, task todo.UpdateTaskInput) error
+	Delete(userId, listId, taskId string) error
 }
 
 type Service struct {

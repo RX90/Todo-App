@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/RX90/Todo-App/server/internal/todo"
 	"github.com/jmoiron/sqlx"
@@ -80,37 +81,57 @@ func (r *TaskDB) GetAll(userId, listId string) ([]todo.Task, error) {
 	return tasks, err
 }
 
-func (r *TaskDB) Update(userId, taskId string, task todo.Task) error {
-	exists, err := r.isTitleExistsInTasks(userId, task.Title)
-	if err != nil {
-		return err
+func (r *TaskDB) Update(userId, listId, taskId string, task todo.UpdateTaskInput) error {
+	setValues := make([]string, 0, 2)
+	args := make([]any, 0, 2)
+	argId := 1
+
+	if task.Title != nil {
+		exists, err := r.isTitleExistsInTasks(userId, *task.Title)
+		if err != nil {
+			return err
+		}
+		if exists {
+			return fmt.Errorf("task '%s' is already exists", *task.Title)
+		}
+
+		setValues = append(setValues, fmt.Sprintf("title = $%d", argId))
+		args = append(args, *task.Title)
+		argId++
 	}
-	if exists {
-		return fmt.Errorf("task '%s' is already exists", task.Title)
+
+	if task.Done != nil {
+		setValues = append(setValues, fmt.Sprintf("done = $%d", argId))
+		args = append(args, *task.Done)
+		argId++
 	}
+
+	setQuery := strings.Join(setValues, ", ")
 
 	query := fmt.Sprintf(`
 		UPDATE %s t
-		SET title = $1, done = $2
+		SET %s
 		FROM %s lt
 		INNER JOIN %s ul ON lt.list_id = ul.list_id
-		WHERE t.id = lt.task_id AND ul.user_id = $3 AND t.id = $4`,
-		tasksTable, listsTasksTable, usersListsTable,
+		WHERE t.id = lt.task_id AND ul.user_id = $%d AND lt.list_id = $%d AND t.id = $%d`,
+		tasksTable, setQuery, listsTasksTable, usersListsTable, argId, argId+1, argId+2,
 	)
-	_, err = r.db.Exec(query, task.Title, task.Done, userId, taskId)
+	args = append(args, userId, listId, taskId)
+
+	_, err := r.db.Exec(query, args...)
 
 	return err
 }
 
-func (r TaskDB) Delete(userId, taskId string) error {
+func (r TaskDB) Delete(userId, listId, taskId string) error {
 	query := fmt.Sprintf(`
 		DELETE FROM %s t
 		USING %s lt
 		INNER JOIN %s ul ON lt.list_id = ul.list_id
-		WHERE t.id = lt.task_id AND ul.user_id = $1 AND t.id = $2`,
+		WHERE t.id = lt.task_id AND ul.user_id = $1 AND lt.list_id = $2 AND t.id = $3`,
 		tasksTable, listsTasksTable, usersListsTable,
 	)
-	_, err := r.db.Exec(query, userId, taskId)
-	
+	_, err := r.db.Exec(query, userId, listId, taskId)
+
 	return err
 }

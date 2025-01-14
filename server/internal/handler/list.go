@@ -60,7 +60,7 @@ func (h *Handler) updateList(c *gin.Context) {
 		return
 	}
 
-	listId := c.Param("id")
+	listId := c.Param("listId")
 	_, err = strconv.Atoi(listId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get list id: %s", err.Error())})
@@ -94,7 +94,7 @@ func (h *Handler) deleteList(c *gin.Context) {
 		return
 	}
 
-	listId := c.Param("id")
+	listId := c.Param("listId")
 	_, err = strconv.Atoi(listId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get list id: %s", err.Error())})
