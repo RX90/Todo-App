@@ -5,6 +5,9 @@ let title = document.getElementById("title");
 let listIdCounter = 0;
 let popupWindow = document.getElementById("background");
 let popupButton = document.getElementById("window-button");
+let createAccount = document.getElementById("create-account");
+let pupopTitle = document.getElementById("pupop-title");
+let infoText = document.getElementById("info-text");
 
 //Проверка существует ли у пользователя токен, если нет, мы отправляем его регаться или логиниться
 if (
@@ -27,8 +30,16 @@ function hiddenPopup() {
 }
 
 popupButton.addEventListener("click", function () {
-  hiddenPopup();
+  signUp(username.value, password.value);
   console.log("Имя: ", username.value, "Пароль:", password.value);
+  hiddenPopup();
+});
+
+createAccount.addEventListener("click", function () {
+  pupopTitle.textContent = "Sign-Up";
+  infoText.textContent = "Please fill in the fields to create an account";
+  popupButton.textContent = "Sign Up!";
+  createAccount.style.display = "none";
 });
 
 function renderSingleList(list) {
@@ -155,6 +166,7 @@ taskInput.addEventListener("keydown", async function (event) {
 
       if (newTask) {
         createTask();
+        sendTask();
       }
     } catch (error) {
       console.error("Ошибка при создании задачи:", error);
@@ -167,4 +179,10 @@ taskInput.addEventListener("keydown", async function (event) {
 document.addEventListener("DOMContentLoaded", async () => {
   const lists = await getAllList();
   if (lists) renderLists(lists);
+});
+
+//Рендер задач
+document.addEventListener("DOMContentLoaded", async () => {
+  const task = await getAllTask();
+  if (task) renderTasks(task);
 });
