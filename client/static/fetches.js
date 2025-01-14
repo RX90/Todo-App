@@ -154,7 +154,7 @@ async function getAllList() {
 async function sendTask() {
   const Task = {
     Id: "",
-    Title: taskInput.textContent,
+    Title: taskInput.value,
     Done: isDone,
   };
   try {

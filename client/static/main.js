@@ -73,7 +73,7 @@ function renderSingleTask(task) {
   circleIcon.classList.add("circle-icon");
 
   const titleTask = document.createElement("span");
-  titleTask.textContent = taskTitle;
+  titleTask.textContent = task.Title;
   titleTask.classList.add("title-task");
 
   if (task.done) {
@@ -159,7 +159,7 @@ function createTask() {
 
 taskInput.addEventListener("keydown", async function (event) {
   if (event.key === "Enter" && taskInput.value.trim() !== "") {
-    const taskTitle = createTask.value.trim();
+    const taskTitle = taskInput.value.trim();
 
     try {
       const newTask = await sendTask();
