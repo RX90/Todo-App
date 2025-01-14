@@ -126,7 +126,7 @@ async function sendList() {
   }
 }
 
-async function getAllList() {
+async function getAllLists() {
   try {
     const response = await fetch("/api/lists/", {
       method: "GET",
@@ -179,7 +179,7 @@ async function sendTask() {
   }
 }
 
-async function getAllTask() {
+async function getAllTasks() {
   try {
     const response = await fetch("/api/lists/tasks", {
       method: "GET",
