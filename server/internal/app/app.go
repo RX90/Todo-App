@@ -8,10 +8,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	"github.com/RX90/Todo-App/server"
 	"github.com/RX90/Todo-App/server/internal/db"
 	"github.com/RX90/Todo-App/server/internal/handler"
 	"github.com/RX90/Todo-App/server/internal/repository"
-	"github.com/RX90/Todo-App/server/internal/server"
 	"github.com/RX90/Todo-App/server/internal/service"
 	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
