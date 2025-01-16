@@ -95,14 +95,15 @@ body {
 
 .add-list {
   color: white;
+  font-size: 15px;
 }
 
 .menu-item:first-child {
-  margin-top: 20px; /* Большой отступ сверху для первого элемента */
+  margin-top: 20px;
 }
 
 .menu-item:not(:first-child) {
-  margin-top: 1%; /* Отступ для всех остальных элементов */
+  margin-top: 2%;
 }
 
 .icon-list {

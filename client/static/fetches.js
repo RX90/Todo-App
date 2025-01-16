@@ -15,30 +15,6 @@ let isDone = false;
 //   TaskID: "",
 // };
 
-async function fetchAccessToken() {
-  try {
-    const response = await fetch(apiURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(User),
-    });
-
-    if (!response.ok) {
-      throw new Error(`Ошибка: ${response.statusText}`);
-    }
-
-    const data = await response.json();
-    const accessToken = data.token;
-    localStorage.setItem("accessToken", accessToken);
-
-    console.log("Access token сохранен:", accessToken);
-  } catch (error) {
-    console.error("Ошибка получения токена:", error);
-  }
-}
-
 async function signUp(username, password) {
   const url = "/api/auth/sign-up";
   const userData = {
@@ -89,40 +65,39 @@ async function signIn(username, password) {
     }
 
     const result = await response.json();
+    console.log("User signed in successfully:", result);
     localStorage.setItem("accessToken", result.token);
-    console.log("User signed in successfully:", result.token);
   } catch (error) {
     console.error("Error during sign in:", error.message);
   }
 }
 
-async function sendList() {
-  const ListData = {
-    id: "",
-    Title: createList.value,
+async function sendList(title) {
+  const url = "/api/lists/";
+  const userData = {
+    Title: title,
   };
+
   try {
-    const response = await fetch("/api/lists/", {
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
-      body: JSON.stringify(ListData), //Обьект с данными о листе
+      body: JSON.stringify(userData),
     });
-    if (!response.ok) {
-      const errorResponse = await response.json();
-      throw new Error(errorResponse.message || "Ошибка отправки листов");
-    }
-    const result = await response.json();
-    console.log("Данные о листе отправлены", result);
-    renderSingleList(result);
 
-    alert("Данные о листе отправлены");
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.err || "Unknown error occurred");
+    }
+
+    const result = await response.json();
+    console.log("Send lists successfully:", result.list_id);
     return result;
   } catch (error) {
-    console.error("Ошибка:", error);
-    alert("Не удалось отправить данные листа " + error.message);
+    console.error("Error send lists", error.message);
   }
 }
 
@@ -147,18 +122,17 @@ async function getAllLists() {
     return result;
   } catch (error) {
     console.error("Ошибка:", error);
-    alert("Не удалось получить листы: " + error.message);
   }
 }
 
-async function sendTask() {
+async function sendTask(listId) {
   const Task = {
     Id: "",
     Title: taskInput.value,
     Done: isDone,
   };
   try {
-    const response = await fetch("/api/lists/tasks", {
+    const response = await fetch(`/api/lists/${listid}/tasks`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -30,8 +30,15 @@ function hiddenPopup() {
 }
 
 popupButton.addEventListener("click", function () {
-  signUp(username.value, password.value);
-  console.log("Имя: ", username.value, "Пароль:", password.value);
+  if (popupButton.textContent === "Sign Up!") {
+    console.log("Регистрация пользователя:", username.value);
+    signUp(username.value, password.value); // Вызываем функцию регистрации
+    signIn(username.value, password.value);
+  } else {
+    console.log("Вход пользователя:", username.value);
+    signIn(username.value, password.value); // Вызываем функцию входа
+  }
+
   hiddenPopup();
 });
 
@@ -60,7 +67,8 @@ function renderSingleList(list) {
   menu.appendChild(menuItem);
 
   menuItem.addEventListener("click", () => {
-    openPanel(list.id, list.title);
+    openPanel(list.id, list.Title);
+    console.log(list.id, list.Title);
   });
 }
 
@@ -160,9 +168,9 @@ function createTask() {
 taskInput.addEventListener("keydown", async function (event) {
   if (event.key === "Enter" && taskInput.value.trim() !== "") {
     const taskTitle = taskInput.value.trim();
-
+    const listId = details.getAttribute("data-id");
     try {
-      const newTask = await sendTask();
+      const newTask = await sendTask(listId);
 
       if (newTask) {
         createTask();
@@ -175,14 +183,22 @@ taskInput.addEventListener("keydown", async function (event) {
   }
 });
 
-//Рендер листов
 document.addEventListener("DOMContentLoaded", async () => {
-  const lists = await getAllList();
-  if (lists) renderLists(lists);
-});
+  try {
+    const lists = await getAllLists();
+    if (lists && Array.isArray(lists)) {
+      lists.forEach(renderSingleList);
+    } else {
+      console.error("Не удалось загрузить листы.");
+    }
 
-//Рендер задач
-document.addEventListener("DOMContentLoaded", async () => {
-  const task = await getAllTask();
-  if (task) renderTasks(task);
+    const tasks = await getAllTasks();
+    if (tasks && Array.isArray(tasks)) {
+      tasks.forEach(renderSingleTask);
+    } else {
+      console.error("Не удалось загрузить задачи.");
+    }
+  } catch (error) {
+    console.error("Ошибка при загрузке данных:", error);
+  }
 });
