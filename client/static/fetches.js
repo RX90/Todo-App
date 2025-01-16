@@ -125,22 +125,34 @@ async function getAllLists() {
   }
 }
 
-async function sendTask(listId) {
+async function sendTask(listId, taskTitle) {
   const Task = {
-    Id: "",
-    Title: taskInput.value,
-    Done: isDone,
+    title: taskTitle,
   };
+
+  const token = localStorage.getItem("accessToken");
+  if (!token) {
+    alert("Требуется вход в систему");
+    return;
+  }
+
+  if (!listId) {
+    alert("Не выбран список для создания задачи.");
+    return;
+  }
+
   try {
-    const response = await fetch(`/api/lists/${listid}/tasks`, {
+    const response = await fetch(`/api/lists/${listId}/tasks`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
       body: JSON.stringify(Task), //Обьект с данными о задаче
     });
     if (!response.ok) {
       const errorResponse = await response.json();
+      console.error("Ошибка сервера:", errorResponse);
       throw new Error(errorResponse.message || "Ошибка отправки задачи");
     }
     const result = await response.json();
@@ -153,9 +165,9 @@ async function sendTask(listId) {
   }
 }
 
-async function getAllTasks() {
+async function getAllTasks(listId) {
   try {
-    const response = await fetch("/api/lists/tasks", {
+    const response = await fetch(`/api/lists/${listId}/tasks`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -164,13 +176,14 @@ async function getAllTasks() {
     });
     if (!response.ok) {
       const errorResponse = await response.json();
+      console.error("Ошибка сервера:", errorResponse);
       throw new Error(errorResponse.message || "Ошибка получения данных задач");
     }
     const result = await response.json();
     console.log("Задачи получены:", result);
 
     result.forEach((task) => {
-      renderSingleTask(task); // Рендерим каждую задачу по очереди
+      renderSingleTask(task);
     });
 
     return result;

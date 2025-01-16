@@ -8,6 +8,7 @@ let popupButton = document.getElementById("window-button");
 let createAccount = document.getElementById("create-account");
 let pupopTitle = document.getElementById("pupop-title");
 let infoText = document.getElementById("info-text");
+const panel = document.querySelector(".panel");
 
 //Проверка существует ли у пользователя токен, если нет, мы отправляем его регаться или логиниться
 if (
@@ -67,8 +68,8 @@ function renderSingleList(list) {
   menu.appendChild(menuItem);
 
   menuItem.addEventListener("click", () => {
-    openPanel(list.id, list.Title);
-    console.log(list.id, list.Title);
+    openPanel(list.id, list.title);
+    console.log(list.id, list.title);
   });
 }
 
@@ -81,12 +82,8 @@ function renderSingleTask(task) {
   circleIcon.classList.add("circle-icon");
 
   const titleTask = document.createElement("span");
-  titleTask.textContent = task.Title;
+  titleTask.textContent = task.title;
   titleTask.classList.add("title-task");
-
-  if (task.done) {
-    titleTask.classList.add("task-done");
-  }
 
   menuTask.appendChild(circleIcon);
   menuTask.appendChild(titleTask);
@@ -103,30 +100,8 @@ createList.addEventListener("keydown", async function (event) {
       const newList = await sendList(title);
 
       if (newList) {
-        const menuItem = document.createElement("div");
-        menuItem.classList.add("menu-item");
-        menuItem.setAttribute("data-id", newList.id);
-
-        const imgList = document.createElement("img");
-        imgList.classList.add("icon-list");
-        imgList.setAttribute("src", "/src/img/list.svg");
-
-        const addList = document.createElement("p");
-        addList.classList.add("add-list");
-        addList.textContent = newList.Title;
-
-        menuItem.appendChild(imgList);
-        menuItem.appendChild(addList);
-
-        menu.appendChild(menuItem);
-
-        openPanel(newList.id, newList.Title);
-
-        menuItem.addEventListener("click", function () {
-          const listId = menuItem.getAttribute("data-id");
-          const listName = menuItem.querySelector(".add-list").textContent;
-          openPanel(listId, listName);
-        });
+        renderSingleList(newList);
+        openPanel(newList.id, title);
       }
     } catch (error) {
       console.error("Ошибка при создании листа:", error);
@@ -144,37 +119,23 @@ function openPanel(listId, listName) {
 
 const taskInput = document.getElementById("task-input");
 const taskButton = document.getElementById("task-button");
-const panel = document.querySelector(".panel");
-
-//Создание задач
-function createTask() {
-  const menuTask = document.createElement("div");
-  menuTask.classList.add("menu-task");
-
-  const circleIcon = document.createElement("img");
-  circleIcon.src = "/src/img/circle.svg";
-  circleIcon.classList.add("circle-icon");
-
-  const titleTask = document.createElement("span");
-  titleTask.textContent = taskInput.value;
-  titleTask.classList.add("title-task");
-
-  menuTask.appendChild(circleIcon);
-  menuTask.appendChild(titleTask);
-
-  panel.appendChild(menuTask);
-}
 
 taskInput.addEventListener("keydown", async function (event) {
   if (event.key === "Enter" && taskInput.value.trim() !== "") {
-    const taskTitle = taskInput.value.trim();
+    const taskTitle = taskInput.value.trim(); // Получаем название задачи
     const listId = details.getAttribute("data-id");
     try {
-      const newTask = await sendTask(listId);
+      const newTaskId = await sendTask(listId, taskTitle);
+      console.log("Title:", taskTitle);
 
-      if (newTask) {
-        createTask();
-        sendTask();
+      if (newTaskId) {
+        const newTask = {
+          id: newTaskId,
+          title: taskTitle,
+        };
+
+        renderSingleTask(newTask);
+        taskInput.value = "";
       }
     } catch (error) {
       console.error("Ошибка при создании задачи:", error);
@@ -192,7 +153,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("Не удалось загрузить листы.");
     }
 
-    const tasks = await getAllTasks();
+    const tasks = await getAllTasks(listId);
     if (tasks && Array.isArray(tasks)) {
       tasks.forEach(renderSingleTask);
     } else {
