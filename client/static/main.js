@@ -39,8 +39,11 @@ popupButton.addEventListener("click", function () {
     console.log("Вход пользователя:", username.value);
     signIn(username.value, password.value); // Вызываем функцию входа
   }
-
-  hiddenPopup();
+  if (error || error.status === 401) {
+    popupButton.disabled = true;
+  } else {
+    hiddenPopup();
+  }
 });
 
 createAccount.addEventListener("click", function () {
@@ -122,7 +125,7 @@ const taskButton = document.getElementById("task-button");
 
 taskInput.addEventListener("keydown", async function (event) {
   if (event.key === "Enter" && taskInput.value.trim() !== "") {
-    const taskTitle = taskInput.value.trim(); // Получаем название задачи
+    const taskTitle = taskInput.value.trim();
     const listId = details.getAttribute("data-id");
     try {
       const newTaskId = await sendTask(listId, taskTitle);
