@@ -77,6 +77,7 @@ function renderSingleList(list) {
 }
 
 function renderSingleTask(task) {
+  const taskList = document.querySelector(".task-list");
   const menuTask = document.createElement("div");
   menuTask.classList.add("menu-task");
 
@@ -91,7 +92,7 @@ function renderSingleTask(task) {
   menuTask.appendChild(circleIcon);
   menuTask.appendChild(titleTask);
 
-  panel.appendChild(menuTask);
+  taskList.appendChild(menuTask);
 }
 
 //Создание листов
@@ -118,6 +119,11 @@ function openPanel(listId, listName) {
   details.style.display = "block";
   details.setAttribute("data-id", listId);
   title.textContent = listName;
+
+  const taskList = document.querySelector(".task-list");
+  taskList.innerHTML = ""; // Очищаем только задачи
+
+  getAllTasks(listId);
 }
 
 const taskInput = document.getElementById("task-input");

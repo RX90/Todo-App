@@ -157,7 +157,6 @@ async function sendTask(listId, taskTitle) {
     }
     const result = await response.json();
     console.log("Данные о задаче отправлены", result);
-    alert("Данные о задаче отправлены");
     return result;
   } catch (error) {
     console.error("Ошибка:", error);
