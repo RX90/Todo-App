@@ -67,12 +67,19 @@ async function signIn(username, password) {
     const result = await response.json();
     console.log("User signed in successfully:", result);
     localStorage.setItem("accessToken", result.token);
+    // localStorage.setItem("refreshToken".result.refreshToken)
   } catch (error) {
     console.error("Error during sign in:", error.message);
   }
 }
 
 async function sendList(title) {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    showPopup();
+    return;
+  }
   const url = "/api/lists/";
   const userData = {
     Title: title,
@@ -102,6 +109,12 @@ async function sendList(title) {
 }
 
 async function getAllLists() {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    showPopup();
+    return;
+  }
   try {
     const response = await fetch("/api/lists/", {
       method: "GET",
@@ -130,14 +143,9 @@ async function sendTask(listId, taskTitle) {
     title: taskTitle,
   };
 
-  const token = localStorage.getItem("accessToken");
-  if (!token) {
-    alert("Требуется вход в систему");
-    return;
-  }
-
-  if (!listId) {
-    alert("Не выбран список для создания задачи.");
+  const accessToken = localStorage.getItem("accessToken");
+  if (!accessToken) {
+    showPopup();
     return;
   }
 
@@ -165,6 +173,13 @@ async function sendTask(listId, taskTitle) {
 }
 
 async function getAllTasks(listId) {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    showPopup();
+    return;
+  }
+
   try {
     const response = await fetch(`/api/lists/${listId}/tasks`, {
       method: "GET",
@@ -188,6 +203,6 @@ async function getAllTasks(listId) {
     return result;
   } catch (error) {
     console.error("Ошибка:", error);
-    alert("Не удалось получить задачи: " + error.message);
+    console.log("Не удалось получить задачи: " + error.message);
   }
 }

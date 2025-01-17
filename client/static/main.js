@@ -30,19 +30,21 @@ function hiddenPopup() {
   popupWindow.style.display = "none";
 }
 
-popupButton.addEventListener("click", function () {
-  if (popupButton.textContent === "Sign Up!") {
-    console.log("Регистрация пользователя:", username.value);
-    signUp(username.value, password.value); // Вызываем функцию регистрации
-    signIn(username.value, password.value);
-  } else {
-    console.log("Вход пользователя:", username.value);
-    signIn(username.value, password.value); // Вызываем функцию входа
-  }
-  if (error || error.status === 401) {
-    popupButton.disabled = true;
-  } else {
-    hiddenPopup();
+popupButton.addEventListener("click", async function () {
+  try {
+    if (popupButton.textContent === "Sign Up!") {
+      console.log("Регистрация пользователя:", username.value);
+      await signUp(username.value, password.value); // Регистрация
+      await signIn(username.value, password.value); // Автоматический вход
+    } else {
+      console.log("Вход пользователя:", username.value);
+      await signIn(username.value, password.value); // Вход
+    }
+    hiddenPopup(); // Закрытие окна после успешного входа
+  } catch (error) {
+    console.error("Ошибка:", error.message);
+    alert("Не удалось войти или зарегистрироваться: " + error.message);
+    popupButton.disabled = true; // Отключение кнопки при ошибке
   }
 });
 
