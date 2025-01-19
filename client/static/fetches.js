@@ -1,8 +1,7 @@
 let userid = document.getElementById("userid");
 let username = document.getElementById("window-input-username");
 let password = document.getElementById("window-input-password");
-let isDone = false;
-
+const isDone = false;
 // const UserList = {
 //   Id: "",
 //   UserId: userid,
@@ -141,6 +140,7 @@ async function getAllLists() {
 async function sendTask(listId, taskTitle) {
   const Task = {
     title: taskTitle,
+    done: false,
   };
 
   const accessToken = localStorage.getItem("accessToken");
@@ -204,5 +204,47 @@ async function getAllTasks(listId) {
   } catch (error) {
     console.error("Ошибка:", error);
     console.log("Не удалось получить задачи: " + error.message);
+  }
+}
+
+async function toggleTaskState(taskId, isDone, listId) {
+  const accessToken = localStorage.getItem("accessToken");
+
+  if (!accessToken) {
+    showPopup();
+    return;
+  }
+
+  console.log("taskId:", taskId);
+  console.log("isDone:", isDone);
+  console.log("listId:", listId);
+
+  const updatePayload = {
+    done: isDone,
+    // title: title
+  };
+
+  try {
+    const response = await fetch(`/api/lists/${listId}/tasks/${taskId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      body: JSON.stringify(updatePayload),
+    });
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error("Ошибка сервера:", errorResponse);
+      throw new Error(errorResponse.message || "Ошибка обновления задачи");
+    }
+    6;
+    const updatedTask = await response.json();
+    console.log("Состояние задачи успешно обновлено:", updatedTask);
+    return updatedTask;
+  } catch (error) {
+    console.error("Ошибка:", error);
+    alert("Не удалось обновить состояние задачи: " + error.message);
   }
 }
