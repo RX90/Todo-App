@@ -87,7 +87,7 @@ func (a *App) Run() error {
 }
 
 func initConfig() error {
-	viper.AddConfigPath("configs")
+	viper.AddConfigPath("server/configs")
 	viper.SetConfigName("config")
 	return viper.ReadInConfig()
 }
