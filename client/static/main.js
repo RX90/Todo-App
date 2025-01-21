@@ -34,17 +34,17 @@ popupButton.addEventListener("click", async function () {
   try {
     if (popupButton.textContent === "Sign Up!") {
       console.log("Регистрация пользователя:", username.value);
-      await signUp(username.value, password.value); // Регистрация
-      await signIn(username.value, password.value); // Автоматический вход
+      await signUp(username.value, password.value);
+      await signIn(username.value, password.value);
     } else {
       console.log("Вход пользователя:", username.value);
-      await signIn(username.value, password.value); // Вход
+      await signIn(username.value, password.value);
     }
-    hiddenPopup(); // Закрытие окна после успешного входа
+    hiddenPopup();
   } catch (error) {
     console.error("Ошибка:", error.message);
     alert("Не удалось войти или зарегистрироваться: " + error.message);
-    popupButton.disabled = true; // Отключение кнопки при ошибке
+    popupButton.disabled = true;
   }
 });
 

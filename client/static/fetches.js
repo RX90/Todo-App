@@ -233,8 +233,8 @@ async function getAllTasks(listId) {
     const result = await response.json();
     console.log("Задачи получены:", result);
 
-    result.forEach((task) => {
-      renderSingleTask(task);
+    result.forEach((tasks) => {
+      renderSingleTask(tasks);
     });
 
     return result;
@@ -308,9 +308,12 @@ async function refreshToken() {
       console.error("Ошибка сервера:", errorResponse);
       throw new Error(errorResponse.message || "Ошибка отправки accessToken");
     }
-    const accessToken = await response.json();
+    const { accessToken } = await response.json();
     console.log("accessToken обновлен");
     localStorage.setItem("accessToken", accessToken);
     return accessToken;
-  } catch (error) {}
+  } catch (error) {
+    showPopup();
+    console.log("Не получилось");
+  }
 }
