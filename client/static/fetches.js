@@ -95,8 +95,17 @@ async function sendList(title) {
     });
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.err || "Unknown error occurred");
+      const errorResponse = await response.json();
+
+      if (
+        response.status === 401 &&
+        errorResponse.message === "token has expired"
+      ) {
+        console.log("Токен истек, обновление токена...");
+        await refreshToken();
+        console.log("Повторный запрос...");
+        return sendList(title);
+      }
     }
 
     const result = await response.json();
@@ -125,10 +134,18 @@ async function getAllLists() {
 
     if (!response.ok) {
       const errorResponse = await response.json();
-      throw new Error(
-        console.log(errorResponse.message || "Ошибка получения данных листов")
-      );
+
+      if (
+        response.status === 401 &&
+        errorResponse.message === "token has expired"
+      ) {
+        console.log("Токен истек, обновление токена...");
+        await refreshToken();
+        console.log("Повторный запрос...");
+        return sendList(title);
+      }
     }
+
     const result = await response.json();
     console.log("Листы получены:", result);
     return result;
@@ -158,11 +175,21 @@ async function sendTask(listId, taskTitle) {
       },
       body: JSON.stringify(Task), //Обьект с данными о задаче
     });
+
     if (!response.ok) {
       const errorResponse = await response.json();
-      console.error("Ошибка сервера:", errorResponse);
-      throw new Error(errorResponse.message || "Ошибка отправки задачи");
+
+      if (
+        response.status === 401 &&
+        errorResponse.message === "token has expired"
+      ) {
+        console.log("Токен истек, обновление токена...");
+        await refreshToken();
+        console.log("Повторный запрос...");
+        return sendList(title);
+      }
     }
+
     const result = await response.json();
     console.log("Данные о задаче отправлены", result);
     return result;
@@ -188,11 +215,21 @@ async function getAllTasks(listId) {
         Authorization: "Bearer " + localStorage.getItem("accessToken"),
       },
     });
+
     if (!response.ok) {
       const errorResponse = await response.json();
-      console.error("Ошибка сервера:", errorResponse);
-      throw new Error(errorResponse.message || "Ошибка получения данных задач");
+
+      if (
+        response.status === 401 &&
+        errorResponse.message === "token has expired"
+      ) {
+        console.log("Токен истек, обновление токена...");
+        await refreshToken();
+        console.log("Повторный запрос...");
+        return sendList(title);
+      }
     }
+
     const result = await response.json();
     console.log("Задачи получены:", result);
 
@@ -236,10 +273,18 @@ async function toggleTaskState(taskId, isDone, listId) {
 
     if (!response.ok) {
       const errorResponse = await response.json();
-      console.error("Ошибка сервера:", errorResponse);
-      throw new Error(errorResponse.message || "Ошибка обновления задачи");
+
+      if (
+        response.status === 401 &&
+        errorResponse.message === "token has expired"
+      ) {
+        console.log("Токен истек, обновление токена...");
+        await refreshToken();
+        console.log("Повторный запрос...");
+        return sendList(title);
+      }
     }
-    6;
+
     const updatedTask = await response.json();
     console.log("Состояние задачи успешно обновлено:", updatedTask);
     return updatedTask;
@@ -247,4 +292,25 @@ async function toggleTaskState(taskId, isDone, listId) {
     console.error("Ошибка:", error);
     alert("Не удалось обновить состояние задачи: " + error.message);
   }
+}
+
+async function refreshToken() {
+  try {
+    const response = await fetch(`/api/auth/refresh`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error("Ошибка сервера:", errorResponse);
+      throw new Error(errorResponse.message || "Ошибка отправки accessToken");
+    }
+    const accessToken = await response.json();
+    console.log("accessToken обновлен");
+    localStorage.setItem("accessToken", accessToken);
+    return accessToken;
+  } catch (error) {}
 }
