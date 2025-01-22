@@ -2,7 +2,7 @@ CREATE TABLE users
 (
     id            serial      not null unique,
     username      varchar(32) not null unique,
-    password_hash varchar(64) not null
+    password_hash varchar(96) not null
 );
 
 CREATE TABLE lists
