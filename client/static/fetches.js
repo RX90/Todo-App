@@ -142,7 +142,7 @@ async function getAllLists() {
         console.log("Токен истек, обновление токена...");
         await refreshToken();
         console.log("Повторный запрос...");
-        return sendList(title);
+        return getAllLists(title);
       }
     }
 
@@ -176,18 +176,14 @@ async function sendTask(listId, taskTitle) {
       body: JSON.stringify(Task), //Обьект с данными о задаче
     });
 
-    if (!response.ok) {
-      const errorResponse = await response.json();
-
-      if (
-        response.status === 401 &&
-        errorResponse.message === "token has expired"
-      ) {
-        console.log("Токен истек, обновление токена...");
-        await refreshToken();
-        console.log("Повторный запрос...");
-        return sendList(title);
-      }
+    if (
+      response.status === 401 &&
+      errorResponse.message === "token has expired"
+    ) {
+      console.log("Токен истек, обновление токена...");
+      await refreshToken();
+      console.log("Повторный запрос...");
+      return sendTask(title);
     }
 
     const result = await response.json();
@@ -226,7 +222,7 @@ async function getAllTasks(listId) {
         console.log("Токен истек, обновление токена...");
         await refreshToken();
         console.log("Повторный запрос...");
-        return sendList(title);
+        return getAllTasks(listId);
       }
     }
 
@@ -271,18 +267,19 @@ async function toggleTaskState(taskId, isDone, listId) {
       body: JSON.stringify(updatePayload),
     });
 
-    if (!response.ok) {
+    if (response.status === 401) {
       const errorResponse = await response.json();
-
-      if (
-        response.status === 401 &&
-        errorResponse.message === "token has expired"
-      ) {
+      if (errorResponse.message === "token has expired") {
         console.log("Токен истек, обновление токена...");
         await refreshToken();
         console.log("Повторный запрос...");
-        return sendList(title);
+        return toggleTaskState(taskId, isDone, listId);
       }
+    }
+
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      throw new Error(errorResponse.message || "Ошибка при обновлении задачи");
     }
 
     const updatedTask = await response.json();
@@ -317,3 +314,6 @@ async function refreshToken() {
     console.log("Не получилось");
   }
 }
+
+//Login: Repa
+//Password: Rarara555
