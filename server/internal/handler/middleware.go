@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/gin-gonic/gin"
 )
@@ -78,9 +79,12 @@ func getUserCtx(c *gin.Context) (string, error) {
 
 func inputValidate(input ...string) error {
 	for _, data := range input {
+		if utf8.RuneCountInString(data) > 32 {
+			return errors.New("input exceeds 32 characters")
+		}
 		for _, char := range data {
 			if !ok[char] {
-				return errors.New("input has invalid character")
+				return errors.New("input has invalid character(s)")
 			}
 		}
 	}

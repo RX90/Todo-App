@@ -39,18 +39,7 @@ func generatePasswordHash(password string) string {
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
 
-func isPasswordOK(password string) error {
-	if len(password) < 8 || len(password) > 32 {
-		return errors.New("invalid length of password")
-	}
-
-	return nil
-}
-
 func (s *AuthService) CreateUser(user todo.User) error {
-	if err := isPasswordOK(user.Password); err != nil {
-		return err
-	}
 	user.Password = generatePasswordHash(user.Password)
 	return s.repos.CreateUser(user)
 }
