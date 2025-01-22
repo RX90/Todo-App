@@ -30,19 +30,21 @@ function hiddenPopup() {
   popupWindow.style.display = "none";
 }
 
-popupButton.addEventListener("click", function () {
-  if (popupButton.textContent === "Sign Up!") {
-    console.log("Регистрация пользователя:", username.value);
-    signUp(username.value, password.value); // Вызываем функцию регистрации
-    signIn(username.value, password.value);
-  } else {
-    console.log("Вход пользователя:", username.value);
-    signIn(username.value, password.value); // Вызываем функцию входа
-  }
-  if (error || error.status === 401) {
-    popupButton.disabled = true;
-  } else {
+popupButton.addEventListener("click", async function () {
+  try {
+    if (popupButton.textContent === "Sign Up!") {
+      console.log("Регистрация пользователя:", username.value);
+      await signUp(username.value, password.value);
+      await signIn(username.value, password.value);
+    } else {
+      console.log("Вход пользователя:", username.value);
+      await signIn(username.value, password.value);
+    }
     hiddenPopup();
+  } catch (error) {
+    console.error("Ошибка:", error.message);
+    alert("Не удалось войти или зарегистрироваться: " + error.message);
+    popupButton.disabled = true;
   }
 });
 
@@ -76,22 +78,48 @@ function renderSingleList(list) {
   });
 }
 
-function renderSingleTask(task) {
+function renderSingleTask(task, listId) {
+  const taskList = document.querySelector(".task-list");
   const menuTask = document.createElement("div");
   menuTask.classList.add("menu-task");
 
   const circleIcon = document.createElement("img");
-  circleIcon.src = "/src/img/circle.svg";
+  circleIcon.src = task.done
+    ? "/src/img/color-circle.svg"
+    : "/src/img/circle.svg";
   circleIcon.classList.add("circle-icon");
 
   const titleTask = document.createElement("span");
   titleTask.textContent = task.title;
   titleTask.classList.add("title-task");
 
+  if (task.done) {
+    titleTask.style.textDecoration = "line-through";
+  }
+
+  circleIcon.addEventListener("click", async function () {
+    const newState = !task.done;
+    const listId = details.getAttribute("data-id");
+
+    try {
+      const updatedTask = await toggleTaskState(task.id, newState, listId);
+
+      if (updatedTask) {
+        task.done = newState;
+        circleIcon.src = newState
+          ? "/src/img/color-circle.svg"
+          : "/src/img/circle.svg";
+        titleTask.style.textDecoration = newState ? "line-through" : "none";
+      }
+    } catch (error) {
+      console.error("Не удалось обновить задачу:", error);
+    }
+  });
+
   menuTask.appendChild(circleIcon);
   menuTask.appendChild(titleTask);
 
-  panel.appendChild(menuTask);
+  taskList.appendChild(menuTask);
 }
 
 //Создание листов
@@ -118,6 +146,11 @@ function openPanel(listId, listName) {
   details.style.display = "block";
   details.setAttribute("data-id", listId);
   title.textContent = listName;
+
+  const taskList = document.querySelector(".task-list");
+  taskList.innerHTML = ""; // Очищаем только задачи
+
+  getAllTasks(listId);
 }
 
 const taskInput = document.getElementById("task-input");
@@ -156,11 +189,14 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("Не удалось загрузить листы.");
     }
 
-    const tasks = await getAllTasks(listId);
-    if (tasks && Array.isArray(tasks)) {
-      tasks.forEach(renderSingleTask);
-    } else {
-      console.error("Не удалось загрузить задачи.");
+    const listId = details.getAttribute("data-id"); // Получаем ID текущего списка
+    if (listId) {
+      const tasks = await getAllTasks(listId);
+      if (tasks && Array.isArray(tasks)) {
+        tasks.forEach((task) => renderSingleTask(task, listId));
+      } else {
+        console.error("Не удалось загрузить задачи.");
+      }
     }
   } catch (error) {
     console.error("Ошибка при загрузке данных:", error);
