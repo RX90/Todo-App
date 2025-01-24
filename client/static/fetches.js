@@ -96,16 +96,21 @@ async function sendList(title) {
 
     if (!response.ok) {
       const errorResponse = await response.json();
+      console.error("Error send list:", errorResponse);
 
       if (
         response.status === 401 &&
         errorResponse.message === "token has expired"
       ) {
-        console.log("Токен истек, обновление токена...");
-        await refreshToken();
-        console.log("Повторный запрос...");
-        return sendList(title);
+        console.log("Token expired, refreshing token...");
+        const newToken = await refreshToken();
+        if (newToken) {
+          localStorage.setItem("accessToken", newToken);
+          return sendList(title);
+        }
       }
+
+      throw new Error(errorResponse.message || "Error send list");
     }
 
     const result = await response.json();
@@ -134,16 +139,19 @@ async function getAllLists() {
 
     if (!response.ok) {
       const errorResponse = await response.json();
-
+      console.error("Error updating task:", errorResponse);
       if (
         response.status === 401 &&
         errorResponse.message === "token has expired"
       ) {
-        console.log("Токен истек, обновление токена...");
-        await refreshToken();
-        console.log("Повторный запрос...");
-        return sendList(title);
+        console.log("Token expired, refreshing token...");
+        const newToken = await refreshToken();
+        if (newToken) {
+          localStorage.setItem("accessToken", newToken);
+          return getAllLists(); // Возвращаем результат повторного вызова
+        }
       }
+      throw new Error(errorResponse.message || "Error get all lists");
     }
 
     const result = await response.json();
@@ -178,16 +186,17 @@ async function sendTask(listId, taskTitle) {
 
     if (!response.ok) {
       const errorResponse = await response.json();
-
+      console.error("Error updating task:", errorResponse);
       if (
         response.status === 401 &&
         errorResponse.message === "token has expired"
       ) {
-        console.log("Токен истек, обновление токена...");
+        console.log("Token expired, refreshing token...");
         await refreshToken();
-        console.log("Повторный запрос...");
-        return sendList(title);
+        console.log("Retrying send task...");
+        return sendTask(listId, taskTitle); // Возвращаем результат повторного вызова
       }
+      throw new Error(errorResponse.message || "Error send task");
     }
 
     const result = await response.json();
@@ -218,16 +227,17 @@ async function getAllTasks(listId) {
 
     if (!response.ok) {
       const errorResponse = await response.json();
-
+      console.error("Error updating task:", errorResponse);
       if (
         response.status === 401 &&
         errorResponse.message === "token has expired"
       ) {
-        console.log("Токен истек, обновление токена...");
+        console.log("Token expired, refreshing token...");
         await refreshToken();
-        console.log("Повторный запрос...");
-        return sendList(title);
+        console.log("Retrying get all tasks...");
+        return getAllTasks(listId); // Возвращаем результат повторного вызова
       }
+      throw new Error(errorResponse.message || "Error get all task");
     }
 
     const result = await response.json();
@@ -252,13 +262,13 @@ async function toggleTaskState(taskId, isDone, listId) {
     return;
   }
 
+  console.log("AccessToken:", accessToken);
   console.log("taskId:", taskId);
   console.log("isDone:", isDone);
   console.log("listId:", listId);
 
   const updatePayload = {
     done: isDone,
-    // title: title
   };
 
   try {
@@ -266,31 +276,33 @@ async function toggleTaskState(taskId, isDone, listId) {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+        Authorization: "Bearer " + accessToken,
       },
       body: JSON.stringify(updatePayload),
     });
 
     if (!response.ok) {
       const errorResponse = await response.json();
-
+      console.error("Error updating task:", errorResponse);
       if (
         response.status === 401 &&
         errorResponse.message === "token has expired"
       ) {
-        console.log("Токен истек, обновление токена...");
+        console.log("Token expired, refreshing token...");
         await refreshToken();
-        console.log("Повторный запрос...");
-        return sendList(title);
+        console.log("Retrying task update...");
+        return toggleTaskState(taskId, isDone, listId); // Возвращаем результат повторного вызова
       }
+      throw new Error(errorResponse.message || "Error updating task");
     }
 
     const updatedTask = await response.json();
-    console.log("Состояние задачи успешно обновлено:", updatedTask);
+    console.log("Task updated successfully:", updatedTask);
     return updatedTask;
   } catch (error) {
-    console.error("Ошибка:", error);
-    alert("Не удалось обновить состояние задачи: " + error.message);
+    console.error("Error in toggleTaskState:", error);
+    alert("Failed to update task: " + error.message);
+    return null;
   }
 }
 
@@ -315,5 +327,9 @@ async function refreshToken() {
   } catch (error) {
     showPopup();
     console.log("Не получилось");
+    throw error; // Пробрасываем ошибку дальше
   }
 }
+
+//Login: Repa
+//Password: Rarara555

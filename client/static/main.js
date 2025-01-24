@@ -82,6 +82,7 @@ function renderSingleTask(task, listId) {
   const taskList = document.querySelector(".task-list");
   const menuTask = document.createElement("div");
   menuTask.classList.add("menu-task");
+  menuTask.setAttribute("data-task-id", task.id);
 
   const circleIcon = document.createElement("img");
   circleIcon.src = task.done
@@ -100,16 +101,18 @@ function renderSingleTask(task, listId) {
   circleIcon.addEventListener("click", async function () {
     const newState = !task.done;
     const listId = details.getAttribute("data-id");
+    const taskId = Number(menuTask.getAttribute("data-task-id"));
 
     try {
-      const updatedTask = await toggleTaskState(task.id, newState, listId);
-
+      const updatedTask = toggleTaskState(taskId, newState, listId);
       if (updatedTask) {
         task.done = newState;
         circleIcon.src = newState
           ? "/src/img/color-circle.svg"
           : "/src/img/circle.svg";
         titleTask.style.textDecoration = newState ? "line-through" : "none";
+      } else {
+        console.error("Ошибка обновления задачи");
       }
     } catch (error) {
       console.error("Не удалось обновить задачу:", error);
@@ -168,6 +171,7 @@ taskInput.addEventListener("keydown", async function (event) {
         const newTask = {
           id: newTaskId,
           title: taskTitle,
+          done: false,
         };
 
         renderSingleTask(newTask);
