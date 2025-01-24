@@ -104,13 +104,15 @@ function renderSingleTask(task, listId) {
     const taskId = Number(menuTask.getAttribute("data-task-id"));
 
     try {
-      const updatedTask = await toggleTaskState(taskId, newState, listId);
+      const updatedTask = toggleTaskState(taskId, newState, listId);
       if (updatedTask) {
         task.done = newState;
         circleIcon.src = newState
           ? "/src/img/color-circle.svg"
           : "/src/img/circle.svg";
         titleTask.style.textDecoration = newState ? "line-through" : "none";
+      } else {
+        console.error("Ошибка обновления задачи");
       }
     } catch (error) {
       console.error("Не удалось обновить задачу:", error);
