@@ -175,7 +175,7 @@ async function sendTask(listId, taskTitle) {
   }
 
   try {
-    const response = await fetch(`/api/lists/${listId}/tasks`, {
+    const response = await fetch(`/api/lists/${listId}/tasks/`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -217,7 +217,7 @@ async function getAllTasks(listId) {
   }
 
   try {
-    const response = await fetch(`/api/lists/${listId}/tasks`, {
+    const response = await fetch(`/api/lists/${listId}/tasks/`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
