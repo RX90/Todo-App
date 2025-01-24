@@ -28,10 +28,6 @@ func (s *TaskService) GetAll(userId, listId string) ([]todo.Task, error) {
 }
 
 func (s *TaskService) Update(userId, listId, taskId string, task todo.UpdateTaskInput) error {
-	if err := task.Validate(); err != nil {
-		return err
-	}
-	
 	return s.repos.Update(userId, listId, taskId, task)
 }
 

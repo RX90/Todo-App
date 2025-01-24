@@ -28,10 +28,10 @@ func TestAuth_signUp(t *testing.T) {
 	}{
 		{
 			name:      "Valid input",
-			inputBody: `{"username":"Тестовый Username123", "password":"Тестовый Password1203"}`,
+			inputBody: `{"username":"Тестовый Username123", "password":"Тестовый Password123"}`,
 			inputUser: todo.User{
 				Username: "Тестовый Username123",
-				Password: "Тестовый Password1203",
+				Password: "Тестовый Password123",
 			},
 			mockBehavior: func(s *mock_service.MockAuthorization, user todo.User) {
 				s.EXPECT().CreateUser(user).Return(nil)
@@ -42,7 +42,6 @@ func TestAuth_signUp(t *testing.T) {
 		{
 			name:                 "Invalid input 1",
 			inputBody:            `{"username":Michael, "password":true}`,
-			inputUser:            todo.User{},
 			mockBehavior:         func(s *mock_service.MockAuthorization, user todo.User) {},
 			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"err":"can't bind JSON: invalid character 'M' looking for beginning of value"}`,
@@ -56,10 +55,9 @@ func TestAuth_signUp(t *testing.T) {
 		{
 			name:                 "Empty required field",
 			inputBody:            `{"username":"", "password":"hello world"}`,
-			inputUser:            todo.User{},
 			mockBehavior:         func(s *mock_service.MockAuthorization, user todo.User) {},
 			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"err":"can't bind JSON: Key: 'User.Username' Error:Field validation for 'Username' failed on the 'required' tag"}`,
+			expectedResponseBody: `{"err":"empty input"}`,
 		},
 		{
 			name:      "Invalid input 2",
@@ -142,10 +140,10 @@ func TestAuth_signIn(t *testing.T) {
 		},
 		{
 			name:      "Get user id error",
-			inputBody: `{"username":"Existing User", "password":"Correct Password"}`,
+			inputBody: `{"username":"Non-existing User", "password":"Incorrect Password"}`,
 			inputUser: todo.User{
-				Username: "Existing User",
-				Password: "Correct Password",
+				Username: "Non-existing User",
+				Password: "Incorrect Password",
 			},
 			mockBehavior: func(s *mock_service.MockAuthorization, user todo.User) {
 				s.EXPECT().GetUserId(user).Return("", errors.New("user not found"))
@@ -341,11 +339,10 @@ func TestAuth_refreshTokens(t *testing.T) {
 }
 
 func TestAuth_logout(t *testing.T) {
-	type mockBehavior func(s *mock_service.MockAuthorization, accessToken, refreshToken string)
+	type mockBehavior func(s *mock_service.MockAuthorization, refreshToken string)
 
 	testTable := []struct {
 		name                 string
-		accessToken          string
 		refreshToken         string
 		mockBehavior         mockBehavior
 		expectedStatusCode   int
@@ -353,9 +350,8 @@ func TestAuth_logout(t *testing.T) {
 	}{
 		{
 			name:         "Valid input",
-			accessToken:  "valid-access-token",
 			refreshToken: "valid-refresh-token",
-			mockBehavior: func(s *mock_service.MockAuthorization, accessToken, refreshToken string) {
+			mockBehavior: func(s *mock_service.MockAuthorization, refreshToken string) {
 				s.EXPECT().DeleteRefreshToken("1", refreshToken).Return(nil)
 			},
 			expectedStatusCode:   http.StatusOK,
@@ -363,17 +359,15 @@ func TestAuth_logout(t *testing.T) {
 		},
 		{
 			name:                 "No refresh token",
-			accessToken:          "valid-access-token",
 			refreshToken:         "",
-			mockBehavior:         func(s *mock_service.MockAuthorization, accessToken, refreshToken string) {},
+			mockBehavior:         func(s *mock_service.MockAuthorization, refreshToken string) {},
 			expectedStatusCode:   http.StatusUnauthorized,
 			expectedResponseBody: `{"err":"refresh token is missing"}`,
 		},
 		{
 			name:         "Invalid refresh token",
-			accessToken:  "valid-access-token",
 			refreshToken: "invalid-refresh-token",
-			mockBehavior: func(s *mock_service.MockAuthorization, accessToken, refreshToken string) {
+			mockBehavior: func(s *mock_service.MockAuthorization, refreshToken string) {
 				s.EXPECT().DeleteRefreshToken("1", refreshToken).Return(errors.New("delete refresh token error"))
 			},
 			expectedStatusCode:   http.StatusInternalServerError,
@@ -387,7 +381,7 @@ func TestAuth_logout(t *testing.T) {
 			defer c.Finish()
 
 			auth := mock_service.NewMockAuthorization(c)
-			testCase.mockBehavior(auth, testCase.accessToken, testCase.refreshToken)
+			testCase.mockBehavior(auth, testCase.refreshToken)
 
 			services := &service.Service{Authorization: auth}
 			handler := NewHandler(services)
@@ -400,7 +394,6 @@ func TestAuth_logout(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest("POST", "/logout", nil)
-			req.Header.Set(authHeader, "Bearer "+testCase.accessToken)
 			req.AddCookie(&http.Cookie{Name: refresh, Value: testCase.refreshToken})
 
 			r.ServeHTTP(w, req)

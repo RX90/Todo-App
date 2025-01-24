@@ -151,11 +151,7 @@ func (h *Handler) refreshTokens(c *gin.Context) {
 }
 
 func (h *Handler) logout(c *gin.Context) {
-	userId, err := getUserCtx(c)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't get user id from context: %s", err.Error())})
-		return
-	}
+	userId := getUserCtx(c)
 
 	refreshToken, err := c.Cookie(refresh)
 	if err != nil || refreshToken == "" {

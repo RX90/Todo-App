@@ -38,10 +38,9 @@ func TestMiddleware_userIdentity(t *testing.T) {
 		},
 		{
 			name:                 "No header",
-			headerName:           "",
 			mockBehavior:         func(s *mock_service.MockAuthorization, token string) {},
 			expectedStatusCode:   http.StatusUnauthorized,
-			expectedResponseBody: `{"err":"access token is empty"}`,
+			expectedResponseBody: `{"err":"auth header is empty"}`,
 		},
 		{
 			name:                 "Invalid header 1",
@@ -49,15 +48,23 @@ func TestMiddleware_userIdentity(t *testing.T) {
 			headerValue:          "Bearertoken",
 			mockBehavior:         func(s *mock_service.MockAuthorization, token string) {},
 			expectedStatusCode:   http.StatusUnauthorized,
-			expectedResponseBody: `{"err":"access token is invalid"}`,
+			expectedResponseBody: `{"err":"auth header is invalid"}`,
 		},
 		{
 			name:                 "Invalid header 2",
 			headerName:           "Authorization",
-			headerValue:          "Bearer      token",
+			headerValue:          "Berer token",
 			mockBehavior:         func(s *mock_service.MockAuthorization, token string) {},
 			expectedStatusCode:   http.StatusUnauthorized,
-			expectedResponseBody: `{"err":"access token is invalid"}`,
+			expectedResponseBody: `{"err":"auth header is invalid"}`,
+		},
+		{
+			name:                 "Invalid header 3",
+			headerName:           "Authorization",
+			headerValue:          "Bearer ",
+			mockBehavior:         func(s *mock_service.MockAuthorization, token string) {},
+			expectedStatusCode:   http.StatusUnauthorized,
+			expectedResponseBody: `{"err":"auth header is invalid"}`,
 		},
 		{
 			name:        "Service error",
@@ -109,7 +116,7 @@ func TestMiddlware_inputValidate(t *testing.T) {
 	}{
 		{
 			name:          "Valid input",
-			input:         []string{"Test Username", "Test Password"},
+			input:         []string{"Test Username ☻", "Test Password"},
 			expectedError: nil,
 		},
 		{
@@ -118,9 +125,9 @@ func TestMiddlware_inputValidate(t *testing.T) {
 			expectedError: errors.New("input exceeds 32 characters"),
 		},
 		{
-			name:          "Invalid characters",
-			input:         []string{"Дела по дому☻"},
-			expectedError: errors.New("input has invalid character(s)"),
+			name:          "No Password",
+			input:         []string{""},
+			expectedError: errors.New("empty input"),
 		},
 	}
 
