@@ -11,16 +11,16 @@ let infoText = document.getElementById("info-text");
 const panel = document.querySelector(".panel");
 
 //Проверка существует ли у пользователя токен, если нет, мы отправляем его регаться или логиниться
-if (
-  !localStorage.getItem("accessToken") ||
-  localStorage.getItem("accessToken").trim() === ""
-) {
-  console.log("Токен не найден");
-  showPopup();
-} else {
-  console.log("Токен получен", localStorage.getItem("accessToken"));
-  hiddenPopup();
-}
+// if (
+//   !localStorage.getItem("accessToken") ||
+//   localStorage.getItem("accessToken").trim() === ""
+// ) {
+//   console.log("Токен не найден");
+//   showPopup();
+// } else {
+//   console.log("Токен получен", localStorage.getItem("accessToken"));
+//   hiddenPopup();
+// }
 
 function showPopup() {
   popupWindow.style.display = "block";
@@ -130,6 +130,17 @@ createList.addEventListener("keydown", async function (event) {
   if (event.key === "Enter" && createList.value.trim() !== "") {
     const title = createList.value.trim();
 
+    if (
+      !localStorage.getItem("accessToken") ||
+      localStorage.getItem("accessToken").trim() === ""
+    ) {
+      console.log("Токен не найден");
+      showPopup();
+    } else {
+      console.log("Токен получен", localStorage.getItem("accessToken"));
+      hiddenPopup();
+    }
+
     try {
       const newList = await sendList(title);
 
@@ -163,6 +174,17 @@ taskInput.addEventListener("keydown", async function (event) {
   if (event.key === "Enter" && taskInput.value.trim() !== "") {
     const taskTitle = taskInput.value.trim();
     const listId = details.getAttribute("data-id");
+
+    // Проверяем токен только здесь
+    if (
+      !localStorage.getItem("accessToken") ||
+      localStorage.getItem("accessToken").trim() === ""
+    ) {
+      console.log("Токен не найден");
+      showPopup(); // Показываем окно логина, если токена нет
+      return; // Прерываем выполнение, чтобы задача не создавалась
+    }
+
     try {
       const newTaskId = await sendTask(listId, taskTitle);
       console.log("Title:", taskTitle);

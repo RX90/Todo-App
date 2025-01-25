@@ -75,10 +75,6 @@ async function signIn(username, password) {
 async function sendList(title) {
   const accessToken = localStorage.getItem("accessToken");
 
-  if (!accessToken) {
-    showPopup();
-    return;
-  }
   const url = "/api/lists/";
   const userData = {
     Title: title,
@@ -124,10 +120,6 @@ async function sendList(title) {
 async function getAllLists() {
   const accessToken = localStorage.getItem("accessToken");
 
-  if (!accessToken) {
-    showPopup();
-    return;
-  }
   try {
     const response = await fetch("/api/lists/", {
       method: "GET",
