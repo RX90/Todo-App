@@ -53,6 +53,13 @@ func TestAuth_signUp(t *testing.T) {
 			expectedResponseBody: `{"err":"can't bind JSON: EOF"}`,
 		},
 		{
+			name:                 "Empty structure",
+			inputBody:            `{}`,
+			mockBehavior:         func(s *mock_service.MockAuthorization, user todo.User) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"err":"empty input"}`,
+		},
+		{
 			name:                 "Empty required field",
 			inputBody:            `{"username":"", "password":"hello world"}`,
 			mockBehavior:         func(s *mock_service.MockAuthorization, user todo.User) {},
@@ -223,11 +230,25 @@ func TestAuth_refreshTokens(t *testing.T) {
 		expectedRefreshToken string
 	}{
 		{
-			name:         "Valid input",
-			accessToken:  "valid-access-token",
+			name:         "Valid input 1",
+			accessToken:  "expired-valid-access-token",
 			refreshToken: "valid-refresh-token",
 			mockBehavior: func(s *mock_service.MockAuthorization, accessToken, refreshToken string) {
 				s.EXPECT().ParseAccessToken(accessToken).Return("1", errors.New("token has expired"))
+				s.EXPECT().CheckRefreshToken("1", refreshToken).Return(nil)
+				s.EXPECT().NewAccessToken("1").Return("new-valid-access-token", nil)
+				s.EXPECT().NewRefreshToken("1").Return("new-valid-refresh-token", nil)
+			},
+			expectedStatusCode:   http.StatusOK,
+			expectedResponseBody: `{"token":"new-valid-access-token"}`,
+			expectedRefreshToken: "new-valid-refresh-token",
+		},
+		{
+			name:         "Valid input 2",
+			accessToken:  "valid-access-token",
+			refreshToken: "valid-refresh-token",
+			mockBehavior: func(s *mock_service.MockAuthorization, accessToken, refreshToken string) {
+				s.EXPECT().ParseAccessToken(accessToken).Return("1", nil)
 				s.EXPECT().CheckRefreshToken("1", refreshToken).Return(nil)
 				s.EXPECT().NewAccessToken("1").Return("new-valid-access-token", nil)
 				s.EXPECT().NewRefreshToken("1").Return("new-valid-refresh-token", nil)

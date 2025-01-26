@@ -237,15 +237,6 @@ func TestTask_updateTask(t *testing.T) {
 			expectedResponseBody: `{"status":"ok"}`,
 		},
 		{
-			name:      "No values",
-			listId:    "2",
-			taskId:    "3",
-			inputBody: `{"title": ""}`,
-			mockBehavior: func(s *mock_service.MockTodoTask, userId, listId, taskId string, task todo.UpdateTaskInput) {},
-			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"err":"empty input"}`,
-		},
-		{
 			name:                 "Invalid listId",
 			listId:               `{"listId":"2"}`,
 			taskId:               "3",
@@ -262,12 +253,30 @@ func TestTask_updateTask(t *testing.T) {
 			expectedResponseBody: `{"err":"can't get task id: strconv.Atoi: parsing \"{\\\"taskId\\\":\\\"3\\\"}\": invalid syntax"}`,
 		},
 		{
-			name:                 "No values",
+			name:                 "No values 1",
 			listId:               "2",
 			taskId:               "3",
 			mockBehavior:         func(s *mock_service.MockTodoTask, userId, listId, taskId string, task todo.UpdateTaskInput) {},
 			expectedStatusCode:   http.StatusBadRequest,
 			expectedResponseBody: `{"err":"can't bind JSON: EOF"}`,
+		},
+		{
+			name:                 "No values 2",
+			listId:               "2",
+			taskId:               "3",
+			inputBody:            `{}`,
+			mockBehavior:         func(s *mock_service.MockTodoTask, userId, listId, taskId string, task todo.UpdateTaskInput) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"err":"update structure has no values"}`,
+		},
+		{
+			name:                 "No values 3",
+			listId:               "2",
+			taskId:               "3",
+			inputBody:            `{"title": ""}`,
+			mockBehavior:         func(s *mock_service.MockTodoTask, userId, listId, taskId string, task todo.UpdateTaskInput) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"err":"empty input"}`,
 		},
 	}
 
