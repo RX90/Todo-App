@@ -73,12 +73,6 @@ async function signIn(username, password) {
 }
 
 async function sendList(title) {
-  const accessToken = localStorage.getItem("accessToken");
-
-  if (!accessToken) {
-    showPopup();
-    return;
-  }
   const url = "/api/lists/";
   const userData = {
     Title: title,
@@ -100,9 +94,10 @@ async function sendList(title) {
 
       if (
         response.status === 401 &&
-        errorResponse.message === "token has expired"
+        errorResponse.err === "token has expired" //Запомнить
       ) {
         console.log("Token expired, refreshing token...");
+        console.log("Йоу мэн", errorResponse);
         const newToken = await refreshToken();
         if (newToken) {
           localStorage.setItem("accessToken", newToken);
@@ -115,7 +110,7 @@ async function sendList(title) {
 
     const result = await response.json();
     console.log("Send lists successfully:", result.list_id);
-    return result;
+    return result.list_id;
   } catch (error) {
     console.error("Error send lists", error.message);
   }
@@ -124,10 +119,6 @@ async function sendList(title) {
 async function getAllLists() {
   const accessToken = localStorage.getItem("accessToken");
 
-  if (!accessToken) {
-    showPopup();
-    return;
-  }
   try {
     const response = await fetch("/api/lists/", {
       method: "GET",
@@ -320,10 +311,10 @@ async function refreshToken() {
       console.error("Ошибка сервера:", errorResponse);
       throw new Error(errorResponse.message || "Ошибка отправки accessToken");
     }
-    const { accessToken } = await response.json();
+    const accessToken = await response.json();
     console.log("accessToken обновлен");
-    localStorage.setItem("accessToken", accessToken);
-    return accessToken;
+    localStorage.setItem("accessToken", accessToken.token);
+    return accessToken.token;
   } catch (error) {
     showPopup();
     console.log("Не получилось");
@@ -333,3 +324,9 @@ async function refreshToken() {
 
 //Login: Repa
 //Password: Rarara555
+
+//Петрович
+//Pidor338
+
+//Гитлер
+//Harosh555

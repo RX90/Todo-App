@@ -11,16 +11,16 @@ let infoText = document.getElementById("info-text");
 const panel = document.querySelector(".panel");
 
 //Проверка существует ли у пользователя токен, если нет, мы отправляем его регаться или логиниться
-if (
-  !localStorage.getItem("accessToken") ||
-  localStorage.getItem("accessToken").trim() === ""
-) {
-  console.log("Токен не найден");
-  showPopup();
-} else {
-  console.log("Токен получен", localStorage.getItem("accessToken"));
-  hiddenPopup();
-}
+// if (
+//   !localStorage.getItem("accessToken") ||
+//   localStorage.getItem("accessToken").trim() === ""
+// ) {
+//   console.log("Токен не найден");
+//   showPopup();
+// } else {
+//   console.log("Токен получен", localStorage.getItem("accessToken"));
+//   hiddenPopup();
+// }
 
 function showPopup() {
   popupWindow.style.display = "block";
@@ -55,10 +55,10 @@ createAccount.addEventListener("click", function () {
   createAccount.style.display = "none";
 });
 
-function renderSingleList(list) {
+function renderSingleList(listid, title) {
   const menuItem = document.createElement("div");
   menuItem.classList.add("menu-item");
-  menuItem.setAttribute("data-id", list.id);
+  menuItem.setAttribute("data-id", listid);
 
   const imgList = document.createElement("img");
   imgList.classList.add("icon-list");
@@ -66,19 +66,19 @@ function renderSingleList(list) {
 
   const addList = document.createElement("p");
   addList.classList.add("add-list");
-  addList.textContent = list.title;
+  addList.textContent = title;
 
   menuItem.appendChild(imgList);
   menuItem.appendChild(addList);
   menu.appendChild(menuItem);
 
   menuItem.addEventListener("click", () => {
-    openPanel(list.id, list.title);
-    console.log(list.id, list.title);
+    openPanel(listid, title);
+    console.log(listid, title);
   });
 }
 
-function renderSingleTask(task, listId) {
+function renderSingleTask(task) {
   const taskList = document.querySelector(".task-list");
   const menuTask = document.createElement("div");
   menuTask.classList.add("menu-task");
@@ -130,12 +130,23 @@ createList.addEventListener("keydown", async function (event) {
   if (event.key === "Enter" && createList.value.trim() !== "") {
     const title = createList.value.trim();
 
-    try {
-      const newList = await sendList(title);
+    if (
+      !localStorage.getItem("accessToken") ||
+      localStorage.getItem("accessToken").trim() === ""
+    ) {
+      console.log("Токен не найден");
+      showPopup();
+    } else {
+      console.log("Токен получен", localStorage.getItem("accessToken"));
+      hiddenPopup();
+    }
 
-      if (newList) {
-        renderSingleList(newList);
-        openPanel(newList.id, title);
+    try {
+      const listId = await sendList(title);
+
+      if (listId) {
+        renderSingleList(listId, title);
+        openPanel(listId, title);
       }
     } catch (error) {
       console.error("Ошибка при создании листа:", error);
@@ -163,8 +174,20 @@ taskInput.addEventListener("keydown", async function (event) {
   if (event.key === "Enter" && taskInput.value.trim() !== "") {
     const taskTitle = taskInput.value.trim();
     const listId = details.getAttribute("data-id");
+    console;
+    // Проверяем токен только здесь
+    if (
+      !localStorage.getItem("accessToken") ||
+      localStorage.getItem("accessToken").trim() === ""
+    ) {
+      console.log("Токен не найден");
+      showPopup(); // Показываем окно логина, если токена нет
+      return; // Прерываем выполнение, чтобы задача не создавалась
+    }
+
     try {
-      const newTaskId = await sendTask(listId, taskTitle);
+      const newObject = await sendTask(listId, taskTitle);
+      const newTaskId = newObject.task_id;
       console.log("Title:", taskTitle);
 
       if (newTaskId) {
@@ -174,6 +197,7 @@ taskInput.addEventListener("keydown", async function (event) {
           done: false,
         };
 
+        console.log("New TASK:", newTask);
         renderSingleTask(newTask);
         taskInput.value = "";
       }
@@ -187,8 +211,10 @@ taskInput.addEventListener("keydown", async function (event) {
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     const lists = await getAllLists();
+    console.log("Получили листы:", lists);
+
     if (lists && Array.isArray(lists)) {
-      lists.forEach(renderSingleList);
+      lists.forEach((list) => renderSingleList(list.id, list.title));
     } else {
       console.error("Не удалось загрузить листы.");
     }
