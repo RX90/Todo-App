@@ -10,14 +10,10 @@ import (
 )
 
 func (h *Handler) createTask(c *gin.Context) {
-	userId, err := getUserCtx(c)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't get user id from context: %s", err.Error())})
-		return
-	}
+	userId := getUserCtx(c)
 
 	listId := c.Param("listId")
-	_, err = strconv.Atoi(listId)
+	_, err := strconv.Atoi(listId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get list id: %s", err.Error())})
 		return
@@ -45,14 +41,10 @@ func (h *Handler) createTask(c *gin.Context) {
 }
 
 func (h *Handler) getAllTasks(c *gin.Context) {
-	userId, err := getUserCtx(c)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't get user id from context: %s", err.Error())})
-		return
-	}
+	userId := getUserCtx(c)
 
 	listId := c.Param("listId")
-	_, err = strconv.Atoi(listId)
+	_, err := strconv.Atoi(listId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get list id: %s", err.Error())})
 		return
@@ -68,14 +60,10 @@ func (h *Handler) getAllTasks(c *gin.Context) {
 }
 
 func (h *Handler) updateTask(c *gin.Context) {
-	userId, err := getUserCtx(c)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't get user id from context: %s", err.Error())})
-		return
-	}
+	userId := getUserCtx(c)
 
 	listId := c.Param("listId")
-	_, err = strconv.Atoi(listId)
+	_, err := strconv.Atoi(listId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get list id: %s", err.Error())})
 		return
@@ -95,6 +83,11 @@ func (h *Handler) updateTask(c *gin.Context) {
 		return
 	}
 
+	if err := input.Validate(); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		return
+	}
+
 	if input.Title != nil {
 		if err := inputValidate(*input.Title); err != nil {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
@@ -111,14 +104,10 @@ func (h *Handler) updateTask(c *gin.Context) {
 }
 
 func (h *Handler) deleteTask(c *gin.Context) {
-	userId, err := getUserCtx(c)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't get user id from context: %s", err.Error())})
-		return
-	}
+	userId := getUserCtx(c)
 
 	listId := c.Param("listId")
-	_, err = strconv.Atoi(listId)
+	_, err := strconv.Atoi(listId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get list id: %s", err.Error())})
 		return

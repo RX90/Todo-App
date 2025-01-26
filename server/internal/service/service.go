@@ -5,6 +5,8 @@ import (
 	"github.com/RX90/Todo-App/server/internal/todo"
 )
 
+//go:generate mockgen -source=service.go -destination=mocks/mock.go
+
 type Authorization interface {
 	CreateUser(user todo.User) error
 	GetUserId(user todo.User) (string, error)

@@ -18,9 +18,9 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.Default()
 
-	router.Static("/static", "../client/static")
-	router.Static("/src", "../client/src")
-	router.LoadHTMLGlob("../client/templates/*.html")
+	router.Static("/static", "./client/static")
+	router.Static("/src", "./client/src")
+	router.LoadHTMLGlob("./client/templates/*.html")
 
 	router.GET("/", func(c *gin.Context) {
 		c.HTML(http.StatusOK, "main.html", nil)

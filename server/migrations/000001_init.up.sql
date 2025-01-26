@@ -1,14 +1,14 @@
 CREATE TABLE users
 (
-    id            serial       not null unique,
-    username      varchar(255) not null unique,
-    password_hash varchar(255) not null
+    id            serial      not null unique,
+    username      varchar(32) not null unique,
+    password_hash varchar(96) not null
 );
 
 CREATE TABLE lists
 (
-    id          serial       not null unique,
-    title       varchar(255) not null
+    id          serial      not null unique,
+    title       varchar(32) not null
 );
 
 CREATE TABLE users_lists
@@ -20,9 +20,9 @@ CREATE TABLE users_lists
 
 CREATE TABLE tasks
 (
-    id          serial       not null unique,
-    title       varchar(255) not null,
-    done        boolean      not null default false
+    id          serial      not null unique,
+    title       varchar(32) not null,
+    done        boolean     not null default false
 );
 
 

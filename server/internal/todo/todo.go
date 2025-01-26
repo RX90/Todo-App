@@ -4,13 +4,13 @@ import "errors"
 
 type User struct {
 	Id       string `json:"-"        db:"id"`
-	Username string `json:"username" db:"username"      binding:"required"`
-	Password string `json:"password" db:"password_hash" binding:"required"`
+	Username string `json:"username" db:"username"`
+	Password string `json:"password" db:"password_hash"`
 }
 
 type List struct {
 	Id    string `json:"id"    db:"id"`
-	Title string `json:"title" db:"title" binding:"required"`
+	Title string `json:"title" db:"title"`
 }
 
 type UsersList struct {
