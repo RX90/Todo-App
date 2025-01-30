@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-	"unicode/utf8"
 
 	"github.com/RX90/Todo-App/server/internal/service"
 	"github.com/RX90/Todo-App/server/internal/todo"
@@ -28,13 +27,8 @@ func (h *Handler) signUp(c *gin.Context) {
 		return
 	}
 
-	if err := inputValidate(input.Username, input.Password); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
-		return
-	}
-
-	if utf8.RuneCountInString(input.Password) < 8 {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "password is less than 8 characters"})
+	if err := authInputValidation(input.Username, input.Password); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't validate input: %s", err.Error())})
 		return
 	}
 
@@ -54,8 +48,8 @@ func (h *Handler) signIn(c *gin.Context) {
 		return
 	}
 
-	if err := inputValidate(input.Username, input.Password); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+	if err := authInputValidation(input.Username, input.Password); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't validate input: %s", err.Error())})
 		return
 	}
 

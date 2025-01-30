@@ -108,32 +108,78 @@ func TestMiddleware_userIdentity(t *testing.T) {
 	}
 }
 
-func TestMiddlware_inputValidate(t *testing.T) {
+func TestMiddleware_authInputValidation(t *testing.T) {
 	testTable := []struct {
 		name          string
-		input         []string
+		username      string
+		password      string
 		expectedError error
 	}{
 		{
 			name:          "Valid input",
-			input:         []string{"Test Username ☻", "Test Password"},
+			username:      "New-Username",
+			password:      "New_Password123",
 			expectedError: nil,
 		},
 		{
-			name:          "Username length exceeds",
-			input:         []string{"Test username for testing the inputValidate function", "Test Password"},
-			expectedError: errors.New("input exceeds 32 characters"),
+			name:          "Empty username",
+			username:      "",
+			password:      "New_Password123",
+			expectedError: errors.New("username is empty"),
 		},
 		{
-			name:          "No Password",
-			input:         []string{""},
-			expectedError: errors.New("empty input"),
+			name:          "Empty password",
+			username:      "New-Username",
+			password:      "",
+			expectedError: errors.New("password is empty"),
+		},
+		{
+			name:          "Long username",
+			username:      "Картофелекопатель",
+			password:      "New_Password123",
+			expectedError: errors.New("username exceeds 32 bytes"),
+		},
+		{
+			name:          "Long Password",
+			username:      "New-Username",
+			password:      "New-Very-Very-Very-Very-Big-Password",
+			expectedError: errors.New("password exceeds 32 bytes"),
+		},
+		{
+			name:          "Short username",
+			username:      "1",
+			password:      "New_Password123",
+			expectedError: errors.New("username is less than 3 characters"),
+		},
+		{
+			name:          "Short password",
+			username:      "New-Username",
+			password:      "qwerty",
+			expectedError: errors.New("password is less than 8 characters"),
+		},
+		{
+			name:          "Invalid characters in username",
+			username:      "Валерий",
+			password:      "New_Password123",
+			expectedError: errors.New("username has invalid character"),
+		},
+		{
+			name:          "Invalid characters in password",
+			username:      "New-Username",
+			password:      "qwerty 123",
+			expectedError: errors.New("password has invalid character"),
+		},
+		{
+			name:          "No digit(s) in password",
+			username:      "New-Username",
+			password:      "New_Password",
+			expectedError: errors.New("password must contain at least one english letter and one digit"),
 		},
 	}
 
 	for _, testCase := range testTable {
 		t.Run(testCase.name, func(t *testing.T) {
-			assert.Equal(t, inputValidate(testCase.input...), testCase.expectedError)
+			assert.Equal(t, authInputValidation(testCase.username, testCase.password), testCase.expectedError)
 		})
 	}
 }

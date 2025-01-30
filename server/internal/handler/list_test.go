@@ -44,7 +44,14 @@ func TestList_createList(t *testing.T) {
 			inputBody:            `{"title":""}`,
 			mockBehavior:         func(s *mock_service.MockTodoList, userId string, list todo.List) {},
 			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"err":"empty input"}`,
+			expectedResponseBody: `{"err":"list title is empty"}`,
+		},
+		{
+			name:                 "Long title",
+			inputBody:            `{"title":"Ultimate Productivity Checklist 24/7"}`,
+			mockBehavior:         func(s *mock_service.MockTodoList, userId string, list todo.List) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"err":"list title exceeds 32 characters"}`,
 		},
 		{
 			name:      "Service error",
@@ -171,11 +178,18 @@ func TestList_updateList(t *testing.T) {
 			expectedResponseBody: `{"status":"ok"}`,
 		},
 		{
-			name:                 "Invalid input 1",
+			name:                 "No title",
 			inputBody:            `{"title":""}`,
 			mockBehavior:         func(s *mock_service.MockTodoList, userId, listId string, list todo.List) {},
 			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"err":"empty input"}`,
+			expectedResponseBody: `{"err":"list title is empty"}`,
+		},
+		{
+			name:                 "Long title",
+			inputBody:            `{"title":"Ultimate Productivity Checklist 24/7"}`,
+			mockBehavior:         func(s *mock_service.MockTodoList, userId, listId string, list todo.List) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"err":"list title exceeds 32 characters"}`,
 		},
 		{
 			name:      "Service error",

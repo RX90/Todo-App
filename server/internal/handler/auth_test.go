@@ -28,10 +28,10 @@ func TestAuth_signUp(t *testing.T) {
 	}{
 		{
 			name:      "Valid input",
-			inputBody: `{"username":"Тестовый Username123", "password":"Тестовый Password123"}`,
+			inputBody: `{"username":"Username-123", "password":"Password_123"}`,
 			inputUser: todo.User{
-				Username: "Тестовый Username123",
-				Password: "Тестовый Password123",
+				Username: "Username-123",
+				Password: "Password_123",
 			},
 			mockBehavior: func(s *mock_service.MockAuthorization, user todo.User) {
 				s.EXPECT().CreateUser(user).Return(nil)
@@ -57,14 +57,14 @@ func TestAuth_signUp(t *testing.T) {
 			inputBody:            `{}`,
 			mockBehavior:         func(s *mock_service.MockAuthorization, user todo.User) {},
 			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"err":"empty input"}`,
+			expectedResponseBody: `{"err":"can't validate input: username is empty"}`,
 		},
 		{
 			name:                 "Empty required field",
 			inputBody:            `{"username":"", "password":"hello world"}`,
 			mockBehavior:         func(s *mock_service.MockAuthorization, user todo.User) {},
 			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"err":"empty input"}`,
+			expectedResponseBody: `{"err":"can't validate input: username is empty"}`,
 		},
 		{
 			name:      "Invalid input 2",
@@ -75,7 +75,7 @@ func TestAuth_signUp(t *testing.T) {
 			},
 			mockBehavior:         func(s *mock_service.MockAuthorization, user todo.User) {},
 			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"err":"password is less than 8 characters"}`,
+			expectedResponseBody: `{"err":"can't validate input: password is less than 8 characters"}`,
 		},
 		{
 			name:      "Service error",
@@ -131,10 +131,10 @@ func TestAuth_signIn(t *testing.T) {
 	}{
 		{
 			name:      "Valid input",
-			inputBody: `{"username":"Existing User", "password":"Correct Password"}`,
+			inputBody: `{"username":"Existing_User", "password":"Correct-Password1"}`,
 			inputUser: todo.User{
-				Username: "Existing User",
-				Password: "Correct Password",
+				Username: "Existing_User",
+				Password: "Correct-Password1",
 			},
 			mockBehavior: func(s *mock_service.MockAuthorization, user todo.User) {
 				s.EXPECT().GetUserId(user).Return("1", nil)
@@ -147,10 +147,10 @@ func TestAuth_signIn(t *testing.T) {
 		},
 		{
 			name:      "Get user id error",
-			inputBody: `{"username":"Non-existing User", "password":"Incorrect Password"}`,
+			inputBody: `{"username":"Non-existing-User", "password":"Incorrect-Password1"}`,
 			inputUser: todo.User{
-				Username: "Non-existing User",
-				Password: "Incorrect Password",
+				Username: "Non-existing-User",
+				Password: "Incorrect-Password1",
 			},
 			mockBehavior: func(s *mock_service.MockAuthorization, user todo.User) {
 				s.EXPECT().GetUserId(user).Return("", errors.New("user not found"))
@@ -160,10 +160,10 @@ func TestAuth_signIn(t *testing.T) {
 		},
 		{
 			name:      "Create access token error",
-			inputBody: `{"username":"Existing User", "password":"Correct Password"}`,
+			inputBody: `{"username":"Existing-User", "password":"Correct-Password1"}`,
 			inputUser: todo.User{
-				Username: "Existing User",
-				Password: "Correct Password",
+				Username: "Existing-User",
+				Password: "Correct-Password1",
 			},
 			mockBehavior: func(s *mock_service.MockAuthorization, user todo.User) {
 				s.EXPECT().GetUserId(user).Return("1", nil)
@@ -174,10 +174,10 @@ func TestAuth_signIn(t *testing.T) {
 		},
 		{
 			name:      "Create refresh token error",
-			inputBody: `{"username":"Existing User", "password":"Correct Password"}`,
+			inputBody: `{"username":"Existing-User", "password":"Correct-Password1"}`,
 			inputUser: todo.User{
-				Username: "Existing User",
-				Password: "Correct Password",
+				Username: "Existing-User",
+				Password: "Correct-Password1",
 			},
 			mockBehavior: func(s *mock_service.MockAuthorization, user todo.User) {
 				s.EXPECT().GetUserId(user).Return("1", nil)

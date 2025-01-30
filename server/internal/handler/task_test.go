@@ -54,15 +54,15 @@ func TestTask_createTask(t *testing.T) {
 			inputBody:            `{"title":""}`,
 			mockBehavior:         func(s *mock_service.MockTodoTask, userId, listId string, task todo.Task) {},
 			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"err":"empty input"}`,
+			expectedResponseBody: `{"err":"task title is empty"}`,
 		},
 		{
-			name:                 "Invalid title",
+			name:                 "Very long title",
 			listId:               "2",
-			inputBody:            `{"title":"New taskkkkkkkkkkkkkkkkkkkkkkkkkkkkkk"}`,
+			inputBody:            `{"title":"3653532164531868247981135657773729915111314349983362545668878193857794314649327131871769623321936763474616927847968356751617623142849781523457868417262515831552693153235167374392823716169184639125836356429164652517954879192794842658745178494539612837651989"}`,
 			mockBehavior:         func(s *mock_service.MockTodoTask, userId, listId string, task todo.Task) {},
 			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"err":"input exceeds 32 characters"}`,
+			expectedResponseBody: `{"err":"task title exceeds 255 characters"}`,
 		},
 		{
 			name:      "Service error",
@@ -222,21 +222,6 @@ func TestTask_updateTask(t *testing.T) {
 			expectedResponseBody: `{"status":"ok"}`,
 		},
 		{
-			name:      "Valid input 3",
-			listId:    "2",
-			taskId:    "3",
-			inputBody: `{"title":"New Task Title", "done":true}`,
-			inputTask: todo.UpdateTaskInput{
-				Title: toPointer("New Task Title"),
-				Done:  toPointer(true),
-			},
-			mockBehavior: func(s *mock_service.MockTodoTask, userId, listId, taskId string, task todo.UpdateTaskInput) {
-				s.EXPECT().Update(userId, listId, taskId, task).Return(nil)
-			},
-			expectedStatusCode:   http.StatusOK,
-			expectedResponseBody: `{"status":"ok"}`,
-		},
-		{
 			name:                 "Invalid listId",
 			listId:               `{"listId":"2"}`,
 			taskId:               "3",
@@ -253,7 +238,7 @@ func TestTask_updateTask(t *testing.T) {
 			expectedResponseBody: `{"err":"can't get task id: strconv.Atoi: parsing \"{\\\"taskId\\\":\\\"3\\\"}\": invalid syntax"}`,
 		},
 		{
-			name:                 "No values 1",
+			name:                 "No values",
 			listId:               "2",
 			taskId:               "3",
 			mockBehavior:         func(s *mock_service.MockTodoTask, userId, listId, taskId string, task todo.UpdateTaskInput) {},
@@ -261,7 +246,7 @@ func TestTask_updateTask(t *testing.T) {
 			expectedResponseBody: `{"err":"can't bind JSON: EOF"}`,
 		},
 		{
-			name:                 "No values 2",
+			name:                 "Empty structure",
 			listId:               "2",
 			taskId:               "3",
 			inputBody:            `{}`,
@@ -270,13 +255,42 @@ func TestTask_updateTask(t *testing.T) {
 			expectedResponseBody: `{"err":"update structure has no values"}`,
 		},
 		{
-			name:                 "No values 3",
-			listId:               "2",
-			taskId:               "3",
-			inputBody:            `{"title": ""}`,
+			name:      "No title",
+			listId:    "2",
+			taskId:    "3",
+			inputBody: `{"title":""}`,
+			inputTask: todo.UpdateTaskInput{
+				Title: toPointer(""),
+			},
 			mockBehavior:         func(s *mock_service.MockTodoTask, userId, listId, taskId string, task todo.UpdateTaskInput) {},
 			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"err":"empty input"}`,
+			expectedResponseBody: `{"err":"task title is empty"}`,
+		},
+		{
+			name:      "Very long title",
+			listId:    "2",
+			taskId:    "3",
+			inputBody: `{"title":"3653532164531868247981135657773729915111314349983362545668878193857794314649327131871769623321936763474616927847968356751617623142849781523457868417262515831552693153235167374392823716169184639125836356429164652517954879192794842658745178494539612837651989"}`,
+			inputTask: todo.UpdateTaskInput{
+				Title: toPointer("3653532164531868247981135657773729915111314349983362545668878193857794314649327131871769623321936763474616927847968356751617623142849781523457868417262515831552693153235167374392823716169184639125836356429164652517954879192794842658745178494539612837651989"),
+			},
+			mockBehavior:         func(s *mock_service.MockTodoTask, userId, listId, taskId string, task todo.UpdateTaskInput) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"err":"task title exceeds 255 characters"}`,
+		},
+		{
+			name:      "Service error",
+			listId:    "2",
+			taskId:    "3",
+			inputBody: `{"title":"New Task Title"}`,
+			inputTask: todo.UpdateTaskInput{
+				Title: toPointer("New Task Title"),
+			},
+			mockBehavior: func(s *mock_service.MockTodoTask, userId, listId, taskId string, task todo.UpdateTaskInput) {
+				s.EXPECT().Update(userId, listId, taskId, task).Return(errors.New("service error"))
+			},
+			expectedStatusCode:   http.StatusInternalServerError,
+			expectedResponseBody: `{"err":"can't update task: service error"}`,
 		},
 	}
 
