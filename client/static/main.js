@@ -9,18 +9,26 @@ let createAccount = document.getElementById("create-account");
 let pupopTitle = document.getElementById("pupop-title");
 let infoText = document.getElementById("info-text");
 const panel = document.querySelector(".panel");
+const loginButton = document.getElementById("login-button");
 
 //Проверка существует ли у пользователя токен, если нет, мы отправляем его регаться или логиниться
-// if (
-//   !localStorage.getItem("accessToken") ||
-//   localStorage.getItem("accessToken").trim() === ""
-// ) {
-//   console.log("Токен не найден");
-//   showPopup();
-// } else {
-//   console.log("Токен получен", localStorage.getItem("accessToken"));
-//   hiddenPopup();
-// }
+if (
+  !localStorage.getItem("accessToken") ||
+  localStorage.getItem("accessToken").trim() === ""
+) {
+  console.log("Токен не найден");
+  loginButton.addEventListener("click", function () {
+    showPopup();
+  });
+} else {
+  console.log("Токен получен", localStorage.getItem("accessToken"));
+  hiddenPopup();
+  loginButton.textContent = "Выйти";
+  loginButton.addEventListener("click", function () {
+    localStorage.removeItem("accessToken"); // Полностью удаляем токен
+    location.reload(); // Перезагружаем страницу
+  });
+}
 
 function showPopup() {
   popupWindow.style.display = "block";
@@ -36,9 +44,11 @@ popupButton.addEventListener("click", async function () {
       console.log("Регистрация пользователя:", username.value);
       await signUp(username.value, password.value);
       await signIn(username.value, password.value);
+      location.reload();
     } else {
       console.log("Вход пользователя:", username.value);
       await signIn(username.value, password.value);
+      location.reload();
     }
     hiddenPopup();
   } catch (error) {
@@ -170,49 +180,57 @@ function openPanel(listId, listName) {
 const taskInput = document.getElementById("task-input");
 const taskButton = document.getElementById("task-button");
 
-taskInput.addEventListener("keydown", async function (event) {
-  if (event.key === "Enter" && taskInput.value.trim() !== "") {
-    const taskTitle = taskInput.value.trim();
-    const listId = details.getAttribute("data-id");
-    console;
-    // Проверяем токен только здесь
-    if (
-      !localStorage.getItem("accessToken") ||
-      localStorage.getItem("accessToken").trim() === ""
-    ) {
-      console.log("Токен не найден");
-      showPopup(); // Показываем окно логина, если токена нет
-      return; // Прерываем выполнение, чтобы задача не создавалась
-    }
+async function createTask() {
+  if (taskInput.value.trim() === "") return; // Проверяем, что поле не пустое
 
-    try {
-      const newObject = await sendTask(listId, taskTitle);
-      const newTaskId = newObject.task_id;
-      console.log("Title:", taskTitle);
+  const taskTitle = taskInput.value.trim();
+  const listId = details.getAttribute("data-id");
 
-      if (newTaskId) {
-        const newTask = {
-          id: newTaskId,
-          title: taskTitle,
-          done: false,
-        };
-
-        console.log("New TASK:", newTask);
-        renderSingleTask(newTask);
-        taskInput.value = "";
-      }
-    } catch (error) {
-      console.error("Ошибка при создании задачи:", error);
-      alert("Не удалось создать задачу: " + error.message);
-    }
+  if (
+    !localStorage.getItem("accessToken") ||
+    localStorage.getItem("accessToken").trim() === ""
+  ) {
+    console.log("Токен не найден");
+    showPopup();
+    return; // Прерываем выполнение, если нет токена
   }
+
+  try {
+    const newObject = await sendTask(listId, taskTitle);
+    const newTaskId = newObject.task_id;
+    console.log("Title:", taskTitle);
+
+    if (newTaskId) {
+      const newTask = {
+        id: newTaskId,
+        title: taskTitle,
+        done: false,
+      };
+
+      console.log("New TASK:", newTask);
+      renderSingleTask(newTask);
+      taskInput.value = ""; // Очищаем поле после успешного создания
+    }
+  } catch (error) {
+    console.error("Ошибка при создании задачи:", error);
+    alert("Не удалось создать задачу: " + error.message);
+  }
+}
+
+taskInput.addEventListener("keydown", async function (event) {
+  if (event.key === "Enter") {
+    await createTask();
+  }
+});
+
+taskButton.addEventListener("click", async function () {
+  await createTask();
 });
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     const lists = await getAllLists();
     console.log("Получили листы:", lists);
-
     if (lists && Array.isArray(lists)) {
       lists.forEach((list) => renderSingleList(list.id, list.title));
     } else {
