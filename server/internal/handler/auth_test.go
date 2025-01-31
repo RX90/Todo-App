@@ -12,7 +12,7 @@ import (
 	"github.com/RX90/Todo-App/server/internal/todo"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
-	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAuth_signUp(t *testing.T) {
@@ -111,8 +111,8 @@ func TestAuth_signUp(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			assert.Equal(t, w.Code, testCase.expectedStatusCode)
-			assert.Equal(t, w.Body.String(), testCase.expectedResponseBody)
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
 		})
 	}
 }
@@ -208,10 +208,10 @@ func TestAuth_signIn(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			assert.Equal(t, w.Code, testCase.expectedStatusCode)
-			assert.Equal(t, w.Body.String(), testCase.expectedResponseBody)
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
 			if testCase.expectedRefreshToken != "" {
-				assert.Equal(t, w.Result().Cookies()[0].Value, testCase.expectedRefreshToken)
+				assert.Equal(t, testCase.expectedRefreshToken, w.Result().Cookies()[0].Value)
 			}
 		})
 	}
@@ -350,10 +350,10 @@ func TestAuth_refreshTokens(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			assert.Equal(t, w.Code, testCase.expectedStatusCode)
-			assert.Equal(t, w.Body.String(), testCase.expectedResponseBody)
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
 			if testCase.expectedRefreshToken != "" {
-				assert.Equal(t, w.Result().Cookies()[0].Value, testCase.expectedRefreshToken)
+				assert.Equal(t, testCase.expectedRefreshToken, w.Result().Cookies()[0].Value)
 			}
 		})
 	}
@@ -419,8 +419,8 @@ func TestAuth_logout(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			assert.Equal(t, w.Code, testCase.expectedStatusCode)
-			assert.Equal(t, w.Body.String(), testCase.expectedResponseBody)
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
 		})
 	}
 }

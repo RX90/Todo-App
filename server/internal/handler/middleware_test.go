@@ -10,7 +10,7 @@ import (
 	mock_service "github.com/RX90/Todo-App/server/internal/service/mocks"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
-	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestMiddleware_userIdentity(t *testing.T) {
@@ -102,8 +102,8 @@ func TestMiddleware_userIdentity(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			assert.Equal(t, w.Code, testCase.expectedStatusCode)
-			assert.Equal(t, w.Body.String(), testCase.expectedResponseBody)
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
 		})
 	}
 }
@@ -179,7 +179,7 @@ func TestMiddleware_authInputValidation(t *testing.T) {
 
 	for _, testCase := range testTable {
 		t.Run(testCase.name, func(t *testing.T) {
-			assert.Equal(t, authInputValidation(testCase.username, testCase.password), testCase.expectedError)
+			assert.Equal(t, testCase.expectedError, authInputValidation(testCase.username, testCase.password))
 		})
 	}
 }

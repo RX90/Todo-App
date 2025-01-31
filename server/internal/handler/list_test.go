@@ -13,7 +13,7 @@ import (
 	"github.com/RX90/Todo-App/server/internal/todo"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
-	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestList_createList(t *testing.T) {
@@ -91,8 +91,8 @@ func TestList_createList(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			assert.Equal(t, w.Code, testCase.expectedStatusCode)
-			assert.Equal(t, w.Body.String(), testCase.expectedResponseBody)
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
 		})
 	}
 }
@@ -148,8 +148,8 @@ func TestList_getAllLists(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			assert.Equal(t, w.Code, testCase.expectedStatusCode)
-			assert.Equal(t, w.Body.String(), testCase.expectedResponseBody)
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
 		})
 	}
 }
@@ -232,8 +232,8 @@ func TestList_updateList(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			assert.Equal(t, w.Code, testCase.expectedStatusCode)
-			assert.Equal(t, w.Body.String(), testCase.expectedResponseBody)
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
 		})
 	}
 }
@@ -292,8 +292,8 @@ func TestList_deleteList(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			assert.Equal(t, w.Code, testCase.expectedStatusCode)
-			assert.Equal(t, w.Body.String(), testCase.expectedResponseBody)
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
 		})
 	}
 }
