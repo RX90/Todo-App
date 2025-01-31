@@ -104,6 +104,36 @@ function renderSingleTask(task) {
   titleTask.textContent = task.title;
   titleTask.classList.add("title-task");
 
+  const panelTask = document.createElement("div");
+  panelTask.classList.add("panel-task");
+  panelTask.style.display = "none";
+  panelTask.style.position = "fixed";
+  panelTask.style.zIndex = "1000";
+
+  const deleteTask = document.createElement("button");
+  deleteTask.textContent = "Delete";
+
+  const editTask = document.createElement("button");
+  editTask.textContent = "Edit";
+
+  panelTask.appendChild(editTask);
+  panelTask.appendChild(deleteTask);
+  document.body.appendChild(panelTask); // Добавляем в body, а не в menuTask
+
+  menuTask.addEventListener("contextmenu", function (event) {
+    event.preventDefault();
+
+    panelTask.style.display = "block";
+    panelTask.style.left = `${event.clientX}px`;
+    panelTask.style.top = `${event.clientY}px`;
+  });
+
+  document.addEventListener("click", function (event) {
+    if (!panelTask.contains(event.target) && !menuTask.contains(event.target)) {
+      panelTask.style.display = "none";
+    }
+  });
+
   if (task.done) {
     titleTask.style.textDecoration = "line-through";
   }
@@ -131,7 +161,6 @@ function renderSingleTask(task) {
 
   menuTask.appendChild(circleIcon);
   menuTask.appendChild(titleTask);
-
   taskList.appendChild(menuTask);
 }
 

@@ -134,6 +134,8 @@ body {
   height: 8%;
   font-family: "Rubik Regular";
   margin-top: 2%;
+  border: 1px solid white;
+  cursor: pointer;
 }
 
 .circle-icon {
@@ -219,3 +221,12 @@ body {
   width: 40%;
   font-family: "Rubik Medium";
 }
+
+/* .panel-task {
+  width: 15%;
+  height: 15%;
+  background-color: white;
+  position: absolute;
+  right: 30%;
+  top: 21.5%;
+} */

@@ -322,11 +322,5 @@ async function refreshToken() {
   }
 }
 
-//Login: Repa
-//Password: Rarara555
-
-//Петрович
-//Pidor338
-
 //Гитлер
 //Harosh555
