@@ -102,13 +102,32 @@ function renderSingleTask(task) {
     : "/src/img/circle.svg";
   circleIcon.classList.add("circle-icon");
 
-  const titleTask = document.createElement("span");
-  titleTask.textContent = task.title;
+  const titleTask = document.createElement("input");
+  titleTask.value = task.title;
   titleTask.classList.add("title-task");
+  titleTask.disabled = true;
 
   const editTask = document.createElement("img");
   editTask.src = "/src/img/edit.svg";
   editTask.classList.add("edit-task");
+
+  editTask.addEventListener("click", async function (event) {
+    titleTask.disabled = false;
+    titleTask.style.border = "1px solid white";
+
+    titleTask.addEventListener("keydown", async function (event) {
+      if (event.key === "Enter" && titleTask.value.trim() !== "") {
+        const listId = details.getAttribute("data-id");
+        const taskId = Number(menuTask.getAttribute("data-task-id"));
+        const newTitle = titleTask.value.trim();
+
+        await EditTask(taskId, listId, newTitle);
+
+        titleTask.disabled = true;
+        titleTask.style.border = "none";
+      }
+    });
+  });
 
   const deleteTask = document.createElement("img");
   deleteTask.src = "/src/img/delete.svg";

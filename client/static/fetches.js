@@ -378,5 +378,38 @@ async function DeleteTask(listId, taskId) {
   }
 }
 
+async function EditTask(taskId, listId, newTitle) {
+  const updateTitle = { title: newTitle };
+  try {
+    const response = await fetch(`/api/lists/${listId}/tasks/${taskId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      body: JSON.stringify(updateTitle),
+    });
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error("Error logout:", errorResponse);
+      if (response.status === 401) {
+        if (errorResponse.err === "token has expired") {
+          console.log("Token expired, refreshing token...");
+          await refreshToken();
+          console.log("Retrying edit task");
+          await logout();
+        } else {
+          showPopup();
+        }
+      }
+      throw new Error(errorResponse.message || "Error while edit task");
+    }
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.log("Не удалось переименовать задачу");
+  }
+}
+
 //Giga5
 //GigaMenchik555

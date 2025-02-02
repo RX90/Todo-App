@@ -160,8 +160,12 @@ body {
 }
 
 .title-task {
-  padding-left: 6%;
+  margin-left: 6%;
   font-size: 15px;
+  background-color: rgb(88, 82, 82);
+  outline: none;
+  border: none;
+  color: white;
 }
 
 #background {
