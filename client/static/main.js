@@ -11,7 +11,6 @@ let infoText = document.getElementById("info-text");
 const panel = document.querySelector(".panel");
 const loginButton = document.getElementById("login-button");
 
-//Проверка существует ли у пользователя токен, если нет, мы отправляем его регаться или логиниться
 if (
   !localStorage.getItem("accessToken") ||
   localStorage.getItem("accessToken").trim() === ""
@@ -23,10 +22,13 @@ if (
 } else {
   console.log("Токен получен", localStorage.getItem("accessToken"));
   hiddenPopup();
+}
+
+async function logoutLocalStorage() {
   loginButton.textContent = "Выйти";
-  loginButton.addEventListener("click", function () {
-    localStorage.removeItem("accessToken"); // Полностью удаляем токен
-    location.reload(); // Перезагружаем страницу
+  loginButton.addEventListener("click", async function () {
+    await logout();
+    location.reload();
   });
 }
 
@@ -104,34 +106,19 @@ function renderSingleTask(task) {
   titleTask.textContent = task.title;
   titleTask.classList.add("title-task");
 
-  const panelTask = document.createElement("div");
-  panelTask.classList.add("panel-task");
-  panelTask.style.display = "none";
-  panelTask.style.position = "fixed";
-  panelTask.style.zIndex = "1000";
+  const editTask = document.createElement("img");
+  editTask.src = "/src/img/edit.svg";
+  editTask.classList.add("edit-task");
 
-  const deleteTask = document.createElement("button");
-  deleteTask.textContent = "Delete";
+  const deleteTask = document.createElement("img");
+  deleteTask.src = "/src/img/delete.svg";
+  deleteTask.classList.add("delete-task");
 
-  const editTask = document.createElement("button");
-  editTask.textContent = "Edit";
-
-  panelTask.appendChild(editTask);
-  panelTask.appendChild(deleteTask);
-  document.body.appendChild(panelTask); // Добавляем в body, а не в menuTask
-
-  menuTask.addEventListener("contextmenu", function (event) {
-    event.preventDefault();
-
-    panelTask.style.display = "block";
-    panelTask.style.left = `${event.clientX}px`;
-    panelTask.style.top = `${event.clientY}px`;
-  });
-
-  document.addEventListener("click", function (event) {
-    if (!panelTask.contains(event.target) && !menuTask.contains(event.target)) {
-      panelTask.style.display = "none";
-    }
+  deleteTask.addEventListener("click", async function () {
+    const listId = details.getAttribute("data-id");
+    const taskId = Number(menuTask.getAttribute("data-task-id"));
+    await DeleteTask(listId, taskId);
+    menuTask.remove();
   });
 
   if (task.done) {
@@ -160,6 +147,8 @@ function renderSingleTask(task) {
   });
 
   menuTask.appendChild(circleIcon);
+  menuTask.appendChild(editTask);
+  menuTask.appendChild(deleteTask);
   menuTask.appendChild(titleTask);
   taskList.appendChild(menuTask);
 }

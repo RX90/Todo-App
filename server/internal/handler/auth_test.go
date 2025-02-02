@@ -12,7 +12,7 @@ import (
 	"github.com/RX90/Todo-App/server/internal/todo"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
-	"github.com/magiconair/properties/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestAuth_signUp(t *testing.T) {
@@ -28,10 +28,10 @@ func TestAuth_signUp(t *testing.T) {
 	}{
 		{
 			name:      "Valid input",
-			inputBody: `{"username":"Тестовый Username123", "password":"Тестовый Password123"}`,
+			inputBody: `{"username":"Username-123", "password":"Password_123"}`,
 			inputUser: todo.User{
-				Username: "Тестовый Username123",
-				Password: "Тестовый Password123",
+				Username: "Username-123",
+				Password: "Password_123",
 			},
 			mockBehavior: func(s *mock_service.MockAuthorization, user todo.User) {
 				s.EXPECT().CreateUser(user).Return(nil)
@@ -53,11 +53,18 @@ func TestAuth_signUp(t *testing.T) {
 			expectedResponseBody: `{"err":"can't bind JSON: EOF"}`,
 		},
 		{
+			name:                 "Empty structure",
+			inputBody:            `{}`,
+			mockBehavior:         func(s *mock_service.MockAuthorization, user todo.User) {},
+			expectedStatusCode:   http.StatusBadRequest,
+			expectedResponseBody: `{"err":"can't validate input: username is empty"}`,
+		},
+		{
 			name:                 "Empty required field",
 			inputBody:            `{"username":"", "password":"hello world"}`,
 			mockBehavior:         func(s *mock_service.MockAuthorization, user todo.User) {},
 			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"err":"empty input"}`,
+			expectedResponseBody: `{"err":"can't validate input: username is empty"}`,
 		},
 		{
 			name:      "Invalid input 2",
@@ -68,7 +75,7 @@ func TestAuth_signUp(t *testing.T) {
 			},
 			mockBehavior:         func(s *mock_service.MockAuthorization, user todo.User) {},
 			expectedStatusCode:   http.StatusBadRequest,
-			expectedResponseBody: `{"err":"password is less than 8 characters"}`,
+			expectedResponseBody: `{"err":"can't validate input: password is less than 8 characters"}`,
 		},
 		{
 			name:      "Service error",
@@ -104,8 +111,8 @@ func TestAuth_signUp(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			assert.Equal(t, w.Code, testCase.expectedStatusCode)
-			assert.Equal(t, w.Body.String(), testCase.expectedResponseBody)
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
 		})
 	}
 }
@@ -124,10 +131,10 @@ func TestAuth_signIn(t *testing.T) {
 	}{
 		{
 			name:      "Valid input",
-			inputBody: `{"username":"Existing User", "password":"Correct Password"}`,
+			inputBody: `{"username":"Existing_User", "password":"Correct-Password1"}`,
 			inputUser: todo.User{
-				Username: "Existing User",
-				Password: "Correct Password",
+				Username: "Existing_User",
+				Password: "Correct-Password1",
 			},
 			mockBehavior: func(s *mock_service.MockAuthorization, user todo.User) {
 				s.EXPECT().GetUserId(user).Return("1", nil)
@@ -140,10 +147,10 @@ func TestAuth_signIn(t *testing.T) {
 		},
 		{
 			name:      "Get user id error",
-			inputBody: `{"username":"Non-existing User", "password":"Incorrect Password"}`,
+			inputBody: `{"username":"Non-existing-User", "password":"Incorrect-Password1"}`,
 			inputUser: todo.User{
-				Username: "Non-existing User",
-				Password: "Incorrect Password",
+				Username: "Non-existing-User",
+				Password: "Incorrect-Password1",
 			},
 			mockBehavior: func(s *mock_service.MockAuthorization, user todo.User) {
 				s.EXPECT().GetUserId(user).Return("", errors.New("user not found"))
@@ -153,10 +160,10 @@ func TestAuth_signIn(t *testing.T) {
 		},
 		{
 			name:      "Create access token error",
-			inputBody: `{"username":"Existing User", "password":"Correct Password"}`,
+			inputBody: `{"username":"Existing-User", "password":"Correct-Password1"}`,
 			inputUser: todo.User{
-				Username: "Existing User",
-				Password: "Correct Password",
+				Username: "Existing-User",
+				Password: "Correct-Password1",
 			},
 			mockBehavior: func(s *mock_service.MockAuthorization, user todo.User) {
 				s.EXPECT().GetUserId(user).Return("1", nil)
@@ -167,10 +174,10 @@ func TestAuth_signIn(t *testing.T) {
 		},
 		{
 			name:      "Create refresh token error",
-			inputBody: `{"username":"Existing User", "password":"Correct Password"}`,
+			inputBody: `{"username":"Existing-User", "password":"Correct-Password1"}`,
 			inputUser: todo.User{
-				Username: "Existing User",
-				Password: "Correct Password",
+				Username: "Existing-User",
+				Password: "Correct-Password1",
 			},
 			mockBehavior: func(s *mock_service.MockAuthorization, user todo.User) {
 				s.EXPECT().GetUserId(user).Return("1", nil)
@@ -201,10 +208,10 @@ func TestAuth_signIn(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			assert.Equal(t, w.Code, testCase.expectedStatusCode)
-			assert.Equal(t, w.Body.String(), testCase.expectedResponseBody)
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
 			if testCase.expectedRefreshToken != "" {
-				assert.Equal(t, w.Result().Cookies()[0].Value, testCase.expectedRefreshToken)
+				assert.Equal(t, testCase.expectedRefreshToken, w.Result().Cookies()[0].Value)
 			}
 		})
 	}
@@ -223,11 +230,25 @@ func TestAuth_refreshTokens(t *testing.T) {
 		expectedRefreshToken string
 	}{
 		{
-			name:         "Valid input",
-			accessToken:  "valid-access-token",
+			name:         "Valid input 1",
+			accessToken:  "expired-valid-access-token",
 			refreshToken: "valid-refresh-token",
 			mockBehavior: func(s *mock_service.MockAuthorization, accessToken, refreshToken string) {
 				s.EXPECT().ParseAccessToken(accessToken).Return("1", errors.New("token has expired"))
+				s.EXPECT().CheckRefreshToken("1", refreshToken).Return(nil)
+				s.EXPECT().NewAccessToken("1").Return("new-valid-access-token", nil)
+				s.EXPECT().NewRefreshToken("1").Return("new-valid-refresh-token", nil)
+			},
+			expectedStatusCode:   http.StatusOK,
+			expectedResponseBody: `{"token":"new-valid-access-token"}`,
+			expectedRefreshToken: "new-valid-refresh-token",
+		},
+		{
+			name:         "Valid input 2",
+			accessToken:  "valid-access-token",
+			refreshToken: "valid-refresh-token",
+			mockBehavior: func(s *mock_service.MockAuthorization, accessToken, refreshToken string) {
+				s.EXPECT().ParseAccessToken(accessToken).Return("1", nil)
 				s.EXPECT().CheckRefreshToken("1", refreshToken).Return(nil)
 				s.EXPECT().NewAccessToken("1").Return("new-valid-access-token", nil)
 				s.EXPECT().NewRefreshToken("1").Return("new-valid-refresh-token", nil)
@@ -329,10 +350,10 @@ func TestAuth_refreshTokens(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			assert.Equal(t, w.Code, testCase.expectedStatusCode)
-			assert.Equal(t, w.Body.String(), testCase.expectedResponseBody)
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
 			if testCase.expectedRefreshToken != "" {
-				assert.Equal(t, w.Result().Cookies()[0].Value, testCase.expectedRefreshToken)
+				assert.Equal(t, testCase.expectedRefreshToken, w.Result().Cookies()[0].Value)
 			}
 		})
 	}
@@ -398,8 +419,8 @@ func TestAuth_logout(t *testing.T) {
 
 			r.ServeHTTP(w, req)
 
-			assert.Equal(t, w.Code, testCase.expectedStatusCode)
-			assert.Equal(t, w.Body.String(), testCase.expectedResponseBody)
+			assert.Equal(t, testCase.expectedStatusCode, w.Code)
+			assert.Equal(t, testCase.expectedResponseBody, w.Body.String())
 		})
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"unicode/utf8"
 
 	"github.com/RX90/Todo-App/server/internal/todo"
 	"github.com/gin-gonic/gin"
@@ -19,8 +20,13 @@ func (h *Handler) createList(c *gin.Context) {
 		return
 	}
 
-	if err := inputValidate(input.Title); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+	l := utf8.RuneCountInString(input.Title)
+
+	if l == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "list title is empty"})
+		return
+	} else if l > 32 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "list title exceeds 32 characters"})
 		return
 	}
 
@@ -35,7 +41,7 @@ func (h *Handler) createList(c *gin.Context) {
 
 func (h *Handler) getAllLists(c *gin.Context) {
 	userId := getUserCtx(c)
-	
+
 	lists, err := h.services.TodoList.GetAll(userId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't get all lists: %s", err.Error())})
@@ -62,8 +68,13 @@ func (h *Handler) updateList(c *gin.Context) {
 		return
 	}
 
-	if err := inputValidate(input.Title); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+	l := utf8.RuneCountInString(input.Title)
+
+	if l == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "list title is empty"})
+		return
+	} else if l > 32 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "list title exceeds 32 characters"})
 		return
 	}
 

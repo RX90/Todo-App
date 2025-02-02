@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"strings"
-	"unicode/utf8"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,16 +42,58 @@ func getUserCtx(c *gin.Context) string {
 	return idAny.(string)
 }
 
-func inputValidate(input ...string) error {
-	for _, data := range input {
-		l := utf8.RuneCountInString(data)
-		
-		if l == 0 {
-			return errors.New("empty input")
-		} else if l > 32 {
-			return errors.New("input exceeds 32 characters")
+func authInputValidation(username, password string) error {
+	l1, l2 := len(username), len(password)
+	hasLetter, hasDigit := false, false
+
+	switch {
+	case l1 == 0:
+		return errors.New("username is empty")
+	case l2 == 0:
+		return errors.New("password is empty")
+	case l1 > 32:
+		return errors.New("username exceeds 32 bytes")
+	case l2 > 32:
+		return errors.New("password exceeds 32 bytes")
+	case l1 < 3:
+		return errors.New("username is less than 3 characters")
+	case l2 < 8:
+		return errors.New("password is less than 8 characters")
+	}
+
+	for _, char := range username {
+		if !isAllowed(char) {
+			return errors.New("username has invalid character")
 		}
 	}
 
+	for _, char := range password {
+		if !isAllowed(char) {
+			return errors.New("password has invalid character")
+		}
+
+		if isLetter(char) {
+			hasLetter = true
+		} else if isDigit(char) {
+			hasDigit = true
+		}
+	}
+
+	if !hasLetter || !hasDigit {
+		return errors.New("password must contain at least one english letter and one digit")
+	}
+
 	return nil
+}
+
+func isAllowed(r rune) bool {
+	return ('a' <= r && r <= 'z') || ('A' <= r && r <= 'Z') || ('0' <= r && r <= '9') || r == '-' || r == '_'
+}
+
+func isLetter(r rune) bool {
+	return ('a' <= r && r <= 'z') || ('A' <= r && r <= 'Z')
+}
+
+func isDigit(r rune) bool {
+	return '0' <= r && r <= '9'
 }

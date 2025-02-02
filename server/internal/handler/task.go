@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"unicode/utf8"
 
 	"github.com/RX90/Todo-App/server/internal/todo"
 	"github.com/gin-gonic/gin"
@@ -26,8 +27,13 @@ func (h *Handler) createTask(c *gin.Context) {
 		return
 	}
 
-	if err := inputValidate(input.Title); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+	l := utf8.RuneCountInString(input.Title)
+
+	if l == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "task title is empty"})
+		return
+	} else if l > 255 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "task title exceeds 255 characters"})
 		return
 	}
 
@@ -89,8 +95,13 @@ func (h *Handler) updateTask(c *gin.Context) {
 	}
 
 	if input.Title != nil {
-		if err := inputValidate(*input.Title); err != nil {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+		l := utf8.RuneCountInString(*input.Title)
+
+		if l == 0 {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "task title is empty"})
+			return
+		} else if l > 255 {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "task title exceeds 255 characters"})
 			return
 		}
 	}

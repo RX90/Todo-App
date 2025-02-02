@@ -130,12 +130,15 @@ body {
 .menu-task {
   display: flex;
   align-items: center;
-  padding: 10px 50px;
+  padding: 10px 10px;
   height: 8%;
+  width: 60%;
   font-family: "Rubik Regular";
   margin-top: 2%;
-  border: 1px solid white;
+  margin-left: 5%;
+
   cursor: pointer;
+  background-color: rgb(88, 82, 82);
 }
 
 .circle-icon {
@@ -143,7 +146,7 @@ body {
   height: 18px;
   position: absolute;
   cursor: pointer;
-  padding-left: 2%;
+  padding-left: 1%;
 }
 
 #task-button {
@@ -222,11 +225,16 @@ body {
   font-family: "Rubik Medium";
 }
 
-/* .panel-task {
-  width: 15%;
-  height: 15%;
-  background-color: white;
+.edit-task {
   position: absolute;
-  right: 30%;
-  top: 21.5%;
-} */
+  left: 60%;
+  width: 16px;
+  height: 16px;
+}
+
+.delete-task {
+  position: absolute;
+  left: 63%;
+  width: 16px;
+  height: 16px;
+}

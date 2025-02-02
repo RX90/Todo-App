@@ -20,9 +20,9 @@ CREATE TABLE users_lists
 
 CREATE TABLE tasks
 (
-    id          serial      not null unique,
-    title       varchar(32) not null,
-    done        boolean     not null default false
+    id          serial       not null unique,
+    title       varchar(255) not null,
+    done        boolean      not null default false
 );
 
 
@@ -43,6 +43,6 @@ CREATE TABLE tokens
 CREATE TABLE users_tokens 
 (
     id       serial                                       not null unique,
-    user_id  int references users (id) on delete cascade  not null,
+    user_id  int references users  (id) on delete cascade not null,
     token_id int references tokens (id) on delete cascade not null
 );
