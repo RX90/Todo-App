@@ -170,6 +170,12 @@ func TestMiddleware_authInputValidation(t *testing.T) {
 			expectedError: errors.New("password has invalid character"),
 		},
 		{
+			name:          "No letter(s) in password",
+			username:      "New-Username",
+			password:      "1234567890",
+			expectedError: errors.New("password must contain at least one english letter and one digit"),
+		},
+		{
 			name:          "No digit(s) in password",
 			username:      "New-Username",
 			password:      "New_Password",

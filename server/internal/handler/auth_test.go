@@ -40,7 +40,7 @@ func TestAuth_signUp(t *testing.T) {
 			expectedResponseBody: `{"status":"ok"}`,
 		},
 		{
-			name:                 "Invalid input 1",
+			name:                 "Invalid input",
 			inputBody:            `{"username":Michael, "password":true}`,
 			mockBehavior:         func(s *mock_service.MockAuthorization, user todo.User) {},
 			expectedStatusCode:   http.StatusBadRequest,
@@ -67,7 +67,7 @@ func TestAuth_signUp(t *testing.T) {
 			expectedResponseBody: `{"err":"can't validate input: username is empty"}`,
 		},
 		{
-			name:      "Invalid input 2",
+			name:      "Password is short",
 			inputBody: `{"username":"Michael", "password":"7symbol"}`,
 			inputUser: todo.User{
 				Username: "Michael",

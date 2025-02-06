@@ -87,7 +87,7 @@ func (r *TaskDB) Update(userId, listId, taskId string, task todo.UpdateTaskInput
 	argId := 1
 
 	if task.Title != nil {
-		exists, err := r.isTitleExistsInTasks(userId, *task.Title)
+		exists, err := r.isTitleExistsInTasks(listId, *task.Title)
 		if err != nil {
 			return err
 		}
