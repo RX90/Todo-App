@@ -10,6 +10,7 @@ let pupopTitle = document.getElementById("pupop-title");
 let infoText = document.getElementById("info-text");
 const panel = document.querySelector(".panel");
 const loginButton = document.getElementById("login-button");
+let activePanel = null;
 
 if (
   !localStorage.getItem("accessToken") ||
@@ -79,7 +80,7 @@ function renderSingleList(listid, title) {
   const addList = document.createElement("input");
   addList.classList.add("add-list");
   addList.value = title;
-  addList.readOnly = true;
+  addList.disabled = true;
 
   const dots = document.createElement("img");
   dots.src = "/src/img/dots.svg";
@@ -87,15 +88,65 @@ function renderSingleList(listid, title) {
 
   dots.addEventListener("click", (event) => {
     event.stopPropagation(); // Останавливаем всплытие
+    if (activePanel) {
+      activePanel.remove();
+    }
+
     const dotsPanel = document.createElement("div");
     dotsPanel.classList.add("dots-panel");
 
-    const dotsEdit = document.createElement("p");
+    const dotsEdit = document.createElement("button");
     dotsEdit.textContent = "Edit";
     dotsEdit.classList.add("dots-edit");
 
+    const iconDotsEdit = document.createElement("img");
+    iconDotsEdit.src = "/src/img/black-edit.svg";
+    iconDotsEdit.classList.add("dots-delete-icon");
+
+    const dotsDelete = document.createElement("button");
+    dotsDelete.textContent = "Delete";
+    dotsDelete.classList.add("dots-delete");
+
+    const iconDotsDelete = document.createElement("img");
+    iconDotsDelete.src = "/src/img/black-delete.svg";
+    iconDotsDelete.classList.add("dots-delete-icon");
+
+    dotsEdit.appendChild(iconDotsEdit);
+    dotsDelete.appendChild(iconDotsDelete);
+    dotsPanel.appendChild(dotsDelete);
     dotsPanel.appendChild(dotsEdit);
     document.body.appendChild(dotsPanel);
+
+    dotsDelete.addEventListener("click", async function () {
+      const listId = menuItem.getAttribute("data-id");
+
+      await DeleteList(listId);
+      location.reload();
+    });
+
+    dotsEdit.addEventListener("click", function () {
+      addList.disabled = false;
+      addList.focus();
+      addList.style.border = "1px solid white";
+
+      addList.addEventListener("keydown", async function (event) {
+        if (event.key === "Enter") {
+          const newTitleList = addList.value.trim();
+          if (newTitleList !== "" && newTitleList !== title) {
+            await EditList(listid, newTitleList);
+            title = newTitleList;
+          }
+          addList.disabled = true;
+          addList.style.border = "none";
+        }
+      });
+    });
+
+    const place = dots.getBoundingClientRect();
+    dotsPanel.style.top = `${place.top + window.scrollY + 20}px`;
+    dotsPanel.style.left = `${place.left + window.scrollX + 10}px`;
+
+    activePanel = dotsPanel;
   });
 
   menuItem.appendChild(imgList);
@@ -108,6 +159,18 @@ function renderSingleList(listid, title) {
     console.log(listid, title);
   });
 }
+
+//Сброс панели по клику на экран
+document.addEventListener("click", (event) => {
+  if (
+    activePanel &&
+    !activePanel.contains(event.target) &&
+    !event.target.classList.contains("dots")
+  ) {
+    activePanel.remove();
+    activePanel = null;
+  }
+});
 
 function renderSingleTask(task) {
   const taskList = document.querySelector(".task-list");
@@ -158,8 +221,9 @@ function renderSingleTask(task) {
     const listId = details.getAttribute("data-id");
     const taskId = Number(menuTask.getAttribute("data-task-id"));
     await DeleteTask(listId, taskId);
-    menuTask.remove();
   });
+
+  menuTask.remove();
 
   function moveToCorrectPlace() {
     menuTask.remove();
@@ -246,6 +310,7 @@ function openPanel(listId, listName) {
 
   taskList.innerHTML = "";
   completedList.innerHTML = "";
+  // dotsPanel.innerHTML = "";
 
   const titleCompleted = document.querySelector(".title-completed");
   titleCompleted.style.display = "none";

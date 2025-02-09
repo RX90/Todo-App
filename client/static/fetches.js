@@ -411,5 +411,69 @@ async function EditTask(taskId, listId, newTitle) {
   }
 }
 
+async function DeleteList(listId) {
+  try {
+    const response = await fetch(`/api/lists/${listId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+    });
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error("Error logout:", errorResponse);
+      if (response.status === 401) {
+        if (errorResponse.err === "token has expired") {
+          console.log("Token expired, refreshing token...");
+          await refreshToken();
+          console.log("Retrying delete list");
+          await logout();
+        } else {
+          showPopup();
+        }
+      }
+      throw new Error(errorResponse.message || "Error while delete list");
+    }
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error("Не удалось удалить лист ", error);
+  }
+}
+
+async function EditList(listId, newTitleList) {
+  const updateTitleList = { title: newTitleList };
+  try {
+    const response = await fetch(`/api/lists/${listId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("accessToken"),
+      },
+      body: JSON.stringify(updateTitleList),
+    });
+    if (!response.ok) {
+      const errorResponse = await response.json();
+      console.error("Error logout:", errorResponse);
+      if (response.status === 401) {
+        if (errorResponse.err === "token has expired") {
+          console.log("Token expired, refreshing token...");
+          await refreshToken();
+          console.log("Retrying edit title");
+          await logout();
+        } else {
+          showPopup();
+        }
+      }
+      throw new Error(errorResponse.message || "Error while edit list");
+    }
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.log("Не удалось переименовать лист");
+  }
+}
+
 //Giga5
 //GigaMenchik555
