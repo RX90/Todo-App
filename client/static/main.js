@@ -220,7 +220,13 @@ function renderSingleTask(task) {
   deleteTask.addEventListener("click", async function () {
     const listId = details.getAttribute("data-id");
     const taskId = Number(menuTask.getAttribute("data-task-id"));
-    await DeleteTask(listId, taskId);
+    const success = await DeleteTask(listId, taskId);
+
+    if (success) {
+      menuTask.remove(); // Удаляем задачу из DOM
+    } else {
+      alert("Ошибка при удалении задачи!");
+    }
   });
 
   menuTask.remove();
