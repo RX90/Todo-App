@@ -76,12 +76,31 @@ function renderSingleList(listid, title) {
   imgList.classList.add("icon-list");
   imgList.setAttribute("src", "/src/img/list.svg");
 
-  const addList = document.createElement("p");
+  const addList = document.createElement("input");
   addList.classList.add("add-list");
-  addList.textContent = title;
+  addList.value = title;
+  addList.readOnly = true;
+
+  const dots = document.createElement("img");
+  dots.src = "/src/img/dots.svg";
+  dots.classList.add("dots");
+
+  dots.addEventListener("click", (event) => {
+    event.stopPropagation(); // Останавливаем всплытие
+    const dotsPanel = document.createElement("div");
+    dotsPanel.classList.add("dots-panel");
+
+    const dotsEdit = document.createElement("p");
+    dotsEdit.textContent = "Edit";
+    dotsEdit.classList.add("dots-edit");
+
+    dotsPanel.appendChild(dotsEdit);
+    document.body.appendChild(dotsPanel);
+  });
 
   menuItem.appendChild(imgList);
   menuItem.appendChild(addList);
+  menuItem.appendChild(dots);
   menu.appendChild(menuItem);
 
   menuItem.addEventListener("click", () => {
@@ -92,6 +111,8 @@ function renderSingleList(listid, title) {
 
 function renderSingleTask(task) {
   const taskList = document.querySelector(".task-list");
+  const completedList = document.querySelector(".completed");
+
   const menuTask = document.createElement("div");
   menuTask.classList.add("menu-task");
   menuTask.setAttribute("data-task-id", task.id);
@@ -140,8 +161,19 @@ function renderSingleTask(task) {
     menuTask.remove();
   });
 
-  if (task.done) {
-    titleTask.style.textDecoration = "line-through";
+  function moveToCorrectPlace() {
+    menuTask.remove();
+    const listId = details.getAttribute("data-id");
+
+    if (task.done) {
+      const titleCompleted = document.querySelector(".title-completed");
+      titleCompleted.style.display = "block";
+      completedList.appendChild(menuTask);
+      titleTask.style.textDecoration = "line-through";
+    } else {
+      taskList.appendChild(menuTask);
+      titleTask.style.textDecoration = "none";
+    }
   }
 
   circleIcon.addEventListener("click", async function () {
@@ -156,7 +188,7 @@ function renderSingleTask(task) {
         circleIcon.src = newState
           ? "/src/img/color-circle.svg"
           : "/src/img/circle.svg";
-        titleTask.style.textDecoration = newState ? "line-through" : "none";
+        moveToCorrectPlace();
       } else {
         console.error("Ошибка обновления задачи");
       }
@@ -169,7 +201,8 @@ function renderSingleTask(task) {
   menuTask.appendChild(editTask);
   menuTask.appendChild(deleteTask);
   menuTask.appendChild(titleTask);
-  taskList.appendChild(menuTask);
+
+  moveToCorrectPlace();
 }
 
 //Создание листов
@@ -209,7 +242,13 @@ function openPanel(listId, listName) {
   title.textContent = listName;
 
   const taskList = document.querySelector(".task-list");
-  taskList.innerHTML = ""; // Очищаем только задачи
+  const completedList = document.querySelector(".completed");
+
+  taskList.innerHTML = "";
+  completedList.innerHTML = "";
+
+  const titleCompleted = document.querySelector(".title-completed");
+  titleCompleted.style.display = "none";
 
   getAllTasks(listId);
 }
@@ -218,7 +257,7 @@ const taskInput = document.getElementById("task-input");
 const taskButton = document.getElementById("task-button");
 
 async function createTask() {
-  if (taskInput.value.trim() === "") return; // Проверяем, что поле не пустое
+  if (taskInput.value.trim() === "") return;
 
   const taskTitle = taskInput.value.trim();
   const listId = details.getAttribute("data-id");
@@ -229,7 +268,7 @@ async function createTask() {
   ) {
     console.log("Токен не найден");
     showPopup();
-    return; // Прерываем выполнение, если нет токена
+    return;
   }
 
   try {
