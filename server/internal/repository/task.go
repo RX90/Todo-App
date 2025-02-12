@@ -123,7 +123,7 @@ func (r *TaskDB) Update(userId, listId, taskId string, task todo.UpdateTaskInput
 	return err
 }
 
-func (r TaskDB) Delete(userId, listId, taskId string) error {
+func (r *TaskDB) Delete(userId, listId, taskId string) error {
 	query := fmt.Sprintf(`
 		DELETE FROM %s t
 		USING %s lt
