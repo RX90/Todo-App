@@ -3,7 +3,7 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
-  background-color: rgb(36, 33, 33);
+  background-color: #171616;
   height: 100vh; /* Высота всей страницы */
   margin: 0;
 }
@@ -22,10 +22,17 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 80%;
+  gap: 60%;
   width: 100%;
-  height: 80px;
-  background-color: rgba(41, 37, 37, 1);
+  height: 60px;
+  background-color: #1f1d1d;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 5%;
+  width: 20%;
 }
 
 .todo-name {
@@ -33,13 +40,14 @@ body {
   margin-left: 5%;
   font-family: "Rubik Medium";
   font-size: 20px;
+  width: 10%;
 }
 
 .menu {
   width: 23%;
-  height: 88%;
-  background-color: rgb(36, 33, 33);
-  border: 1px solid white;
+  min-height: 91.6vh;
+  background-color: #1b1b1b;
+  overflow: auto;
 }
 
 .menu-item {
@@ -51,8 +59,20 @@ body {
   font-family: "Rubik Regular";
   cursor: pointer;
   position: relative;
-  width: 88%;
-  height: 5%;
+  width: 85%;
+  height: 1%;
+  background-color: #1b1b1b;
+  padding: 3px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.menu-item:hover {
+  background-color: rgb(67, 66, 66);
+}
+
+.menu-item:first-child:hover {
+  background-color: #1b1b1b; /* Оставляем цвет неизменным */
 }
 
 .plus-icon {
@@ -62,17 +82,17 @@ body {
 }
 
 #new-list {
-  background-color: rgb(36, 33, 33);
+  background-color: #1b1b1b;
   border: none;
   outline: none;
   font-family: "Rubik Regular";
   color: white;
-  padding: 10px;
+  padding: 15px;
   font-size: 15px;
 }
 
 .add-list {
-  background-color: rgb(36, 33, 33);
+  background-color: #1b1b1b;
   font-size: 15px;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -80,6 +100,8 @@ body {
   pointer-events: none;
   color: white;
   border: none;
+  padding: 10px;
+  background-color: transparent;
 }
 
 .menu-item:first-child {
@@ -96,7 +118,7 @@ body {
 }
 
 #details {
-  background-color: rgb(36, 33, 33);
+  background-color: #171616;
   color: white;
   position: absolute;
   top: 11%;
@@ -116,20 +138,25 @@ body {
   padding: 10px 150px;
   font-size: 20px;
   font-family: "Rubik Regular";
+  color: #9146ff;
 }
 
 #task-input {
   background-color: rgb(36, 33, 33);
   color: white;
-  padding-left: 3%;
+  padding-left: 2%;
   font-size: 15px;
   border: 1px solid white;
   border-radius: 5px;
-  width: 70%;
+  width: 65%;
   height: 35px;
   margin-left: 13%;
   outline: none;
   position: relative;
+}
+
+#task-input:focus {
+  border: 2px solid #9146ff;
 }
 
 .task-creation {
@@ -147,12 +174,12 @@ body {
   margin-top: 2%;
   margin-left: 13%;
   cursor: pointer;
-  background-color: rgb(88, 82, 82);
+  border-radius: 3px;
 }
 
 .circle-icon {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
   position: absolute;
   cursor: pointer;
   padding-left: 1%;
@@ -160,21 +187,29 @@ body {
 
 #task-button {
   position: absolute;
-  right: 14%;
+  right: 12%;
   font-family: "Rubik Regular";
   border-radius: 5px;
-  padding: 8px;
+  padding: 11px;
   cursor: pointer;
   font-size: 12px;
+  border: none;
+  width: 80px;
+}
+
+#task-button:active {
+  background-color: #9146ff;
+  color: white;
 }
 
 .title-task {
   margin-left: 6%;
-  font-size: 15px;
-  background-color: rgb(88, 82, 82);
+  font-size: 17px;
+  background-color: #171616;
   outline: none;
   border: none;
-  color: white;
+  /* color: white; */
+  color: rgb(152, 147, 147);
 }
 
 #background {
@@ -196,8 +231,8 @@ body {
   transform: translate(-50%, -50%);
   z-index: 1000;
   width: 40%;
-  height: 47%;
-  background-color: rgb(50, 50, 50);
+  height: 50%;
+  background-color: #19171c;
   color: white;
   padding: 20px;
   border-radius: 10px;
@@ -215,6 +250,14 @@ body {
   padding: 10px;
   border-radius: 5px;
   margin-top: 5%;
+  background-color: #19171c;
+  border: 1px solid white;
+  color: white;
+  outline: none;
+}
+
+#window-input-username:focus {
+  border: 3px solid #9146ff;
 }
 
 #window-input-password {
@@ -223,19 +266,34 @@ body {
   padding: 10px;
   border-radius: 5px;
   margin-top: 5%;
+  outline: none;
+  color: white;
+  background-color: #19171c;
+  border: none;
+  border: 1px solid white;
+}
+
+#window-input-password:focus {
+  border: 3px solid #9146ff;
 }
 
 #pupop-window p {
-  margin-top: 4%;
   font-size: 14px;
   text-align: center;
+  margin-top: 5%;
 }
 
 #window-button {
   margin-top: 3%;
   padding: 10px;
   width: 40%;
+  height: 12%;
   font-family: "Rubik Medium";
+  border-radius: 5px;
+  background-color: #9146ff;
+  color: white;
+  outline: none;
+  border: none;
 }
 
 .edit-task {
@@ -254,14 +312,14 @@ body {
 
 .title-completed {
   margin-top: 10%;
-  padding: 10px 50px;
+  padding: 10px 150px;
   font-family: "Rubik Regular";
   display: none;
 }
 
 .dots {
   position: fixed;
-  left: 21%;
+  left: 19%;
   opacity: 0;
   transition: opacity 0.3s;
   width: 20px;
@@ -275,36 +333,49 @@ body {
 .dots-panel {
   width: 140px;
   height: auto;
-  background-color: white;
+  background-color: rgb(71, 66, 66);
   position: absolute;
-  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); /* Глубокая, мягкая тень */
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 8px; /* Чуть сильнее скругление */
   display: flex;
   justify-content: center;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
 }
 
 #login-button {
-  padding: 10px;
-  background-color: white;
-  width: 5%;
+  padding: 7px;
+  background-color: #4c4a4f;
+  width: 30%;
   font-family: "Rubik Regular";
   border-radius: 5px;
+  color: white;
+  border: none;
+}
+
+#login-button-signin {
+  padding: 7px;
+  background-color: #9146ff;
+  width: 50%;
+  font-family: "Rubik Regular";
+  border-radius: 5px;
+  color: white;
+  border: none;
 }
 
 .dots-edit,
 .dots-delete {
   border: none;
   outline: none;
-  background-color: white;
+  background-color: rgb(71, 66, 66);
   font-family: "Rubik Regular";
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
   height: 30px;
+  color: white;
 }
 
 .dots-delete-icon {
@@ -312,14 +383,23 @@ body {
   left: 4%;
   width: 15px;
   height: 15px;
+  color: white;
 }
 
 .dots-delete:hover {
-  background-color: rgb(186, 170, 170);
+  background-color: rgb(96, 87, 87);
   border-radius: 3px;
+  opacity: 0, 5;
+  cursor: pointer;
 }
 
 .dots-edit:hover {
-  background-color: rgb(186, 170, 170);
+  background-color: rgb(96, 87, 87);
   border-radius: 3px;
+  opacity: 0, 5;
+  cursor: pointer;
+}
+
+.add-list:focus {
+  outline: none;
 }

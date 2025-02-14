@@ -10,6 +10,7 @@ let pupopTitle = document.getElementById("pupop-title");
 let infoText = document.getElementById("info-text");
 const panel = document.querySelector(".panel");
 const loginButton = document.getElementById("login-button");
+const loginButtonSignIn = document.getElementById("login-button-signin");
 let activePanel = null;
 
 if (
@@ -26,7 +27,8 @@ if (
 }
 
 async function logoutLocalStorage() {
-  loginButton.textContent = "Выйти";
+  loginButtonSignIn.style.display = "none";
+  loginButton.textContent = "Logout";
   loginButton.addEventListener("click", async function () {
     await logout();
     location.reload();
@@ -100,7 +102,7 @@ function renderSingleList(listid, title) {
     dotsEdit.classList.add("dots-edit");
 
     const iconDotsEdit = document.createElement("img");
-    iconDotsEdit.src = "/src/img/black-edit.svg";
+    iconDotsEdit.src = "/src/img/edit.svg";
     iconDotsEdit.classList.add("dots-delete-icon");
 
     const dotsDelete = document.createElement("button");
@@ -108,7 +110,7 @@ function renderSingleList(listid, title) {
     dotsDelete.classList.add("dots-delete");
 
     const iconDotsDelete = document.createElement("img");
-    iconDotsDelete.src = "/src/img/black-delete.svg";
+    iconDotsDelete.src = "/src/img/delete.svg";
     iconDotsDelete.classList.add("dots-delete-icon");
 
     dotsEdit.appendChild(iconDotsEdit);
@@ -119,7 +121,6 @@ function renderSingleList(listid, title) {
 
     dotsDelete.addEventListener("click", async function () {
       const listId = menuItem.getAttribute("data-id");
-
       await DeleteList(listId);
       location.reload();
     });
@@ -127,7 +128,6 @@ function renderSingleList(listid, title) {
     dotsEdit.addEventListener("click", function () {
       addList.disabled = false;
       addList.focus();
-      addList.style.border = "1px solid white";
 
       addList.addEventListener("keydown", async function (event) {
         if (event.key === "Enter") {
@@ -137,7 +137,6 @@ function renderSingleList(listid, title) {
             title = newTitleList;
           }
           addList.disabled = true;
-          addList.style.border = "none";
         }
       });
     });
@@ -181,9 +180,7 @@ function renderSingleTask(task) {
   menuTask.setAttribute("data-task-id", task.id);
 
   const circleIcon = document.createElement("img");
-  circleIcon.src = task.done
-    ? "/src/img/color-circle.svg"
-    : "/src/img/circle.svg";
+  circleIcon.src = task.done ? "/src/img/done.svg" : "/src/img/!done.svg";
   circleIcon.classList.add("circle-icon");
 
   const titleTask = document.createElement("input");
@@ -197,7 +194,7 @@ function renderSingleTask(task) {
 
   editTask.addEventListener("click", async function (event) {
     titleTask.disabled = false;
-    titleTask.style.border = "1px solid white";
+    titleTask.focus();
 
     titleTask.addEventListener("keydown", async function (event) {
       if (event.key === "Enter" && titleTask.value.trim() !== "") {
@@ -208,7 +205,6 @@ function renderSingleTask(task) {
         await EditTask(taskId, listId, newTitle);
 
         titleTask.disabled = true;
-        titleTask.style.border = "none";
       }
     });
   });
@@ -234,15 +230,19 @@ function renderSingleTask(task) {
   function moveToCorrectPlace() {
     menuTask.remove();
     const listId = details.getAttribute("data-id");
+    const titleCompleted = document.querySelector(".title-completed");
 
     if (task.done) {
-      const titleCompleted = document.querySelector(".title-completed");
       titleCompleted.style.display = "block";
       completedList.appendChild(menuTask);
       titleTask.style.textDecoration = "line-through";
     } else {
       taskList.appendChild(menuTask);
       titleTask.style.textDecoration = "none";
+    }
+
+    if (completedList.children.length === 0) {
+      titleCompleted.style.display = "none";
     }
   }
 
@@ -255,9 +255,7 @@ function renderSingleTask(task) {
       const updatedTask = toggleTaskState(taskId, newState, listId);
       if (updatedTask) {
         task.done = newState;
-        circleIcon.src = newState
-          ? "/src/img/color-circle.svg"
-          : "/src/img/circle.svg";
+        circleIcon.src = newState ? "/src/img/done.svg" : "/src/img/!done.svg";
         moveToCorrectPlace();
       } else {
         console.error("Ошибка обновления задачи");

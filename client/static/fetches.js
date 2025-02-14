@@ -342,7 +342,6 @@ async function logout() {
     // return result;
   } catch (error) {
     console.error("Error in logout", error);
-    alert("Failed to logout " + error.message);
     localStorage.removeItem("accessToken");
   }
 }
