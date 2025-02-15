@@ -10,6 +10,8 @@ let pupopTitle = document.getElementById("pupop-title");
 let infoText = document.getElementById("info-text");
 const panel = document.querySelector(".panel");
 const loginButton = document.getElementById("login-button");
+const loginButtonSignIn = document.getElementById("login-button-signin");
+let activePanel = null;
 
 if (
   !localStorage.getItem("accessToken") ||
@@ -25,7 +27,8 @@ if (
 }
 
 async function logoutLocalStorage() {
-  loginButton.textContent = "Выйти";
+  loginButtonSignIn.style.display = "none";
+  loginButton.textContent = "Logout";
   loginButton.addEventListener("click", async function () {
     await logout();
     location.reload();
@@ -76,12 +79,78 @@ function renderSingleList(listid, title) {
   imgList.classList.add("icon-list");
   imgList.setAttribute("src", "/src/img/list.svg");
 
-  const addList = document.createElement("p");
+  const addList = document.createElement("input");
   addList.classList.add("add-list");
-  addList.textContent = title;
+  addList.value = title;
+  addList.disabled = true;
+
+  const dots = document.createElement("img");
+  dots.src = "/src/img/dots.svg";
+  dots.classList.add("dots");
+
+  dots.addEventListener("click", (event) => {
+    event.stopPropagation(); // Останавливаем всплытие
+    if (activePanel) {
+      activePanel.remove();
+    }
+
+    const dotsPanel = document.createElement("div");
+    dotsPanel.classList.add("dots-panel");
+
+    const dotsEdit = document.createElement("button");
+    dotsEdit.textContent = "Edit";
+    dotsEdit.classList.add("dots-edit");
+
+    const iconDotsEdit = document.createElement("img");
+    iconDotsEdit.src = "/src/img/edit.svg";
+    iconDotsEdit.classList.add("dots-delete-icon");
+
+    const dotsDelete = document.createElement("button");
+    dotsDelete.textContent = "Delete";
+    dotsDelete.classList.add("dots-delete");
+
+    const iconDotsDelete = document.createElement("img");
+    iconDotsDelete.src = "/src/img/delete.svg";
+    iconDotsDelete.classList.add("dots-delete-icon");
+
+    dotsEdit.appendChild(iconDotsEdit);
+    dotsDelete.appendChild(iconDotsDelete);
+    dotsPanel.appendChild(dotsDelete);
+    dotsPanel.appendChild(dotsEdit);
+    document.body.appendChild(dotsPanel);
+
+    dotsDelete.addEventListener("click", async function () {
+      const listId = menuItem.getAttribute("data-id");
+      await DeleteList(listId);
+      location.reload();
+    });
+
+    dotsEdit.addEventListener("click", function () {
+      addList.disabled = false;
+      addList.focus();
+
+      addList.addEventListener("keydown", async function (event) {
+        if (event.key === "Enter") {
+          const newTitleList = addList.value.trim();
+          if (newTitleList !== "" && newTitleList !== title) {
+            await EditList(listid, newTitleList);
+            title = newTitleList;
+          }
+          addList.disabled = true;
+        }
+      });
+    });
+
+    const place = dots.getBoundingClientRect();
+    dotsPanel.style.top = `${place.top + window.scrollY + 20}px`;
+    dotsPanel.style.left = `${place.left + window.scrollX + 10}px`;
+
+    activePanel = dotsPanel;
+  });
 
   menuItem.appendChild(imgList);
   menuItem.appendChild(addList);
+  menuItem.appendChild(dots);
   menu.appendChild(menuItem);
 
   menuItem.addEventListener("click", () => {
@@ -90,16 +159,28 @@ function renderSingleList(listid, title) {
   });
 }
 
+//Сброс панели по клику на экран
+document.addEventListener("click", (event) => {
+  if (
+    activePanel &&
+    !activePanel.contains(event.target) &&
+    !event.target.classList.contains("dots")
+  ) {
+    activePanel.remove();
+    activePanel = null;
+  }
+});
+
 function renderSingleTask(task) {
   const taskList = document.querySelector(".task-list");
+  const completedList = document.querySelector(".completed");
+
   const menuTask = document.createElement("div");
   menuTask.classList.add("menu-task");
   menuTask.setAttribute("data-task-id", task.id);
 
   const circleIcon = document.createElement("img");
-  circleIcon.src = task.done
-    ? "/src/img/color-circle.svg"
-    : "/src/img/circle.svg";
+  circleIcon.src = task.done ? "/src/img/done.svg" : "/src/img/!done.svg";
   circleIcon.classList.add("circle-icon");
 
   const titleTask = document.createElement("input");
@@ -113,7 +194,7 @@ function renderSingleTask(task) {
 
   editTask.addEventListener("click", async function (event) {
     titleTask.disabled = false;
-    titleTask.style.border = "1px solid white";
+    titleTask.focus();
 
     titleTask.addEventListener("keydown", async function (event) {
       if (event.key === "Enter" && titleTask.value.trim() !== "") {
@@ -124,7 +205,6 @@ function renderSingleTask(task) {
         await EditTask(taskId, listId, newTitle);
 
         titleTask.disabled = true;
-        titleTask.style.border = "none";
       }
     });
   });
@@ -136,12 +216,34 @@ function renderSingleTask(task) {
   deleteTask.addEventListener("click", async function () {
     const listId = details.getAttribute("data-id");
     const taskId = Number(menuTask.getAttribute("data-task-id"));
-    await DeleteTask(listId, taskId);
-    menuTask.remove();
+    const success = await DeleteTask(listId, taskId);
+
+    if (success) {
+      menuTask.remove(); // Удаляем задачу из DOM
+    } else {
+      alert("Ошибка при удалении задачи!");
+    }
   });
 
-  if (task.done) {
-    titleTask.style.textDecoration = "line-through";
+  menuTask.remove();
+
+  function moveToCorrectPlace() {
+    menuTask.remove();
+    const listId = details.getAttribute("data-id");
+    const titleCompleted = document.querySelector(".title-completed");
+
+    if (task.done) {
+      titleCompleted.style.display = "block";
+      completedList.appendChild(menuTask);
+      titleTask.style.textDecoration = "line-through";
+    } else {
+      taskList.appendChild(menuTask);
+      titleTask.style.textDecoration = "none";
+    }
+
+    if (completedList.children.length === 0) {
+      titleCompleted.style.display = "none";
+    }
   }
 
   circleIcon.addEventListener("click", async function () {
@@ -153,10 +255,8 @@ function renderSingleTask(task) {
       const updatedTask = toggleTaskState(taskId, newState, listId);
       if (updatedTask) {
         task.done = newState;
-        circleIcon.src = newState
-          ? "/src/img/color-circle.svg"
-          : "/src/img/circle.svg";
-        titleTask.style.textDecoration = newState ? "line-through" : "none";
+        circleIcon.src = newState ? "/src/img/done.svg" : "/src/img/!done.svg";
+        moveToCorrectPlace();
       } else {
         console.error("Ошибка обновления задачи");
       }
@@ -169,7 +269,8 @@ function renderSingleTask(task) {
   menuTask.appendChild(editTask);
   menuTask.appendChild(deleteTask);
   menuTask.appendChild(titleTask);
-  taskList.appendChild(menuTask);
+
+  moveToCorrectPlace();
 }
 
 //Создание листов
@@ -209,7 +310,14 @@ function openPanel(listId, listName) {
   title.textContent = listName;
 
   const taskList = document.querySelector(".task-list");
-  taskList.innerHTML = ""; // Очищаем только задачи
+  const completedList = document.querySelector(".completed");
+
+  taskList.innerHTML = "";
+  completedList.innerHTML = "";
+  // dotsPanel.innerHTML = "";
+
+  const titleCompleted = document.querySelector(".title-completed");
+  titleCompleted.style.display = "none";
 
   getAllTasks(listId);
 }
@@ -218,7 +326,7 @@ const taskInput = document.getElementById("task-input");
 const taskButton = document.getElementById("task-button");
 
 async function createTask() {
-  if (taskInput.value.trim() === "") return; // Проверяем, что поле не пустое
+  if (taskInput.value.trim() === "") return;
 
   const taskTitle = taskInput.value.trim();
   const listId = details.getAttribute("data-id");
@@ -229,7 +337,7 @@ async function createTask() {
   ) {
     console.log("Токен не найден");
     showPopup();
-    return; // Прерываем выполнение, если нет токена
+    return;
   }
 
   try {
