@@ -32,6 +32,20 @@ func (r *TaskDB) isTitleExistsInTasks(listId, title string) (bool, error) {
 	return exists, err
 }
 
+func (r *TaskDB) countUserTasks(listId string) (int, error) {
+	var count int
+
+	query := fmt.Sprintf(`
+		SELECT COUNT(*) AS tasks_count
+		FROM %s
+		WHERE list_id = $1`,
+		listsTasksTable,
+	)
+	err := r.db.QueryRow(query, listId).Scan(&count)
+
+	return count, err
+}
+
 func (r *TaskDB) Create(listId string, task todo.Task) (string, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -44,6 +58,14 @@ func (r *TaskDB) Create(listId string, task todo.Task) (string, error) {
 	}
 	if exists {
 		return "", fmt.Errorf("task '%s' is already exists", task.Title)
+	}
+
+	count, err := r.countUserTasks(listId)
+	if err != nil {
+		return "", err
+	}
+	if count >= 50 {
+		return "", fmt.Errorf("reached the limit of tasks")
 	}
 
 	var taskId string

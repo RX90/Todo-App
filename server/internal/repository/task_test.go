@@ -100,6 +100,85 @@ func TestTask_isTitleExistsInTasks(t *testing.T) {
 	}
 }
 
+func TestTask_countUserTasks(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	assert.NoError(t, err)
+	defer db.Close()
+
+	sqlxDB := sqlx.NewDb(db, "postgres")
+	repo := newTaskDB(sqlxDB)
+
+	testTable := []struct {
+		name          string
+		listId        string
+		mockFunc      func(mock sqlmock.Sqlmock, listId string)
+		expectedCount int
+		wantErr       bool
+	}{
+		{
+			name:   "Didn't reach the limit",
+			listId: "2",
+			mockFunc: func(mock sqlmock.Sqlmock, listId string) {
+				query := regexp.QuoteMeta(`
+					SELECT COUNT(*) AS tasks_count
+					FROM lists_tasks
+					WHERE list_id = $1`,
+				)
+				rows := sqlmock.NewRows([]string{"tasks_count"}).AddRow(40)
+				mock.ExpectQuery(query).WithArgs(listId).WillReturnRows(rows)
+			},
+			expectedCount: 40,
+			wantErr:       false,
+		},
+		{
+			name:   "Reached the limit",
+			listId: "2",
+			mockFunc: func(mock sqlmock.Sqlmock, listId string) {
+				query := regexp.QuoteMeta(`
+					SELECT COUNT(*) AS tasks_count
+					FROM lists_tasks
+					WHERE list_id = $1`,
+				)
+				rows := sqlmock.NewRows([]string{"tasks_count"}).AddRow(50)
+				mock.ExpectQuery(query).WithArgs(listId).WillReturnRows(rows)
+			},
+			expectedCount: 50,
+			wantErr:       false,
+		},
+		{
+			name:   "DB error",
+			listId: "2",
+			mockFunc: func(mock sqlmock.Sqlmock, listId string) {
+				query := regexp.QuoteMeta(`
+					SELECT COUNT(*) AS tasks_count
+					FROM lists_tasks
+					WHERE list_id = $1`,
+				)
+				mock.ExpectQuery(query).WithArgs(listId).WillReturnError(errors.New("db error"))
+			},
+			expectedCount: 0,
+			wantErr:       true,
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.name, func(t *testing.T) {
+			testCase.mockFunc(mock, testCase.listId)
+
+			count, err := repo.countUserTasks(testCase.listId)
+
+			if testCase.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+
+			assert.Equal(t, testCase.expectedCount, count)
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
 func TestTask_Create(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -133,6 +212,14 @@ func TestTask_Create(t *testing.T) {
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(listId, task.Title).WillReturnRows(rows)
+
+				query = regexp.QuoteMeta(`
+					SELECT COUNT(*) AS tasks_count
+					FROM lists_tasks
+					WHERE list_id = $1`,
+				)
+				rows = sqlmock.NewRows([]string{"tasks_count"}).AddRow(40)
+				mock.ExpectQuery(query).WithArgs(listId).WillReturnRows(rows)
 
 				query = regexp.QuoteMeta(`INSERT INTO tasks (title) VALUES ($1) RETURNING id`)
 				rows = sqlmock.NewRows([]string{"id"}).AddRow("6")
@@ -187,6 +274,63 @@ func TestTask_Create(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name:   "Reached tasks limit",
+			listId: "2",
+			task: todo.Task{
+				Title: "Need to buy milk (Нужно купить молоко)🥛",
+			},
+			mockFunc: func(mock sqlmock.Sqlmock, listId string, task todo.Task) {
+				mock.ExpectBegin()
+
+				query := regexp.QuoteMeta(`
+					SELECT EXISTS(
+					SELECT 1
+					FROM tasks t
+					INNER JOIN lists_tasks lt ON t.id = lt.task_id
+					WHERE lt.list_id = $1 AND LOWER(t.title) = LOWER($2))`,
+				)
+				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
+				mock.ExpectQuery(query).WithArgs(listId, task.Title).WillReturnRows(rows)
+
+				query = regexp.QuoteMeta(`
+					SELECT COUNT(*) AS tasks_count
+					FROM lists_tasks
+					WHERE list_id = $1`,
+				)
+				rows = sqlmock.NewRows([]string{"tasks_count"}).AddRow(50)
+				mock.ExpectQuery(query).WithArgs(listId).WillReturnRows(rows)
+			},
+			wantErr: true,
+		},
+		{
+			name:   "DB error on limit check",
+			listId: "2",
+			task: todo.Task{
+				Title: "Need to buy milk (Нужно купить молоко)🥛",
+			},
+			mockFunc: func(mock sqlmock.Sqlmock, listId string, task todo.Task) {
+				mock.ExpectBegin()
+
+				query := regexp.QuoteMeta(`
+					SELECT EXISTS(
+					SELECT 1
+					FROM tasks t
+					INNER JOIN lists_tasks lt ON t.id = lt.task_id
+					WHERE lt.list_id = $1 AND LOWER(t.title) = LOWER($2))`,
+				)
+				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
+				mock.ExpectQuery(query).WithArgs(listId, task.Title).WillReturnRows(rows)
+
+				query = regexp.QuoteMeta(`
+					SELECT COUNT(*) AS tasks_count
+					FROM lists_tasks
+					WHERE list_id = $1`,
+				)
+				mock.ExpectQuery(query).WithArgs(listId).WillReturnError(errors.New("db error"))
+			},
+			wantErr: true,
+		},
+		{
 			name:   "DB error on task insertion",
 			listId: "2",
 			task: todo.Task{
@@ -204,6 +348,14 @@ func TestTask_Create(t *testing.T) {
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(listId, task.Title).WillReturnRows(rows)
+
+				query = regexp.QuoteMeta(`
+					SELECT COUNT(*) AS tasks_count
+					FROM lists_tasks
+					WHERE list_id = $1`,
+				)
+				rows = sqlmock.NewRows([]string{"tasks_count"}).AddRow(40)
+				mock.ExpectQuery(query).WithArgs(listId).WillReturnRows(rows)
 
 				query = regexp.QuoteMeta(`INSERT INTO tasks (title) VALUES ($1) RETURNING id`)
 				mock.ExpectQuery(query).WithArgs(task.Title).WillReturnError(errors.New("db error"))
@@ -230,6 +382,14 @@ func TestTask_Create(t *testing.T) {
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(listId, task.Title).WillReturnRows(rows)
+
+				query = regexp.QuoteMeta(`
+					SELECT COUNT(*) AS tasks_count
+					FROM lists_tasks
+					WHERE list_id = $1`,
+				)
+				rows = sqlmock.NewRows([]string{"tasks_count"}).AddRow(40)
+				mock.ExpectQuery(query).WithArgs(listId).WillReturnRows(rows)
 
 				query = regexp.QuoteMeta(`INSERT INTO tasks (title) VALUES ($1) RETURNING id`)
 				rows = sqlmock.NewRows([]string{"id"}).AddRow("6")

@@ -101,6 +101,85 @@ func TestList_isTitleExistsInLists(t *testing.T) {
 	}
 }
 
+func TestList_countUserLists(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	assert.NoError(t, err)
+	defer db.Close()
+
+	sqlxDB := sqlx.NewDb(db, "postgres")
+	repo := newListDB(sqlxDB)
+
+	testTable := []struct {
+		name          string
+		userId        string
+		mockFunc      func(mock sqlmock.Sqlmock, userId string)
+		expectedCount int
+		wantErr       bool
+	}{
+		{
+			name:   "Didn't reach the limit",
+			userId: "1",
+			mockFunc: func(mock sqlmock.Sqlmock, userId string) {
+				query := regexp.QuoteMeta(`
+					SELECT COUNT(*) AS lists_count
+					FROM users_lists
+					WHERE user_id = $1`,
+				)
+				rows := sqlmock.NewRows([]string{"lists_count"}).AddRow(14)
+				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
+			},
+			expectedCount: 14,
+			wantErr:       false,
+		},
+		{
+			name:   "Reached the limit",
+			userId: "1",
+			mockFunc: func(mock sqlmock.Sqlmock, userId string) {
+				query := regexp.QuoteMeta(`
+					SELECT COUNT(*) AS lists_count
+					FROM users_lists
+					WHERE user_id = $1`,
+				)
+				rows := sqlmock.NewRows([]string{"lists_count"}).AddRow(20)
+				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
+			},
+			expectedCount: 20,
+			wantErr:       false,
+		},
+		{
+			name:   "DB error",
+			userId: "1",
+			mockFunc: func(mock sqlmock.Sqlmock, userId string) {
+				query := regexp.QuoteMeta(`
+					SELECT COUNT(*) AS lists_count
+					FROM users_lists
+					WHERE user_id = $1`,
+				)
+				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(errors.New("db error"))
+			},
+			expectedCount: 0,
+			wantErr:       true,
+		},
+	}
+
+	for _, testCase := range testTable {
+		t.Run(testCase.name, func(t *testing.T) {
+			testCase.mockFunc(mock, testCase.userId)
+
+			count, err := repo.countUserLists(testCase.userId)
+
+			if testCase.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+			}
+
+			assert.Equal(t, testCase.expectedCount, count)
+			assert.NoError(t, mock.ExpectationsWereMet())
+		})
+	}
+}
+
 func TestList_Create(t *testing.T) {
 	db, mock, err := sqlmock.New()
 	assert.NoError(t, err)
@@ -134,6 +213,14 @@ func TestList_Create(t *testing.T) {
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
+
+				query = regexp.QuoteMeta(`
+					SELECT COUNT(*) AS lists_count
+					FROM users_lists
+					WHERE user_id = $1`,
+				)
+				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(10)
+				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
 				query = regexp.QuoteMeta(`INSERT INTO lists (title) VALUES ($1) RETURNING id`)
 				rows = sqlmock.NewRows([]string{"id"}).AddRow("5")
@@ -188,6 +275,63 @@ func TestList_Create(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name:   "Reached lists limit",
+			userId: "1",
+			list: todo.List{
+				Title: "Shopping list",
+			},
+			mockFunc: func(mock sqlmock.Sqlmock, userId string, list todo.List) {
+				mock.ExpectBegin()
+
+				query := regexp.QuoteMeta(`
+					SELECT EXISTS(
+					SELECT 1
+					FROM lists l
+					INNER JOIN users_lists ul ON l.id = ul.list_id
+					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+				)
+				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
+				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
+
+				query = regexp.QuoteMeta(`
+					SELECT COUNT(*) AS lists_count
+					FROM users_lists
+					WHERE user_id = $1`,
+				)
+				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(20)
+				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
+			},
+			wantErr: true,
+		},
+		{
+			name:   "DB error on limit check",
+			userId: "1",
+			list: todo.List{
+				Title: "Shopping list",
+			},
+			mockFunc: func(mock sqlmock.Sqlmock, userId string, list todo.List) {
+				mock.ExpectBegin()
+
+				query := regexp.QuoteMeta(`
+					SELECT EXISTS(
+					SELECT 1
+					FROM lists l
+					INNER JOIN users_lists ul ON l.id = ul.list_id
+					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+				)
+				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
+				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
+
+				query = regexp.QuoteMeta(`
+					SELECT COUNT(*) AS lists_count
+					FROM users_lists
+					WHERE user_id = $1`,
+				)
+				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(errors.New("db error"))
+			},
+			wantErr: true,
+		},
+		{
 			name:   "DB error on list insertion",
 			userId: "1",
 			list: todo.List{
@@ -205,6 +349,14 @@ func TestList_Create(t *testing.T) {
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
+
+				query = regexp.QuoteMeta(`
+					SELECT COUNT(*) AS lists_count
+					FROM users_lists
+					WHERE user_id = $1`,
+				)
+				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(10)
+				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
 				query = regexp.QuoteMeta(`INSERT INTO lists (title) VALUES ($1) RETURNING id`)
 				mock.ExpectQuery(query).WithArgs(list.Title).WillReturnError(errors.New("db error"))
@@ -231,6 +383,14 @@ func TestList_Create(t *testing.T) {
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
+
+				query = regexp.QuoteMeta(`
+					SELECT COUNT(*) AS lists_count
+					FROM users_lists
+					WHERE user_id = $1`,
+				)
+				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(10)
+				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
 				query = regexp.QuoteMeta(`INSERT INTO lists (title) VALUES ($1) RETURNING id`)
 				rows = sqlmock.NewRows([]string{"id"}).AddRow("5")
