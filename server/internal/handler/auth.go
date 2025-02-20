@@ -147,14 +147,8 @@ func (h *Handler) refreshTokens(c *gin.Context) {
 func (h *Handler) logout(c *gin.Context) {
 	userId := getUserCtx(c)
 
-	refreshToken, err := c.Cookie(refresh)
-	if err != nil || refreshToken == "" {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"err": "refresh token is missing"})
-		return
-	}
-
-	if err := h.services.Authorization.DeleteRefreshToken(userId, refreshToken); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't delete refresh token: %s", err.Error())})
+	if err := h.services.Authorization.DeleteRefreshToken(userId); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("error occured on deleting refresh token: %s", err.Error())})
 		return
 	}
 

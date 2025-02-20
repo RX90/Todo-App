@@ -539,27 +539,24 @@ func TestAuth_DeleteRefreshToken(t *testing.T) {
 	testTable := []struct {
 		name         string
 		userId       string
-		refreshToken string
-		mockFunc     func(mock sqlmock.Sqlmock, userId, refreshToken string)
+		mockFunc     func(mock sqlmock.Sqlmock, userId string)
 		wantErr      bool
 	}{
 		{
 			name:         "Successful deletion",
 			userId:       "1",
-			refreshToken: "refresh_token",
-			mockFunc: func(mock sqlmock.Sqlmock, userId, refreshToken string) {
-				query := regexp.QuoteMeta("DELETE FROM tokens t USING users_tokens ut WHERE t.id = ut.token_id AND ut.user_id = $1 AND t.refresh_token = $2")
-				mock.ExpectExec(query).WithArgs(userId, refreshToken).WillReturnResult(sqlmock.NewResult(0, 1))
+			mockFunc: func(mock sqlmock.Sqlmock, userId string) {
+				query := regexp.QuoteMeta("DELETE FROM tokens t USING users_tokens ut WHERE t.id = ut.token_id AND ut.user_id = $1")
+				mock.ExpectExec(query).WithArgs(userId).WillReturnResult(sqlmock.NewResult(0, 1))
 			},
 			wantErr: false,
 		},
 		{
 			name:         "DB error on deletion",
 			userId:       "1",
-			refreshToken: "refresh_token",
-			mockFunc: func(mock sqlmock.Sqlmock, userId, refreshToken string) {
-				query := regexp.QuoteMeta("DELETE FROM tokens t USING users_tokens ut WHERE t.id = ut.token_id AND ut.user_id = $1 AND t.refresh_token = $2")
-				mock.ExpectExec(query).WithArgs(userId, refreshToken).WillReturnError(errors.New("db error"))
+			mockFunc: func(mock sqlmock.Sqlmock, userId string) {
+				query := regexp.QuoteMeta("DELETE FROM tokens t USING users_tokens ut WHERE t.id = ut.token_id AND ut.user_id = $1")
+				mock.ExpectExec(query).WithArgs(userId).WillReturnError(errors.New("db error"))
 			},
 			wantErr: true,
 		},
@@ -567,9 +564,9 @@ func TestAuth_DeleteRefreshToken(t *testing.T) {
 
 	for _, testCase := range testTable {
 		t.Run(testCase.name, func(t *testing.T) {
-			testCase.mockFunc(mock, testCase.userId, testCase.refreshToken)
+			testCase.mockFunc(mock, testCase.userId)
 
-			err := repo.DeleteRefreshToken(testCase.userId, testCase.refreshToken)
+			err := repo.DeleteRefreshToken(testCase.userId)
 
 			if testCase.wantErr {
 				assert.Error(t, err)

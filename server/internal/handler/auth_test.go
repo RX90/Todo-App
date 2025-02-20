@@ -360,39 +360,29 @@ func TestAuth_refreshTokens(t *testing.T) {
 }
 
 func TestAuth_logout(t *testing.T) {
-	type mockBehavior func(s *mock_service.MockAuthorization, refreshToken string)
+	type mockBehavior func(s *mock_service.MockAuthorization)
 
 	testTable := []struct {
 		name                 string
-		refreshToken         string
 		mockBehavior         mockBehavior
 		expectedStatusCode   int
 		expectedResponseBody string
 	}{
 		{
-			name:         "Valid input",
-			refreshToken: "valid-refresh-token",
-			mockBehavior: func(s *mock_service.MockAuthorization, refreshToken string) {
-				s.EXPECT().DeleteRefreshToken("1", refreshToken).Return(nil)
+			name: "Valid input",
+			mockBehavior: func(s *mock_service.MockAuthorization) {
+				s.EXPECT().DeleteRefreshToken("1").Return(nil)
 			},
 			expectedStatusCode:   http.StatusOK,
 			expectedResponseBody: `{"status":"ok"}`,
 		},
 		{
-			name:                 "No refresh token",
-			refreshToken:         "",
-			mockBehavior:         func(s *mock_service.MockAuthorization, refreshToken string) {},
-			expectedStatusCode:   http.StatusUnauthorized,
-			expectedResponseBody: `{"err":"refresh token is missing"}`,
-		},
-		{
-			name:         "Invalid refresh token",
-			refreshToken: "invalid-refresh-token",
-			mockBehavior: func(s *mock_service.MockAuthorization, refreshToken string) {
-				s.EXPECT().DeleteRefreshToken("1", refreshToken).Return(errors.New("delete refresh token error"))
+			name: "Service error",
+			mockBehavior: func(s *mock_service.MockAuthorization) {
+				s.EXPECT().DeleteRefreshToken("1").Return(errors.New("db error"))
 			},
 			expectedStatusCode:   http.StatusInternalServerError,
-			expectedResponseBody: `{"err":"can't delete refresh token: delete refresh token error"}`,
+			expectedResponseBody: `{"err":"error occured on deleting refresh token: db error"}`,
 		},
 	}
 
@@ -402,7 +392,7 @@ func TestAuth_logout(t *testing.T) {
 			defer c.Finish()
 
 			auth := mock_service.NewMockAuthorization(c)
-			testCase.mockBehavior(auth, testCase.refreshToken)
+			testCase.mockBehavior(auth)
 
 			services := &service.Service{Authorization: auth}
 			handler := NewHandler(services)
@@ -415,7 +405,6 @@ func TestAuth_logout(t *testing.T) {
 
 			w := httptest.NewRecorder()
 			req := httptest.NewRequest("POST", "/logout", nil)
-			req.AddCookie(&http.Cookie{Name: refresh, Value: testCase.refreshToken})
 
 			r.ServeHTTP(w, req)
 
