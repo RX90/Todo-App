@@ -45,23 +45,40 @@ function hiddenPopup() {
 
 popupButton.addEventListener("click", async function () {
   try {
+    const user = username.value;
+    const pass = password.value;
+
     if (popupButton.textContent === "Регистрация") {
-      console.log("Регистрация пользователя:", username.value);
-      await signUp(username.value, password.value);
-      await signIn(username.value, password.value);
-      location.reload();
+      console.log("Регистрация пользователя:", user);
+      await signUp(user, pass);
+      await signIn(user, pass);
+
+      // hiddenPopup();
+      // setTimeout(() => location.reload(), 100);
     } else {
-      console.log("Вход пользователя:", username.value);
-      await signIn(username.value, password.value);
-      location.reload();
+      await signIn(user, pass);
+
+      hiddenPopup();
+      setTimeout(() => location.reload(), 100);
     }
-    hiddenPopup();
   } catch (error) {
     console.error("Ошибка:", error.message);
-    alert("Не удалось войти или зарегистрироваться: " + error.message);
     popupButton.disabled = true;
+    showWarning();
   }
 });
+
+function showWarning() {
+  const usernameInput = document.getElementById("window-input-username");
+  const passwordInput = document.getElementById("window-input-password");
+  const warnings = document.getElementsByClassName("warning");
+
+  usernameInput.style.border = "2px solid red";
+  passwordInput.style.border = "2px solid red";
+
+  warnings[0].style.opacity = 1;
+  warnings[1].style.opacity = 1;
+}
 
 createAccount.addEventListener("click", function () {
   pupopTitle.textContent = "Войти";

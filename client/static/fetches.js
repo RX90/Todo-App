@@ -32,6 +32,7 @@ async function signUp(username, password) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      showWarning();
       throw new Error(errorData.err || "Unknown error occurred");
     }
 
@@ -60,13 +61,13 @@ async function signIn(username, password) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      showWarning();
       throw new Error(errorData.err || "Unknown error occurred");
     }
 
     const result = await response.json();
     console.log("User signed in successfully:", result);
     localStorage.setItem("accessToken", result.token);
-    // localStorage.setItem("refreshToken".result.refreshToken)
   } catch (error) {
     console.error("Error during sign in:", error.message);
   }

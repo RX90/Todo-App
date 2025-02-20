@@ -41,18 +41,29 @@
     <div id="background">
       <div id="pupop-window">
         <h3 id="pupop-title">Sign-In</h3>
-        <input type="text" id="window-input-username" placeholder="Username" />
+
+        <div class="first-input">
+          <label class="input-label">Имя</label>
+        <input type="text" id="window-input-username" />
+        <p class="warning">Некорректно веденные данные</p>
+      </div>
+
+      <div class="second-input">
+        <label class="input-label">Пароль</label>
         <input
-          type="password"
-          id="window-input-password"
-          placeholder="Password"
-        />
+        type="password"
+        id="window-input-password"
+      />
+      <p class="warning">Некорректно веденные данные</p></div>
+        
+      <div class="popup-down">
         <p id="info-text">Пожалуйста создайте аккаунт</p>
         <p id="create-account" style="cursor: pointer; color: #9146FF; font-weight: 1000;">
           CREATE ACCOUNT
         </p>
-
         <button id="window-button">Sign In!</button>
+      </div>
+        
       </div>
     </div>
   </body>
