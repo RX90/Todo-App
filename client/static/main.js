@@ -52,9 +52,6 @@ popupButton.addEventListener("click", async function () {
       console.log("Регистрация пользователя:", user);
       await signUp(user, pass);
       await signIn(user, pass);
-
-      // hiddenPopup();
-      // setTimeout(() => location.reload(), 100);
     } else {
       await signIn(user, pass);
 
@@ -79,6 +76,22 @@ function showWarning() {
   warnings[0].style.opacity = 1;
   warnings[1].style.opacity = 1;
 }
+
+function clearWarning() {
+  const usernameInput = document.getElementById("window-input-username");
+  const passwordInput = document.getElementById("window-input-password");
+  const warnings = document.getElementsByClassName("warning");
+
+  usernameInput.style.border = "";
+  passwordInput.style.border = "";
+
+  warnings[0].style.opacity = 0;
+  warnings[1].style.opacity = 0;
+
+  popupButton.disabled = false;
+}
+username.addEventListener("input", clearWarning);
+password.addEventListener("input", clearWarning);
 
 createAccount.addEventListener("click", function () {
   pupopTitle.textContent = "Войти";

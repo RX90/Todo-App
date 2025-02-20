@@ -15,62 +15,39 @@ const isDone = false;
 // };
 
 async function signUp(username, password) {
-  const url = "/api/auth/sign-up";
-  const userData = {
-    username: username,
-    password: password,
-  };
+  const response = await fetch("/api/auth/sign-up", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
+  });
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      showWarning();
-      throw new Error(errorData.err || "Unknown error occurred");
-    }
-
-    const result = await response.json();
-    console.log("User signed up successfully:", result);
-  } catch (error) {
-    console.error("Error during sign up:", error.message);
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.err || "Ошибка регистрации"); // Пробрасываем ошибку
   }
+
+  return await response.json();
 }
 
 async function signIn(username, password) {
-  const url = "/api/auth/sign-in";
-  const userData = {
-    username: username,
-    password: password,
-  };
+  const response = await fetch("/api/auth/sign-in", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password }),
+  });
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(userData),
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      showWarning();
-      throw new Error(errorData.err || "Unknown error occurred");
-    }
-
-    const result = await response.json();
-    console.log("User signed in successfully:", result);
-    localStorage.setItem("accessToken", result.token);
-  } catch (error) {
-    console.error("Error during sign in:", error.message);
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.err || "Ошибка авторизации"); // Пробрасываем ошибку
   }
+
+  const result = await response.json();
+  localStorage.setItem("accessToken", result.token);
+  return result;
 }
 
 async function sendList(title) {
