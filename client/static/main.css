@@ -26,6 +26,8 @@ body {
   width: 100%;
   height: 60px;
   background-color: #1f1d1d;
+  position: fixed;
+  z-index: 2000;
 }
 
 .button-group {
@@ -47,7 +49,11 @@ body {
   width: 23%;
   min-height: 91.6vh;
   background-color: #1b1b1b;
+  position: fixed;
   overflow: auto;
+  /* overflow-y: auto; */
+  margin-top: 3.9%;
+  z-index: 4000;
 }
 
 .menu-item {
@@ -90,6 +96,10 @@ body {
   padding: 15px;
   font-size: 15px;
 }
+
+/* ::placeholder {
+  color: #9146ff;
+} */
 
 .add-list {
   background-color: #1b1b1b;
@@ -146,13 +156,15 @@ body {
   color: white;
   padding-left: 2%;
   font-size: 15px;
-  border: 1px solid white;
+  /* border: 1px solid white; */
   border-radius: 5px;
   width: 65%;
   height: 35px;
   margin-left: 13%;
   outline: none;
   position: relative;
+  outline: none;
+  border: none;
 }
 
 #task-input:focus {
@@ -231,13 +243,16 @@ body {
   transform: translate(-50%, -50%);
   z-index: 1000;
   width: 40%;
-  height: 50%;
+  height: 70%;
   background-color: #19171c;
   color: white;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 5%;
 }
 
 #pupop-window h3 {
@@ -277,17 +292,45 @@ body {
   border: 3px solid #9146ff;
 }
 
-#pupop-window p {
-  font-size: 14px;
-  text-align: center;
-  margin-top: 5%;
+.first-input {
+  /* margin-top: 5%; */
+}
+
+.second-input {
+  /* margin-top: 5%; */
+}
+
+.input-label {
+  position: absolute;
+  margin: 0;
+  font-size: 15px;
+}
+
+.warning {
+  color: red;
+  font-size: 12px;
+  width: 30%;
+  margin: 1%;
+  padding-left: 17%;
+  opacity: 0;
+}
+
+.popup-down {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+#create-account {
+  width: 25%;
+  /* display: block; */
 }
 
 #window-button {
   margin-top: 3%;
   padding: 10px;
   width: 40%;
-  height: 12%;
+
   font-family: "Rubik Medium";
   border-radius: 5px;
   background-color: #9146ff;
@@ -311,15 +354,15 @@ body {
 }
 
 .title-completed {
-  margin-top: 10%;
+  margin-top: 5%;
   padding: 10px 150px;
   font-family: "Rubik Regular";
   display: none;
 }
 
 .dots {
-  position: fixed;
-  left: 19%;
+  position: absolute;
+  left: 88%;
   opacity: 0;
   transition: opacity 0.3s;
   width: 20px;
@@ -331,17 +374,19 @@ body {
 }
 
 .dots-panel {
-  width: 140px;
+  width: 160px;
   height: auto;
   background-color: rgb(71, 66, 66);
   position: absolute;
-  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3); /* Глубокая, мягкая тень */
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
   padding: 10px;
-  border-radius: 8px; /* Чуть сильнее скругление */
+  border-radius: 8px;
   display: flex;
   justify-content: center;
   flex-direction: column;
+  text-align: center;
   gap: 15px;
+  z-index: 5000;
 }
 
 #login-button {
@@ -371,16 +416,18 @@ body {
   background-color: rgb(71, 66, 66);
   font-family: "Rubik Regular";
   display: flex;
-  justify-content: center;
+  justify-content: start;
   align-items: center;
   position: relative;
   height: 30px;
   color: white;
+  padding-left: 20%;
+  font-size: 14px;
 }
 
 .dots-delete-icon {
   position: absolute;
-  left: 4%;
+  right: 87%;
   width: 15px;
   height: 15px;
   color: white;

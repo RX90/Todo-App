@@ -28,7 +28,7 @@ if (
 
 async function logoutLocalStorage() {
   loginButtonSignIn.style.display = "none";
-  loginButton.textContent = "Logout";
+  loginButton.textContent = "Выйти";
   loginButton.addEventListener("click", async function () {
     await logout();
     location.reload();
@@ -45,28 +45,58 @@ function hiddenPopup() {
 
 popupButton.addEventListener("click", async function () {
   try {
-    if (popupButton.textContent === "Sign Up!") {
-      console.log("Регистрация пользователя:", username.value);
-      await signUp(username.value, password.value);
-      await signIn(username.value, password.value);
-      location.reload();
+    const user = username.value;
+    const pass = password.value;
+
+    if (popupButton.textContent === "Регистрация") {
+      console.log("Регистрация пользователя:", user);
+      await signUp(user, pass);
+      await signIn(user, pass);
     } else {
-      console.log("Вход пользователя:", username.value);
-      await signIn(username.value, password.value);
-      location.reload();
+      await signIn(user, pass);
+
+      hiddenPopup();
+      setTimeout(() => location.reload(), 100);
     }
-    hiddenPopup();
   } catch (error) {
     console.error("Ошибка:", error.message);
-    alert("Не удалось войти или зарегистрироваться: " + error.message);
     popupButton.disabled = true;
+    showWarning();
   }
 });
 
+function showWarning() {
+  const usernameInput = document.getElementById("window-input-username");
+  const passwordInput = document.getElementById("window-input-password");
+  const warnings = document.getElementsByClassName("warning");
+
+  usernameInput.style.border = "2px solid red";
+  passwordInput.style.border = "2px solid red";
+
+  warnings[0].style.opacity = 1;
+  warnings[1].style.opacity = 1;
+}
+
+function clearWarning() {
+  const usernameInput = document.getElementById("window-input-username");
+  const passwordInput = document.getElementById("window-input-password");
+  const warnings = document.getElementsByClassName("warning");
+
+  usernameInput.style.border = "";
+  passwordInput.style.border = "";
+
+  warnings[0].style.opacity = 0;
+  warnings[1].style.opacity = 0;
+
+  popupButton.disabled = false;
+}
+username.addEventListener("input", clearWarning);
+password.addEventListener("input", clearWarning);
+
 createAccount.addEventListener("click", function () {
-  pupopTitle.textContent = "Sign-Up";
-  infoText.textContent = "Please fill in the fields to create an account";
-  popupButton.textContent = "Sign Up!";
+  pupopTitle.textContent = "Войти";
+  infoText.textContent = "Заполните все поля для регистрации";
+  popupButton.textContent = "Зарегестрироваться";
   createAccount.style.display = "none";
 });
 
@@ -98,7 +128,7 @@ function renderSingleList(listid, title) {
     dotsPanel.classList.add("dots-panel");
 
     const dotsEdit = document.createElement("button");
-    dotsEdit.textContent = "Edit";
+    dotsEdit.textContent = "Переименовать";
     dotsEdit.classList.add("dots-edit");
 
     const iconDotsEdit = document.createElement("img");
@@ -106,17 +136,18 @@ function renderSingleList(listid, title) {
     iconDotsEdit.classList.add("dots-delete-icon");
 
     const dotsDelete = document.createElement("button");
-    dotsDelete.textContent = "Delete";
+    dotsDelete.textContent = "Удалить";
+    dotsDelete.style.color = "red";
     dotsDelete.classList.add("dots-delete");
 
     const iconDotsDelete = document.createElement("img");
-    iconDotsDelete.src = "/src/img/delete.svg";
+    iconDotsDelete.src = "/src/img/red-delete.svg";
     iconDotsDelete.classList.add("dots-delete-icon");
 
     dotsEdit.appendChild(iconDotsEdit);
     dotsDelete.appendChild(iconDotsDelete);
-    dotsPanel.appendChild(dotsDelete);
     dotsPanel.appendChild(dotsEdit);
+    dotsPanel.appendChild(dotsDelete);
     document.body.appendChild(dotsPanel);
 
     dotsDelete.addEventListener("click", async function () {
@@ -189,7 +220,7 @@ function renderSingleTask(task) {
   titleTask.disabled = true;
 
   const editTask = document.createElement("img");
-  editTask.src = "/src/img/edit.svg";
+  editTask.src = "/src/img/violet-edit.svg";
   editTask.classList.add("edit-task");
 
   editTask.addEventListener("click", async function (event) {
@@ -210,7 +241,7 @@ function renderSingleTask(task) {
   });
 
   const deleteTask = document.createElement("img");
-  deleteTask.src = "/src/img/delete.svg";
+  deleteTask.src = "/src/img/violet-delete.svg";
   deleteTask.classList.add("delete-task");
 
   deleteTask.addEventListener("click", async function () {
