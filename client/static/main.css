@@ -240,10 +240,14 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  display: none;
 }
 
 #signin-block {
-  position: relative;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 40%;
   height: 50%;
   background-color: #2f2f2f;
@@ -323,7 +327,7 @@ body {
   width: 40%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   margin-top: 3%;
 }
 
@@ -394,7 +398,7 @@ body {
   z-index: 5000;
 }
 
-#login-button {
+#login-button-signin {
   padding: 7px;
   background-color: #4c4a4f;
   width: 30%;
@@ -404,7 +408,7 @@ body {
   border: none;
 }
 
-#login-button-signin {
+#login-button-signup {
   padding: 7px;
   background-color: #9146ff;
   width: 50%;

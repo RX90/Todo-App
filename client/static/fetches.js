@@ -1,6 +1,5 @@
 let userid = document.getElementById("userid");
-let username = document.getElementById("window-input-username");
-let password = document.getElementById("window-input-password");
+
 const isDone = false;
 // const UserList = {
 //   Id: "",
@@ -32,12 +31,13 @@ async function signUp(username, password) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      showWarning();
+      // showWarning();
       throw new Error(errorData.err || "Unknown error occurred");
     }
 
     const result = await response.json();
     console.log("User signed up successfully:", result);
+    return result;
   } catch (error) {
     console.error("Error during sign up:", error.message);
   }
@@ -61,13 +61,15 @@ async function signIn(username, password) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      showWarning();
+      // showWarning();
       throw new Error(errorData.err || "Unknown error occurred");
     }
 
     const result = await response.json();
+
     console.log("User signed in successfully:", result);
     localStorage.setItem("accessToken", result.token);
+    return result;
   } catch (error) {
     console.error("Error during sign in:", error.message);
   }
