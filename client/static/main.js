@@ -122,7 +122,7 @@ signupSendData.addEventListener("click", async function () {
     isValid = false;
   }
 
-  if (/[a-zA-Z]/.test(pass)) {
+  if (/[a-z]/.test(pass) && /[A-Z]/.test(pass)) {
     letterLabel.style.color = "white";
   } else {
     letterLabel.style.color = "red";
