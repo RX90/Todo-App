@@ -45,12 +45,12 @@
         <div class="input-signin-block">
           <div class="first-input-signin">
             <label class="signin-label">Имя</label>
-            <input type="text" class="signin-name-input">
+            <input type="text" class="signin-name-input" required>
           </div>
 
           <div class="second-input-signin">
             <label class="signin-label">Пароль</label>
-            <input type="password" class="signin-password-input">
+            <input type="password" class="signin-password-input" required>
           </div>
         </div>
 
@@ -63,8 +63,42 @@
     </div>
 
     <div class="background-sign-up">
-      <div id="signUp-block">
+      <div id="signup-block">
+        <h3 class="title-signup">Регистрация</h3>
 
+        <div class="input-signup-block">
+          <div class="first-input-signup">
+            <label class="signup-label">Имя</label>
+            <input type="text" class="signup-name-input" required>
+          </div>
+
+          <div class="second-input-signup">
+            <label class="signup-label">Пароль</label>
+            <input type="password" class="signup-password-input" required>
+            <p class="signin-condition">Ваш пароль должен содержать как минимум</p>
+
+            <div class="validation-item">
+              <input type="checkbox" id="letter-check" disabled>
+              <label for="letter-check">1 букву</label>
+            </div>
+
+            <div class="validation-item">
+              <input type="checkbox" id="number-check" disabled>
+              <label for="number-check">1 цифру или специальный символ !?*%</label>
+            </div>
+
+            <div class="validation-item">
+              <input type="checkbox" id="length-check" disabled>
+              <label for="length-check">10 символов</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="signup-down-block">
+          <button id="signup-button">Зарегестрироваться</button>
+          
+          
+        </div>
       </div>
     </div>
 

@@ -3,13 +3,23 @@ let menu = document.querySelector(".menu");
 let details = document.getElementById("details");
 let title = document.getElementById("title");
 let listIdCounter = 0;
+
 let loginButton = document.getElementById("login-button-signin");
 let registerButton = document.getElementById("login-button-signup");
+
 let infoText = document.getElementById("info-text");
+
 let panelSignin = document.querySelector(".background-sign-in");
+let panelSignUp = document.querySelector(".background-sign-up");
+
 let signinSendData = document.getElementById("signin-button");
-let username = document.querySelector(".signin-name-input");
-let password = document.querySelector(".signin-password-input");
+let signupSendData = document.getElementById("signup-button");
+
+let usernameLogin = document.querySelector(".signin-name-input");
+let passwordLogin = document.querySelector(".signin-password-input");
+
+let usernameRegister = document.querySelector(".signup-name-input");
+let passwordRegister = document.querySelector(".signup-password-input");
 
 let activePanel = null;
 
@@ -35,6 +45,7 @@ async function logoutLocalStorage() {
   });
 }
 
+//Логинизация
 function showPopupSignin() {
   panelSignin.style.display = "block";
 }
@@ -48,20 +59,89 @@ loginButton.addEventListener("click", function () {
 });
 
 signinSendData.addEventListener("click", async function () {
-  const user = username.value;
-  const pass = password.value;
+  const user = usernameLogin.value.trim();
+  const pass = passwordLogin.value.trim();
 
-  const success = await signIn(user, pass); // Проверяем успешность логина
+  const success = await signIn(user, pass);
   if (success) {
-    console.log("Логин успешен!");
-    hiddenPopupSignin(); // Скрываем форму логина
-    await updateLists(); // Загружаем и отображаем листы
+    console.log("Вход прошел успешно");
+    hiddenPopupSignin();
+
+    const lists = await getAllLists();
+    if (lists && Array.isArray(lists)) {
+      lists.forEach((list) => renderSingleList(list.id, list.title));
+    }
   } else {
     console.error("Ошибка входа! Проверьте логин и пароль.");
   }
 });
 
-// document.addEventListener("DOMContentLoaded", function () {
+//Регистрация
+function showPopupSignUp() {
+  panelSignUp.style.display = "block";
+}
+
+function hiddenPopupSignUp() {
+  panelSignUp.style.display = "none";
+}
+
+registerButton.addEventListener("click", function () {
+  showPopupSignUp();
+});
+
+signupSendData.addEventListener("click", async function () {
+  const user = usernameRegister.value;
+  const pass = passwordRegister.value;
+
+  let letterCheck = document.getElementById("letter-check");
+  let numberCheck = document.getElementById("number-check");
+  let lengthCheck = document.getElementById("length-check");
+
+  let isValid = true;
+
+  if (user.length < 3 || user.length > 32) {
+    console.log("Имя от 3 до 32 символов");
+    isValid = false;
+  }
+
+  if (pass.length < 8 || pass.length > 32) {
+    console.log("Пароль от 8 до 32 символов");
+    isValid = false;
+  } else {
+    lengthCheck.checked = true;
+  }
+
+  if (!pass.value === /[a-zA-z]/.test(pass)) {
+    console.log("Нет 1 маленькой или большой буквы");
+    isValid = false;
+  } else {
+    letterCheck.checked = true;
+  }
+
+  if (!pass.value === /[\d]/.test(pass)) {
+    console.log("Нет хотя бы 1 цифры");
+    isValid = false;
+  } else {
+    numberCheck.checked = true;
+  }
+
+  if (!isValid) {
+    return;
+  }
+
+  const success = await signUp(user, pass);
+  if (success) {
+    console.log("Регистрация прошла успешно");
+    hiddenPopupSignUp();
+    const lists = await getAllLists();
+    if (lists && Array.isArray(lists)) {
+      lists.forEach((list) => renderSingleList(list.id, list.title));
+    }
+  } else {
+    console.error("Ошибка входа! Проверьте логин и пароль.");
+  }
+});
+
 function renderSingleList(listid, title) {
   const menuItem = document.createElement("div");
   menuItem.classList.add("menu-item");
@@ -153,7 +233,6 @@ function renderSingleList(listid, title) {
     console.log(listid, title);
   });
 }
-// });
 
 //Сброс панели по клику на экран
 document.addEventListener("click", (event) => {
@@ -367,29 +446,3 @@ taskInput.addEventListener("keydown", async function (event) {
 taskButton.addEventListener("click", async function () {
   await createTask();
 });
-
-function update() {
-  document.addEventListener("DOMContentLoaded", async () => {
-    try {
-      const lists = await getAllLists();
-      console.log("Получили листы:", lists);
-      if (lists && Array.isArray(lists)) {
-        lists.forEach((list) => renderSingleList(list.id, list.title));
-      } else {
-        console.error("Не удалось загрузить листы.");
-      }
-
-      const listId = details.getAttribute("data-id"); // Получаем ID текущего списка
-      if (listId) {
-        const tasks = await getAllTasks(listId);
-        if (tasks && Array.isArray(tasks)) {
-          tasks.forEach((task) => renderSingleTask(task, listId));
-        } else {
-          console.error("Не удалось загрузить задачи.");
-        }
-      }
-    } catch (error) {
-      console.error("Ошибка при загрузке данных:", error);
-    }
-  });
-}
