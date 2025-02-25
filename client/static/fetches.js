@@ -36,9 +36,10 @@ async function signUp(username, password) {
 
     const result = await response.json();
     console.log("User signed up successfully:", result);
-    // return result;
+    return true;
   } catch (error) {
     console.error("Error during sign up:", error.message);
+    return false;
   }
 }
 
@@ -67,9 +68,10 @@ async function signIn(username, password) {
 
     console.log("User signed in successfully:", result);
     localStorage.setItem("accessToken", result.token);
-    return result;
+    return true;
   } catch (error) {
     console.error("Error during sign in:", error.message);
+    return false;
   }
 }
 

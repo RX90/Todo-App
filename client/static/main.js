@@ -93,46 +93,64 @@ signupSendData.addEventListener("click", async function () {
   const user = usernameRegister.value;
   const pass = passwordRegister.value;
 
-  let letterCheck = document.getElementById("letter-check");
-  let numberCheck = document.getElementById("number-check");
-  let lengthCheck = document.getElementById("length-check");
+  // let letterCheck = document.getElementById("letter-check");
+  // let numberCheck = document.getElementById("number-check");
+  // let lengthCheck = document.getElementById("length-check");
+
+  let letterLabel = document.getElementById("letter-label");
+  let numberLabel = document.getElementById("number-label");
+  let lengthLabel = document.getElementById("length-label");
+  let errorMessage = document.getElementById("error-message");
 
   let isValid = true;
+
+  errorMessage.textContent = "";
 
   if (user.length < 3 || user.length > 32) {
     console.log("Имя от 3 до 32 символов");
     isValid = false;
   }
 
-  if (pass.length < 8 || pass.length > 32) {
-    console.log("Пароль от 8 до 32 символов");
-    isValid = false;
+  letterLabel.style.color = "white";
+  numberLabel.style.color = "white";
+  lengthLabel.style.color = "white";
+
+  if (/[\d]/.test(pass)) {
+    numberLabel.style.color = "white";
   } else {
-    lengthCheck.checked = true;
+    numberLabel.style.color = "red";
+    isValid = false;
   }
 
-  if (!pass.value === /[a-zA-z]/.test(pass)) {
-    console.log("Нет 1 маленькой или большой буквы");
-    isValid = false;
+  if (/[a-zA-Z]/.test(pass)) {
+    letterLabel.style.color = "white";
   } else {
-    letterCheck.checked = true;
+    letterLabel.style.color = "red";
+    isValid = false;
   }
 
-  if (!pass.value === /[\d]/.test(pass)) {
-    console.log("Нет хотя бы 1 цифры");
-    isValid = false;
+  if (pass.length >= 8 && pass.length <= 32) {
+    lengthLabel.style.color = "white";
   } else {
-    numberCheck.checked = true;
+    lengthLabel.style.color = "red";
+    isValid = false;
   }
 
   if (!isValid) {
+    errorMessage.textContent = "Проверьте правильность введенных данных";
     return;
   }
 
   const success = await signUp(user, pass);
   if (success) {
     console.log("Регистрация прошла успешно");
-    hiddenPopupSignUp();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const signInSuccess = await signIn(user, pass);
+    if (signInSuccess) {
+      console.log("Вход выполнен");
+      hiddenPopupSignUp();
+    }
+
     const lists = await getAllLists();
     if (lists && Array.isArray(lists)) {
       lists.forEach((list) => renderSingleList(list.id, list.title));

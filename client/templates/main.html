@@ -75,21 +75,22 @@
           <div class="second-input-signup">
             <label class="signup-label">Пароль</label>
             <input type="password" class="signup-password-input" required>
+            <p id="error-message"></p>
             <p class="signin-condition">Ваш пароль должен содержать как минимум</p>
 
             <div class="validation-item">
-              <input type="checkbox" id="letter-check" disabled>
-              <label for="letter-check">1 букву</label>
+              <input type="checkbox" id="length-check" disabled>
+              <label for="length-check" id="length-label">8 символов</label>
             </div>
 
             <div class="validation-item">
               <input type="checkbox" id="number-check" disabled>
-              <label for="number-check">1 цифру или специальный символ !?*%</label>
+              <label for="number-check" id="number-label">1 цифра</label>
             </div>
 
             <div class="validation-item">
-              <input type="checkbox" id="length-check" disabled>
-              <label for="length-check">10 символов</label>
+              <input type="checkbox" id="letter-check" disabled>
+              <label for="letter-check" id="letter-label">1 Большая и маленькая буква</label>
             </div>
           </div>
         </div>
