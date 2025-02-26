@@ -224,126 +224,281 @@ body {
   color: rgb(152, 147, 147);
 }
 
-#background {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.7);
-  z-index: 500;
-  display: none;
-}
-
-#pupop-window {
-  font-family: "Rubik Regular";
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1000;
-  width: 40%;
-  height: 70%;
-  background-color: #19171c;
-  color: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  gap: 5%;
-}
-
-#pupop-window h3 {
-  margin: 0 0 10px 0;
-}
-
-#window-input-username {
-  font-family: "Rubik Regular";
-  width: 60%;
-  padding: 10px;
-  border-radius: 5px;
-  margin-top: 5%;
-  background-color: #19171c;
-  border: 1px solid white;
-  color: white;
-  outline: none;
-}
-
-#window-input-username:focus {
-  border: 3px solid #9146ff;
-}
-
-#window-input-password {
-  font-family: "Rubik Regular";
-  width: 60%;
-  padding: 10px;
-  border-radius: 5px;
-  margin-top: 5%;
-  outline: none;
-  color: white;
-  background-color: #19171c;
-  border: none;
-  border: 1px solid white;
-}
-
-#window-input-password:focus {
-  border: 3px solid #9146ff;
-}
-
-.first-input {
-  /* margin-top: 5%; */
-}
-
-.second-input {
-  /* margin-top: 5%; */
-}
-
-.input-label {
-  position: absolute;
-  margin: 0;
-  font-size: 15px;
-}
-
-.warning {
-  color: red;
-  font-size: 12px;
-  width: 30%;
-  margin: 1%;
-  padding-left: 17%;
-  opacity: 0;
-}
-
-.popup-down {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-#create-account {
-  width: 25%;
-  /* display: block; */
-}
-
-#window-button {
-  margin-top: 3%;
-  padding: 10px;
-  width: 40%;
-
-  font-family: "Rubik Medium";
-  border-radius: 5px;
-  background-color: #9146ff;
-  color: white;
-  outline: none;
-  border: none;
-}
-
 .edit-task {
   position: absolute;
   right: 31%;
   width: 16px;
   height: 16px;
+}
+
+.background-sign-in {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 5000;
+  background-color: rgba(31, 29, 29, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: none;
+}
+
+#signin-block {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: 50%;
+  background-color: #2f2f2f;
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+  border-radius: 12px;
+  font-family: "Rubik Regular";
+  user-select: none;
+}
+
+.title-signin {
+  height: 5%;
+  color: white;
+}
+
+.input-signin-block {
+  position: absolute;
+  top: 20%;
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  height: 40%;
+  gap: 30px;
+}
+
+.first-input-signin {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.second-input-signin {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.signin-label {
+  color: white;
+  font-size: 16px;
+}
+
+.signin-name-input {
+  padding: 8px;
+  outline: none;
+  border: none;
+  background-color: #3b3b3b;
+  font-size: 15px;
+  border-radius: 5px;
+  color: white;
+}
+
+.signin-name-input:focus {
+  border: 3px solid #9146ff;
+}
+
+.signin-password-input {
+  padding: 8px;
+  outline: none;
+  border: none;
+  background-color: #3b3b3b;
+  font-size: 15px;
+  border-radius: 5px;
+  color: white;
+}
+
+.signin-password-input:focus {
+  border: 3px solid #9146ff;
+}
+
+.signin-down-block {
+  position: absolute;
+  top: 65%;
+  color: white;
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 3%;
+}
+
+.signin-down-block span {
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  color: #9146ff;
+  text-decoration: underline;
+}
+
+.signin-down-block button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 45px;
+  font-family: "Rubik Regular";
+  cursor: pointer;
+  border-radius: 5px;
+  outline: none;
+  border: none;
+  background-color: #9146ff;
+  color: white;
+  font-size: 15px;
+}
+
+.background-sign-up {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  z-index: 5000;
+  background-color: rgba(31, 29, 29, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  display: none;
+}
+
+#signup-block {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40%;
+  height: 70%;
+  background-color: #2f2f2f;
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+  border-radius: 12px;
+  font-family: "Rubik Regular";
+  user-select: none;
+}
+
+.title-signup {
+  height: 5%;
+  color: white;
+}
+
+.input-signup-block {
+  position: absolute;
+  top: 20%;
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  min-height: 30%;
+  gap: 30px;
+}
+
+.first-input-signup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.second-input-signup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.signup-label {
+  color: white;
+  font-size: 16px;
+}
+
+.signup-name-input {
+  padding: 8px;
+  outline: none;
+  border: none;
+  background-color: #3b3b3b;
+  font-size: 14px;
+  border-radius: 5px;
+  color: white;
+}
+
+.signup-name-input:focus {
+  border: 3px solid #9146ff;
+}
+
+.signup-password-input {
+  padding: 8px;
+  outline: none;
+  border: none;
+  background-color: #3b3b3b;
+  font-size: 14px;
+  border-radius: 5px;
+  color: white;
+}
+
+.signup-password-input:focus {
+  border: 3px solid #9146ff;
+}
+
+.signup-down-block {
+  position: absolute;
+  top: 80%;
+  color: white;
+  width: 40%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.signup-down-block span {
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+  color: #9146ff;
+  text-decoration: underline;
+}
+
+.signup-down-block button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 45px;
+  font-family: "Rubik Regular";
+  cursor: pointer;
+  border-radius: 5px;
+  outline: none;
+  border: none;
+  background-color: #9146ff;
+  color: white;
+  font-size: 15px;
+}
+
+.signin-condition {
+  font-size: 14px;
+  color: white;
+  margin: 1;
+}
+
+.validation-item {
+  color: white;
+  font-size: 14px;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+#error-message {
+  color: red;
+  font-size: 13px;
+  margin: 0;
 }
 
 .delete-task {
@@ -389,7 +544,7 @@ body {
   z-index: 5000;
 }
 
-#login-button {
+#login-button-signin {
   padding: 7px;
   background-color: #4c4a4f;
   width: 30%;
@@ -399,7 +554,7 @@ body {
   border: none;
 }
 
-#login-button-signin {
+#login-button-signup {
   padding: 7px;
   background-color: #9146ff;
   width: 50%;

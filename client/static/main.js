@@ -3,14 +3,24 @@ let menu = document.querySelector(".menu");
 let details = document.getElementById("details");
 let title = document.getElementById("title");
 let listIdCounter = 0;
-let popupWindow = document.getElementById("background");
-let popupButton = document.getElementById("window-button");
-let createAccount = document.getElementById("create-account");
-let pupopTitle = document.getElementById("pupop-title");
+
+let loginButton = document.getElementById("login-button-signin");
+let registerButton = document.getElementById("login-button-signup");
+
 let infoText = document.getElementById("info-text");
-const panel = document.querySelector(".panel");
-const loginButton = document.getElementById("login-button");
-const loginButtonSignIn = document.getElementById("login-button-signin");
+
+let panelSignin = document.querySelector(".background-sign-in");
+let panelSignUp = document.querySelector(".background-sign-up");
+
+let signinSendData = document.getElementById("signin-button");
+let signupSendData = document.getElementById("signup-button");
+
+let usernameLogin = document.querySelector(".signin-name-input");
+let passwordLogin = document.querySelector(".signin-password-input");
+
+let usernameRegister = document.querySelector(".signup-name-input");
+let passwordRegister = document.querySelector(".signup-password-input");
+
 let activePanel = null;
 
 if (
@@ -19,15 +29,15 @@ if (
 ) {
   console.log("Токен не найден");
   loginButton.addEventListener("click", function () {
-    showPopup();
+    showPopupSignin();
   });
 } else {
   console.log("Токен получен", localStorage.getItem("accessToken"));
-  hiddenPopup();
+  hiddenPopupSignin();
 }
 
 async function logoutLocalStorage() {
-  loginButtonSignIn.style.display = "none";
+  registerButton.style.display = "none";
   loginButton.textContent = "Выйти";
   loginButton.addEventListener("click", async function () {
     await logout();
@@ -35,69 +45,119 @@ async function logoutLocalStorage() {
   });
 }
 
-function showPopup() {
-  popupWindow.style.display = "block";
+//Логинизация
+function showPopupSignin() {
+  panelSignin.style.display = "block";
 }
 
-function hiddenPopup() {
-  popupWindow.style.display = "none";
+function hiddenPopupSignin() {
+  panelSignin.style.display = "none";
 }
 
-popupButton.addEventListener("click", async function () {
-  try {
-    const user = username.value;
-    const pass = password.value;
+loginButton.addEventListener("click", function () {
+  showPopupSignin();
+});
 
-    if (popupButton.textContent === "Регистрация") {
-      console.log("Регистрация пользователя:", user);
-      await signUp(user, pass);
-      await signIn(user, pass);
-    } else {
-      await signIn(user, pass);
+signinSendData.addEventListener("click", async function () {
+  const user = usernameLogin.value.trim();
+  const pass = passwordLogin.value.trim();
 
-      hiddenPopup();
-      setTimeout(() => location.reload(), 100);
+  const success = await signIn(user, pass);
+  if (success) {
+    console.log("Вход прошел успешно");
+    hiddenPopupSignin();
+
+    const lists = await getAllLists();
+    if (lists && Array.isArray(lists)) {
+      lists.forEach((list) => renderSingleList(list.id, list.title));
     }
-  } catch (error) {
-    console.error("Ошибка:", error.message);
-    popupButton.disabled = true;
-    showWarning();
+  } else {
+    console.error("Ошибка входа! Проверьте логин и пароль.");
   }
 });
 
-function showWarning() {
-  const usernameInput = document.getElementById("window-input-username");
-  const passwordInput = document.getElementById("window-input-password");
-  const warnings = document.getElementsByClassName("warning");
-
-  usernameInput.style.border = "2px solid red";
-  passwordInput.style.border = "2px solid red";
-
-  warnings[0].style.opacity = 1;
-  warnings[1].style.opacity = 1;
+//Регистрация
+function showPopupSignUp() {
+  panelSignUp.style.display = "block";
 }
 
-function clearWarning() {
-  const usernameInput = document.getElementById("window-input-username");
-  const passwordInput = document.getElementById("window-input-password");
-  const warnings = document.getElementsByClassName("warning");
-
-  usernameInput.style.border = "";
-  passwordInput.style.border = "";
-
-  warnings[0].style.opacity = 0;
-  warnings[1].style.opacity = 0;
-
-  popupButton.disabled = false;
+function hiddenPopupSignUp() {
+  panelSignUp.style.display = "none";
 }
-username.addEventListener("input", clearWarning);
-password.addEventListener("input", clearWarning);
 
-createAccount.addEventListener("click", function () {
-  pupopTitle.textContent = "Войти";
-  infoText.textContent = "Заполните все поля для регистрации";
-  popupButton.textContent = "Зарегестрироваться";
-  createAccount.style.display = "none";
+registerButton.addEventListener("click", function () {
+  showPopupSignUp();
+});
+
+signupSendData.addEventListener("click", async function () {
+  const user = usernameRegister.value;
+  const pass = passwordRegister.value;
+
+  // let letterCheck = document.getElementById("letter-check");
+  // let numberCheck = document.getElementById("number-check");
+  // let lengthCheck = document.getElementById("length-check");
+
+  let letterLabel = document.getElementById("letter-label");
+  let numberLabel = document.getElementById("number-label");
+  let lengthLabel = document.getElementById("length-label");
+  let errorMessage = document.getElementById("error-message");
+
+  let isValid = true;
+
+  errorMessage.textContent = "";
+
+  if (user.length < 3 || user.length > 32) {
+    console.log("Имя от 3 до 32 символов");
+    isValid = false;
+  }
+
+  letterLabel.style.color = "white";
+  numberLabel.style.color = "white";
+  lengthLabel.style.color = "white";
+
+  if (/[\d]/.test(pass)) {
+    numberLabel.style.color = "white";
+  } else {
+    numberLabel.style.color = "red";
+    isValid = false;
+  }
+
+  if (/[a-z]/.test(pass) && /[A-Z]/.test(pass)) {
+    letterLabel.style.color = "white";
+  } else {
+    letterLabel.style.color = "red";
+    isValid = false;
+  }
+
+  if (pass.length >= 8 && pass.length <= 32) {
+    lengthLabel.style.color = "white";
+  } else {
+    lengthLabel.style.color = "red";
+    isValid = false;
+  }
+
+  if (!isValid) {
+    errorMessage.textContent = "Проверьте правильность введенных данных";
+    return;
+  }
+
+  const success = await signUp(user, pass);
+  if (success) {
+    console.log("Регистрация прошла успешно");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    const signInSuccess = await signIn(user, pass);
+    if (signInSuccess) {
+      console.log("Вход выполнен");
+      hiddenPopupSignUp();
+    }
+
+    const lists = await getAllLists();
+    if (lists && Array.isArray(lists)) {
+      lists.forEach((list) => renderSingleList(list.id, list.title));
+    }
+  } else {
+    console.error("Ошибка входа! Проверьте логин и пароль.");
+  }
 });
 
 function renderSingleList(listid, title) {
@@ -153,7 +213,9 @@ function renderSingleList(listid, title) {
     dotsDelete.addEventListener("click", async function () {
       const listId = menuItem.getAttribute("data-id");
       await DeleteList(listId);
-      location.reload();
+      menuItem.remove();
+      dotsPanel.remove();
+      details.style.display = "none";
     });
 
     dotsEdit.addEventListener("click", function () {
@@ -314,10 +376,10 @@ createList.addEventListener("keydown", async function (event) {
       localStorage.getItem("accessToken").trim() === ""
     ) {
       console.log("Токен не найден");
-      showPopup();
+      showPopupSignin();
     } else {
       console.log("Токен получен", localStorage.getItem("accessToken"));
-      hiddenPopup();
+      hiddenPopupSignin();
     }
 
     try {
@@ -401,28 +463,4 @@ taskInput.addEventListener("keydown", async function (event) {
 
 taskButton.addEventListener("click", async function () {
   await createTask();
-});
-
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    const lists = await getAllLists();
-    console.log("Получили листы:", lists);
-    if (lists && Array.isArray(lists)) {
-      lists.forEach((list) => renderSingleList(list.id, list.title));
-    } else {
-      console.error("Не удалось загрузить листы.");
-    }
-
-    const listId = details.getAttribute("data-id"); // Получаем ID текущего списка
-    if (listId) {
-      const tasks = await getAllTasks(listId);
-      if (tasks && Array.isArray(tasks)) {
-        tasks.forEach((task) => renderSingleTask(task, listId));
-      } else {
-        console.error("Не удалось загрузить задачи.");
-      }
-    }
-  } catch (error) {
-    console.error("Ошибка при загрузке данных:", error);
-  }
 });

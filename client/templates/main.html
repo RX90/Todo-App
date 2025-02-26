@@ -12,8 +12,8 @@
         <p class="todo-name">TO DO CRAB</p>
 
         <div class="button-group">
-          <button id="login-button">Войти</button>
-          <button id="login-button-signin">Зарегестрироваться</button>
+          <button id="login-button-signin">Войти</button>
+          <button id="login-button-signup">Зарегестрироваться</button>
         </div>
         
     </header>
@@ -38,34 +38,71 @@
       </div>
     </div>
 
-    <div id="background">
-      <div id="pupop-window">
-        <h3 id="pupop-title">Sign-In</h3>
+    <div class="background-sign-in">
+      <div id="signin-block">
+        <h3 class="title-signin">Войти</h3>
 
-        <div class="first-input">
-          <label class="input-label">Имя</label>
-        <input type="text" id="window-input-username" />
-        <p class="warning">Некорректно веденные данные</p>
-      </div>
+        <div class="input-signin-block">
+          <div class="first-input-signin">
+            <label class="signin-label">Имя</label>
+            <input type="text" class="signin-name-input" required>
+          </div>
 
-      <div class="second-input">
-        <label class="input-label">Пароль</label>
-        <input
-        type="password"
-        id="window-input-password"
-      />
-      <p class="warning">Некорректно веденные данные</p></div>
-        
-      <div class="popup-down">
-        <p id="info-text">Пожалуйста создайте аккаунт</p>
-        <p id="create-account" style="cursor: pointer; color: #9146FF; font-weight: 1000;">
-          CREATE ACCOUNT
-        </p>
-        <button id="window-button">Sign In!</button>
-      </div>
-        
+          <div class="second-input-signin">
+            <label class="signin-label">Пароль</label>
+            <input type="password" class="signin-password-input" required>
+          </div>
+        </div>
+
+        <div class="signin-down-block">
+          <button id="signin-button">Войти</button>
+          <span>Регистрация</span>
+         
+        </div>
       </div>
     </div>
+
+    <div class="background-sign-up">
+      <div id="signup-block">
+        <h3 class="title-signup">Регистрация</h3>
+
+        <div class="input-signup-block">
+          <div class="first-input-signup">
+            <label class="signup-label">Имя</label>
+            <input type="text" class="signup-name-input" required>
+          </div>
+
+          <div class="second-input-signup">
+            <label class="signup-label">Пароль</label>
+            <input type="password" class="signup-password-input" required>
+            <p id="error-message"></p>
+            <p class="signin-condition">Ваш пароль должен содержать как минимум</p>
+
+            <div class="validation-item">
+              <input type="checkbox" id="length-check" disabled>
+              <label for="length-check" id="length-label">8 символов</label>
+            </div>
+
+            <div class="validation-item">
+              <input type="checkbox" id="number-check" disabled>
+              <label for="number-check" id="number-label">1 цифра</label>
+            </div>
+
+            <div class="validation-item">
+              <input type="checkbox" id="letter-check" disabled>
+              <label for="letter-check" id="letter-label">1 Большая и маленькая буква</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="signup-down-block">
+          <button id="signup-button">Зарегестрироваться</button>
+          
+          
+        </div>
+      </div>
+    </div>
+
   </body>
 
   <script src="/static/fetches.js"></script>
