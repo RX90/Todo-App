@@ -14,6 +14,7 @@
         <div class="button-group">
           <button id="login-button-signin">Войти</button>
           <button id="login-button-signup">Зарегестрироваться</button>
+          <button id="login-button-logout" style="display: none;">Выйти</button>
         </div>
         
     </header>
@@ -22,6 +23,7 @@
       <div class="menu-item">
         <img src="/src/img/plus.svg" class="plus-icon" alt="" />
         <input type="text" id="new-list" placeholder="New List" />
+        
       </div>
     </main>
 
@@ -70,6 +72,7 @@
           <div class="first-input-signup">
             <label class="signup-label">Имя</label>
             <input type="text" class="signup-name-input" required>
+            <p id="error-user-message"></p>
           </div>
 
           <div class="second-input-signup">
@@ -79,18 +82,21 @@
             <p class="signin-condition">Ваш пароль должен содержать как минимум</p>
 
             <div class="validation-item">
-              <input type="checkbox" id="length-check" disabled>
+              <!-- <input type="checkbox" id="length-check" disabled> -->
+              <img src="../src/img/checkbox.svg" id="checkbox-length" alt="">
               <label for="length-check" id="length-label">8 символов</label>
             </div>
 
             <div class="validation-item">
-              <input type="checkbox" id="number-check" disabled>
+              <!-- <input type="checkbox" id="number-check" disabled> -->
+              <img src="../src/img/checkbox.svg" id="checkbox-number" alt="">
               <label for="number-check" id="number-label">1 цифра</label>
             </div>
 
             <div class="validation-item">
-              <input type="checkbox" id="letter-check" disabled>
-              <label for="letter-check" id="letter-label">1 Большая и маленькая буква</label>
+              <!-- <input type="checkbox" id="letter-check" disabled> -->
+              <img src="../src/img/checkbox.svg" id="checkbox-letter" alt="">
+              <label for="letter-check" id="letter-label">1 большая и маленькая буква</label>
             </div>
           </div>
         </div>

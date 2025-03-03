@@ -102,7 +102,7 @@ async function sendList(title) {
           console.log("Retrying send list");
           await sendList(title);
         } else {
-          showPopup();
+          showPopupSignin();
         }
       }
 
@@ -176,7 +176,7 @@ async function sendTask(listId, taskTitle) {
           console.log("Retrying send list");
           await sendTask(listId, title);
         } else {
-          showPopup();
+          showPopupSignin();
         }
       }
       throw new Error(errorResponse.message || "Error send task");
@@ -195,7 +195,7 @@ async function getAllTasks(listId) {
   const accessToken = localStorage.getItem("accessToken");
 
   if (!accessToken) {
-    showPopup();
+    showPopupSignin();
     return;
   }
 
@@ -218,7 +218,7 @@ async function getAllTasks(listId) {
           console.log("Retrying send list");
           await getAllTasks(listId);
         } else {
-          showPopup();
+          showPopupSignin();
         }
       }
       throw new Error(errorResponse.message || "Error get all task");
@@ -242,7 +242,7 @@ async function toggleTaskState(taskId, isDone, listId) {
   const accessToken = localStorage.getItem("accessToken");
 
   if (!accessToken) {
-    showPopup();
+    showPopupSignin();
     return;
   }
 
@@ -275,7 +275,7 @@ async function toggleTaskState(taskId, isDone, listId) {
           console.log("Retrying send list");
           await sendTask(taskId, listId, isDone);
         } else {
-          showPopup();
+          showPopupSignin();
         }
       }
       throw new Error(errorResponse.message || "Error updating task");
@@ -310,7 +310,7 @@ async function refreshToken() {
     localStorage.setItem("accessToken", accessToken.token);
     return accessToken.token;
   } catch (error) {
-    showPopup();
+    showPopupSignin();
     console.log("Не получилось");
     throw error; // Пробрасываем ошибку дальше
   }
@@ -335,14 +335,13 @@ async function logout() {
           console.log("Retrying send list");
           await logout();
         } else {
-          showPopup();
+          showPopupSignin();
         }
       }
       throw new Error(errorResponse.message || "Error while logout");
     }
-    // const result = await response.json();
+
     localStorage.removeItem("accessToken");
-    // return result;
   } catch (error) {
     console.error("Error in logout", error);
     localStorage.removeItem("accessToken");
@@ -368,7 +367,7 @@ async function DeleteTask(listId, taskId) {
           console.log("Retrying delete task");
           await logout();
         } else {
-          showPopup();
+          showPopupSignin();
         }
       }
       throw new Error(errorResponse.message || "Error while delete task");
@@ -401,7 +400,7 @@ async function EditTask(taskId, listId, newTitle) {
           console.log("Retrying edit task");
           await logout();
         } else {
-          showPopup();
+          showPopupSignin();
         }
       }
       throw new Error(errorResponse.message || "Error while edit task");
@@ -432,7 +431,7 @@ async function DeleteList(listId) {
           console.log("Retrying delete list");
           await logout();
         } else {
-          showPopup();
+          showPopupSignin();
         }
       }
       throw new Error(errorResponse.message || "Error while delete list");
@@ -465,7 +464,7 @@ async function EditList(listId, newTitleList) {
           console.log("Retrying edit title");
           await logout();
         } else {
-          showPopup();
+          showPopupSignin();
         }
       }
       throw new Error(errorResponse.message || "Error while edit list");

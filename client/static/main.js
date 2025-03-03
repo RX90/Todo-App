@@ -6,6 +6,7 @@ let listIdCounter = 0;
 
 let loginButton = document.getElementById("login-button-signin");
 let registerButton = document.getElementById("login-button-signup");
+let logoutButton = document.getElementById("login-button-logout");
 
 let infoText = document.getElementById("info-text");
 
@@ -38,9 +39,12 @@ if (
 
 async function logoutLocalStorage() {
   registerButton.style.display = "none";
-  loginButton.textContent = "Выйти";
-  loginButton.addEventListener("click", async function () {
+  loginButton.style.display = "none";
+  logoutButton.style.display = "block";
+
+  logoutButton.addEventListener("click", async function () {
     await logout();
+
     location.reload();
   });
 }
@@ -98,16 +102,37 @@ signupSendData.addEventListener("click", async function () {
   // let lengthCheck = document.getElementById("length-check");
 
   let letterLabel = document.getElementById("letter-label");
+  let letterCheckbox = document.getElementById("checkbox-letter");
+
   let numberLabel = document.getElementById("number-label");
+  let numberCheckbox = document.getElementById("checkbox-number");
+
   let lengthLabel = document.getElementById("length-label");
+  let lengthCheckbox = document.getElementById("checkbox-length");
+
   let errorMessage = document.getElementById("error-message");
+  let errorUser = document.getElementById("error-user-message");
 
   let isValid = true;
 
+  errorUser.textContent = "";
   errorMessage.textContent = "";
 
   if (user.length < 3 || user.length > 32) {
     console.log("Имя от 3 до 32 символов");
+    isValid = false;
+  }
+
+  if (/[а-яА-ЯёЁ]/.test(user)) {
+    console.log("Логин содержит русские буквы!");
+    errorUser.textContent = "Логин должен содержать только английские буквы";
+    isValid = false;
+  }
+
+  if (/[а-яА-ЯёЁ]/.test(pass)) {
+    console.log("Пароль содержит русские буквы!");
+    errorMessage.textContent =
+      "Пароль должен содержать только английские буквы";
     isValid = false;
   }
 
@@ -117,6 +142,7 @@ signupSendData.addEventListener("click", async function () {
 
   if (/[\d]/.test(pass)) {
     numberLabel.style.color = "white";
+    numberCheckbox.src = "../src/img/violet-checkbox.svg";
   } else {
     numberLabel.style.color = "red";
     isValid = false;
@@ -124,6 +150,7 @@ signupSendData.addEventListener("click", async function () {
 
   if (/[a-z]/.test(pass) && /[A-Z]/.test(pass)) {
     letterLabel.style.color = "white";
+    letterCheckbox.src = "../src/img/violet-checkbox.svg";
   } else {
     letterLabel.style.color = "red";
     isValid = false;
@@ -131,13 +158,19 @@ signupSendData.addEventListener("click", async function () {
 
   if (pass.length >= 8 && pass.length <= 32) {
     lengthLabel.style.color = "white";
+    lengthCheckbox.src = "../src/img/violet-checkbox.svg";
   } else {
     lengthLabel.style.color = "red";
     isValid = false;
   }
 
   if (!isValid) {
-    errorMessage.textContent = "Проверьте правильность введенных данных";
+    if (!errorMessage.textContent) {
+      errorMessage.textContent = "";
+    }
+    if (!errorUser.textContent) {
+      errorUser.textContent = "";
+    }
     return;
   }
 
@@ -280,6 +313,7 @@ function renderSingleTask(task) {
   titleTask.value = task.title;
   titleTask.classList.add("title-task");
   titleTask.disabled = true;
+  const maxLength = 65;
 
   const editTask = document.createElement("img");
   editTask.src = "/src/img/violet-edit.svg";
@@ -288,6 +322,12 @@ function renderSingleTask(task) {
   editTask.addEventListener("click", async function (event) {
     titleTask.disabled = false;
     titleTask.focus();
+
+    titleTask.addEventListener("input", function () {
+      if (titleTask.value.length > maxLength) {
+        titleTask.value = titleTask.value.substring(0, maxLength);
+      }
+    });
 
     titleTask.addEventListener("keydown", async function (event) {
       if (event.key === "Enter" && titleTask.value.trim() !== "") {
@@ -463,4 +503,19 @@ taskInput.addEventListener("keydown", async function (event) {
 
 taskButton.addEventListener("click", async function () {
   await createTask();
+});
+
+document.addEventListener("DOMContentLoaded", async () => {
+  if (localStorage.getItem("accessToken")) {
+    console.log("Токен найден, загружаем списки...");
+    const lists = await getAllLists();
+    if (lists && Array.isArray(lists)) {
+      lists.forEach((list) => {
+        renderSingleList(list.id, list.title);
+        getAllTasks(list.id);
+      });
+    }
+  } else {
+    console.log("Токен не найден, показываем окно входа.");
+  }
 });
