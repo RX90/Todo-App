@@ -63,17 +63,17 @@ func (mr *MockAuthorizationMockRecorder) CreateUser(user interface{}) *gomock.Ca
 }
 
 // DeleteRefreshToken mocks base method.
-func (m *MockAuthorization) DeleteRefreshToken(userId, refreshToken string) error {
+func (m *MockAuthorization) DeleteRefreshToken(userId string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteRefreshToken", userId, refreshToken)
+	ret := m.ctrl.Call(m, "DeleteRefreshToken", userId)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteRefreshToken indicates an expected call of DeleteRefreshToken.
-func (mr *MockAuthorizationMockRecorder) DeleteRefreshToken(userId, refreshToken interface{}) *gomock.Call {
+func (mr *MockAuthorizationMockRecorder) DeleteRefreshToken(userId interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRefreshToken", reflect.TypeOf((*MockAuthorization)(nil).DeleteRefreshToken), userId, refreshToken)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteRefreshToken", reflect.TypeOf((*MockAuthorization)(nil).DeleteRefreshToken), userId)
 }
 
 // GetUserId mocks base method.

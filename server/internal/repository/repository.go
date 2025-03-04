@@ -22,7 +22,7 @@ type Authorization interface {
 	GetUserId(user todo.User) (string, error)
 	NewRefreshToken(token, userId string, expiresAt time.Time) error
 	CheckRefreshToken(userId, refreshToken string) error
-	DeleteRefreshToken(userId, refreshToken string) error
+	DeleteRefreshToken(userId string) error
 }
 
 type TodoList interface {

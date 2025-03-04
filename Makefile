@@ -6,4 +6,5 @@ build:
 	timeout 3
 	migrate -path ./server/migrations -database "postgres://postgres:password@localhost:5432/postgres?sslmode=disable" up
 test:
+	go clean -testcache
 	go test -v ./...

@@ -31,6 +31,20 @@ func (r *ListDB) isTitleExistsInLists(userId, title string) (bool, error) {
 	return exists, err
 }
 
+func (r *ListDB) countUserLists(userId string) (int, error) {
+	var count int
+
+	query := fmt.Sprintf(`
+		SELECT COUNT(*) AS lists_count
+		FROM %s
+		WHERE user_id = $1`,
+		usersListsTable,
+	)
+	err := r.db.QueryRow(query, userId).Scan(&count)
+
+	return count, err
+}
+
 func (r *ListDB) Create(userId string, list todo.List) (string, error) {
 	tx, err := r.db.Begin()
 	if err != nil {
@@ -43,6 +57,14 @@ func (r *ListDB) Create(userId string, list todo.List) (string, error) {
 	}
 	if exists {
 		return "", fmt.Errorf("list '%s' is already exists", list.Title)
+	}
+
+	count, err := r.countUserLists(userId)
+	if err != nil {
+		return "", err
+	}
+	if count >= 20 {
+		return "", fmt.Errorf("reached the limit of lists")
 	}
 
 	var listId string

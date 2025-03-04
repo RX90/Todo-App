@@ -119,6 +119,6 @@ func (s *AuthService) CheckRefreshToken(userId, refreshToken string) error {
 	return s.repos.CheckRefreshToken(userId, refreshToken)
 }
 
-func (s *AuthService) DeleteRefreshToken(userId, refreshToken string) error {
-	return s.repos.DeleteRefreshToken(userId, refreshToken)
+func (s *AuthService) DeleteRefreshToken(userId string) error {
+	return s.repos.DeleteRefreshToken(userId)
 }

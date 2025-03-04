@@ -138,17 +138,14 @@ func (r *AuthDB) CheckRefreshToken(userId, refreshToken string) error {
 	return nil
 }
 
-func (r *AuthDB) DeleteRefreshToken(userId, refreshToken string) error {
+func (r *AuthDB) DeleteRefreshToken(userId string) error {
 	query := fmt.Sprintf(`
 		DELETE FROM %s t
 		USING %s ut
-		WHERE t.id = ut.token_id AND ut.user_id = $1 AND t.refresh_token = $2`,
+		WHERE t.id = ut.token_id AND ut.user_id = $1`,
 		tokensTable, usersTokensTable,
 	)
-	_, err := r.db.Exec(query, userId, refreshToken)
-	if err != nil {
-		return err
-	}
+	_, err := r.db.Exec(query, userId)
 
-	return nil
+	return err
 }

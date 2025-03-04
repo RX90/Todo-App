@@ -197,6 +197,21 @@ func TestTask_updateTask(t *testing.T) {
 			name:      "Valid input 1",
 			listId:    "2",
 			taskId:    "3",
+			inputBody: `{"title":"New Task Title", "done":true}`,
+			inputTask: todo.UpdateTaskInput{
+				Title: toPointer("New Task Title"),
+				Done: toPointer(true),
+			},
+			mockBehavior: func(s *mock_service.MockTodoTask, userId, listId, taskId string, task todo.UpdateTaskInput) {
+				s.EXPECT().Update(userId, listId, taskId, task).Return(nil)
+			},
+			expectedStatusCode:   http.StatusOK,
+			expectedResponseBody: `{"status":"ok"}`,
+		},
+		{
+			name:      "Valid input 2",
+			listId:    "2",
+			taskId:    "3",
 			inputBody: `{"title":"New Task Title"}`,
 			inputTask: todo.UpdateTaskInput{
 				Title: toPointer("New Task Title"),
@@ -208,7 +223,7 @@ func TestTask_updateTask(t *testing.T) {
 			expectedResponseBody: `{"status":"ok"}`,
 		},
 		{
-			name:      "Valid input 2",
+			name:      "Valid input 3",
 			listId:    "2",
 			taskId:    "3",
 			inputBody: `{"done":true}`,
