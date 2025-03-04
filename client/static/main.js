@@ -22,6 +22,8 @@ let passwordLogin = document.querySelector(".signin-password-input");
 let usernameRegister = document.querySelector(".signup-name-input");
 let passwordRegister = document.querySelector(".signup-password-input");
 
+let moveToRegistr = document.getElementById("move-to-registr");
+
 let activePanel = null;
 
 if (
@@ -78,6 +80,12 @@ signinSendData.addEventListener("click", async function () {
   } else {
     console.error("Ошибка входа! Проверьте логин и пароль.");
   }
+});
+
+moveToRegistr.addEventListener("click", function () {
+  hiddenPopupSignin();
+
+  showPopupSignUp();
 });
 
 //Регистрация
@@ -352,7 +360,12 @@ function renderSingleTask(task) {
     const success = await DeleteTask(listId, taskId);
 
     if (success) {
-      menuTask.remove(); // Удаляем задачу из DOM
+      menuTask.remove();
+      setTimeout(() => {
+        if (completedList.children.length === 0) {
+          document.querySelector(".title-completed").style.display = "none";
+        }
+      }, 0);
     } else {
       alert("Ошибка при удалении задачи!");
     }
