@@ -22,6 +22,8 @@ let passwordLogin = document.querySelector(".signin-password-input");
 let usernameRegister = document.querySelector(".signup-name-input");
 let passwordRegister = document.querySelector(".signup-password-input");
 
+let moveToRegistr = document.getElementById("move-to-registr");
+
 let activePanel = null;
 
 if (
@@ -78,6 +80,12 @@ signinSendData.addEventListener("click", async function () {
   } else {
     console.error("Ошибка входа! Проверьте логин и пароль.");
   }
+});
+
+moveToRegistr.addEventListener("click", function () {
+  hiddenPopupSignin();
+
+  showPopupSignUp();
 });
 
 //Регистрация
