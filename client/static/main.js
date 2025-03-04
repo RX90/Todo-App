@@ -352,7 +352,12 @@ function renderSingleTask(task) {
     const success = await DeleteTask(listId, taskId);
 
     if (success) {
-      menuTask.remove(); // Удаляем задачу из DOM
+      menuTask.remove();
+      setTimeout(() => {
+        if (completedList.children.length === 0) {
+          document.querySelector(".title-completed").style.display = "none";
+        }
+      }, 0);
     } else {
       alert("Ошибка при удалении задачи!");
     }
