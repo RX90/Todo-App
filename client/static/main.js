@@ -278,12 +278,14 @@ function renderSingleList(listid, title) {
           const newTitleList = addList.value.trim();
 
           const existingList = [...menu.querySelectorAll(".add-list")]
+            .filter((list) => list !== addList)
             .map((list) => list.value.trim().toLowerCase())
             .includes(newTitleList.toLowerCase());
 
           if (existingList) {
             addList.value = title;
             addList.disabled = true;
+            event.preventDefault();
             return;
           }
 
