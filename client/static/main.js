@@ -4,6 +4,8 @@ let details = document.getElementById("details");
 let title = document.getElementById("title");
 let listIdCounter = 0;
 
+let plusList = document.querySelector(".plus-icon");
+
 let loginButton = document.getElementById("login-button-signin");
 let registerButton = document.getElementById("login-button-signup");
 let logoutButton = document.getElementById("login-button-logout");
@@ -126,8 +128,16 @@ signupSendData.addEventListener("click", async function () {
   errorUser.textContent = "";
   errorMessage.textContent = "";
 
+  if (/[а-яА-ЯёЁ]/.test(pass)) {
+    console.log("Пароль содержит русские буквы!");
+    errorMessage.textContent =
+      "Пароль должен содержать только английские буквы"; /*!import*/
+    isValid = false;
+  }
+
   if (user.length < 3 || user.length > 32) {
     console.log("Имя от 3 до 32 символов");
+    errorUser.textContent = "Лоигн должен содежать минимум 3 символа";
     isValid = false;
   }
 
@@ -137,22 +147,20 @@ signupSendData.addEventListener("click", async function () {
     isValid = false;
   }
 
-  if (/[а-яА-ЯёЁ]/.test(pass)) {
-    console.log("Пароль содержит русские буквы!");
-    errorMessage.textContent =
-      "Пароль должен содержать только английские буквы";
-    isValid = false;
+  if (!isValid) {
+    return; // Если есть ошибки, прекращаем выполнение
   }
 
-  letterLabel.style.color = "white";
-  numberLabel.style.color = "white";
-  lengthLabel.style.color = "white";
+  // letterLabel.style.color = "white";
+  // numberLabel.style.color = "white";
+  // lengthLabel.style.color = "white";
 
   if (/[\d]/.test(pass)) {
     numberLabel.style.color = "white";
     numberCheckbox.src = "../src/img/violet-checkbox.svg";
   } else {
     numberLabel.style.color = "red";
+    errorMessage.textContent = "Добавь еще одну цифру";
     isValid = false;
   }
 
@@ -161,6 +169,7 @@ signupSendData.addEventListener("click", async function () {
     letterCheckbox.src = "../src/img/violet-checkbox.svg";
   } else {
     letterLabel.style.color = "red";
+    errorMessage.textContent = "Забыл про большую и маленькую букву";
     isValid = false;
   }
 
@@ -169,6 +178,7 @@ signupSendData.addEventListener("click", async function () {
     lengthCheckbox.src = "../src/img/violet-checkbox.svg";
   } else {
     lengthLabel.style.color = "red";
+    errorMessage.textContent = "Пароль должен содежать минимум 8 символов";
     isValid = false;
   }
 
@@ -266,6 +276,17 @@ function renderSingleList(listid, title) {
       addList.addEventListener("keydown", async function (event) {
         if (event.key === "Enter") {
           const newTitleList = addList.value.trim();
+
+          const existingList = [...menu.querySelectorAll(".add-list")]
+            .map((list) => list.value.trim().toLowerCase())
+            .includes(newTitleList.toLowerCase());
+
+          if (existingList) {
+            addList.value = title;
+            addList.disabled = true;
+            return;
+          }
+
           if (newTitleList !== "" && newTitleList !== title) {
             await EditList(listid, newTitleList);
             title = newTitleList;
@@ -276,8 +297,8 @@ function renderSingleList(listid, title) {
     });
 
     const place = dots.getBoundingClientRect();
-    dotsPanel.style.top = `${place.top + window.scrollY + 20}px`;
-    dotsPanel.style.left = `${place.left + window.scrollX + 10}px`;
+    dotsPanel.style.top = `${place.top + window.scrollY - 100}px`;
+    dotsPanel.style.left = `${place.left + window.scrollX + 30}px`;
 
     activePanel = dotsPanel;
   });
@@ -328,20 +349,34 @@ function renderSingleTask(task) {
   editTask.classList.add("edit-task");
 
   editTask.addEventListener("click", async function (event) {
-    titleTask.disabled = false;
-    titleTask.focus();
+    titleTask.disabled = false; // Даем возможность редактировать
+    titleTask.focus(); // Фокус на поле ввода
 
     titleTask.addEventListener("input", function () {
+      // Ограничение по длине названия задачи
       if (titleTask.value.length > maxLength) {
         titleTask.value = titleTask.value.substring(0, maxLength);
       }
     });
 
     titleTask.addEventListener("keydown", async function (event) {
-      if (event.key === "Enter" && titleTask.value.trim() !== "") {
+      const newTitle = titleTask.value.trim();
+
+      if (event.key === "Enter" && newTitle !== "") {
+        const existingTask = [...taskList.querySelectorAll(".title-task")]
+          .filter((input) => input !== titleTask)
+          .map((input) => input.value.trim().toLowerCase())
+          .includes(newTitle.toLowerCase());
+
+        if (existingTask) {
+          titleTask.value = task.title;
+          titleTask.disabled = true;
+          event.preventDefault();
+          return;
+        }
+
         const listId = details.getAttribute("data-id");
         const taskId = Number(menuTask.getAttribute("data-task-id"));
-        const newTitle = titleTask.value.trim();
 
         await EditTask(taskId, listId, newTitle);
 
@@ -367,7 +402,6 @@ function renderSingleTask(task) {
         }
       }, 0);
     } else {
-      alert("Ошибка при удалении задачи!");
     }
   });
 
@@ -423,6 +457,14 @@ function renderSingleTask(task) {
 createList.addEventListener("keydown", async function (event) {
   if (event.key === "Enter" && createList.value.trim() !== "") {
     const title = createList.value.trim();
+    let maxList = 10;
+
+    const currentListsCount = document.querySelectorAll(".menu-item").length;
+    if (currentListsCount > maxList) {
+      console.log("Достигнуто максимальное количество листов");
+      createList.value = "";
+      return;
+    }
 
     if (
       !localStorage.getItem("accessToken") ||
@@ -444,10 +486,46 @@ createList.addEventListener("keydown", async function (event) {
       }
     } catch (error) {
       console.error("Ошибка при создании листа:", error);
-      alert("Не удалось создать лист: " + error.message);
     }
+
     createList.value = "";
   }
+});
+
+plusList.addEventListener("click", async function () {
+  const title = createList.value.trim();
+
+  let maxList = 10;
+
+  const currentListsCount = document.querySelectorAll(".menu-item").length;
+  if (currentListsCount > maxList) {
+    console.log("Достигнуто максимальное количество листов");
+    createList.value = "";
+    return;
+  }
+
+  if (
+    !localStorage.getItem("accessToken") ||
+    localStorage.getItem("accessToken").trim() === ""
+  ) {
+    console.log("Токен не найден");
+    showPopupSignin();
+  } else {
+    console.log("Токен получен", localStorage.getItem("accessToken"));
+    hiddenPopupSignin();
+  }
+
+  try {
+    const listId = await sendList(title);
+
+    if (listId) {
+      renderSingleList(listId, title);
+      openPanel(listId, title);
+    }
+  } catch (error) {
+    console.error("Ошибка при создании листа:", error);
+  }
+  createList.value = "";
 });
 
 function openPanel(listId, listName) {
@@ -504,7 +582,6 @@ async function createTask() {
     }
   } catch (error) {
     console.error("Ошибка при создании задачи:", error);
-    alert("Не удалось создать задачу: " + error.message);
   }
 }
 

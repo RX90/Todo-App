@@ -9,11 +9,14 @@
   <body>
     <header>
       <div class="header">
-        <p class="todo-name">TO DO CRAB</p>
+        <div class="header-logo">
+          <img src="../src/img/ugly_logo_negate.png" class="ugly-logo" alt="">
+          <p class="todo-name">TODOAPP</p>
+        </div>
 
         <div class="button-group">
           <button id="login-button-signin">Войти</button>
-          <button id="login-button-signup">Зарегестрироваться</button>
+          <button id="login-button-signup">Зарегистрироваться</button>
           <button id="login-button-logout" style="display: none;">Выйти</button>
         </div>
         
@@ -22,7 +25,7 @@
     <main class="menu">
       <div class="menu-item">
         <img src="/src/img/plus.svg" class="plus-icon" alt="" />
-        <input type="text" id="new-list" placeholder="New List" />
+        <input type="text" id="new-list" placeholder="Создать лист" />
         
       </div>
     </main>
@@ -30,12 +33,12 @@
     <div id="details">
       <h2 id="title"></h2>
       <div class="task-creation">
-        <input id="task-input" type="text" placeholder="New task..." />
-        <button id="task-button">Add Task</button>
+        <input id="task-input" type="text" placeholder="Создать задачу..." />
+        <button id="task-button">Добавить задачу</button>
       </div>
       <div class="task-list"></div>
       
-        <h2 class="title-completed">Completed</h2>
+        <h2 class="title-completed">Выполнено</h2>
         <div class="completed"></div>
       </div>
     </div>
@@ -46,7 +49,7 @@
 
         <div class="input-signin-block">
           <div class="first-input-signin">
-            <label class="signin-label">Имя</label>
+            <label class="signin-label">Логин</label>
             <input type="text" class="signin-name-input" required>
           </div>
 
@@ -70,7 +73,7 @@
 
         <div class="input-signup-block">
           <div class="first-input-signup">
-            <label class="signup-label">Имя</label>
+            <label class="signup-label">Логин</label>
             <input type="text" class="signup-name-input" required>
             <p id="error-user-message"></p>
           </div>
@@ -102,7 +105,7 @@
         </div>
 
         <div class="signup-down-block">
-          <button id="signup-button">Зарегестрироваться</button>
+          <button id="signup-button">Зарегистрироваться</button>
           
           
         </div>
