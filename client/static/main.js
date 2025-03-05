@@ -4,6 +4,8 @@ let details = document.getElementById("details");
 let title = document.getElementById("title");
 let listIdCounter = 0;
 
+let plusList = document.querySelector(".plus-icon");
+
 let loginButton = document.getElementById("login-button-signin");
 let registerButton = document.getElementById("login-button-signup");
 let logoutButton = document.getElementById("login-button-logout");
@@ -295,8 +297,8 @@ function renderSingleList(listid, title) {
     });
 
     const place = dots.getBoundingClientRect();
-    dotsPanel.style.top = `${place.top + window.scrollY + 20}px`;
-    dotsPanel.style.left = `${place.left + window.scrollX + 10}px`;
+    dotsPanel.style.top = `${place.top + window.scrollY - 100}px`;
+    dotsPanel.style.left = `${place.left + window.scrollX + 30}px`;
 
     activePanel = dotsPanel;
   });
@@ -456,6 +458,14 @@ function renderSingleTask(task) {
 createList.addEventListener("keydown", async function (event) {
   if (event.key === "Enter" && createList.value.trim() !== "") {
     const title = createList.value.trim();
+    let maxList = 10;
+
+    const currentListsCount = document.querySelectorAll(".menu-item").length;
+    if (currentListsCount > maxList) {
+      console.log("Достигнуто максимальное количество листов");
+      createList.value = "";
+      return;
+    }
 
     if (
       !localStorage.getItem("accessToken") ||
@@ -478,8 +488,45 @@ createList.addEventListener("keydown", async function (event) {
     } catch (error) {
       console.error("Ошибка при создании листа:", error);
     }
+
     createList.value = "";
   }
+});
+
+plusList.addEventListener("click", async function () {
+  const title = createList.value.trim();
+
+  let maxList = 10;
+
+  const currentListsCount = document.querySelectorAll(".menu-item").length;
+  if (currentListsCount > maxList) {
+    console.log("Достигнуто максимальное количество листов");
+    createList.value = "";
+    return;
+  }
+
+  if (
+    !localStorage.getItem("accessToken") ||
+    localStorage.getItem("accessToken").trim() === ""
+  ) {
+    console.log("Токен не найден");
+    showPopupSignin();
+  } else {
+    console.log("Токен получен", localStorage.getItem("accessToken"));
+    hiddenPopupSignin();
+  }
+
+  try {
+    const listId = await sendList(title);
+
+    if (listId) {
+      renderSingleList(listId, title);
+      openPanel(listId, title);
+    }
+  } catch (error) {
+    console.error("Ошибка при создании листа:", error);
+  }
+  createList.value = "";
 });
 
 function openPanel(listId, listName) {
