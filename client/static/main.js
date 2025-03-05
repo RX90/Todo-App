@@ -274,6 +274,17 @@ function renderSingleList(listid, title) {
       addList.addEventListener("keydown", async function (event) {
         if (event.key === "Enter") {
           const newTitleList = addList.value.trim();
+
+          const existingList = [...menu.querySelectorAll(".add-list")]
+            .map((list) => list.value.trim().toLowerCase())
+            .includes(newTitleList.toLowerCase());
+
+          if (existingList) {
+            addList.value = title;
+            addList.disabled = true;
+            return;
+          }
+
           if (newTitleList !== "" && newTitleList !== title) {
             await EditList(listid, newTitleList);
             title = newTitleList;
@@ -336,20 +347,35 @@ function renderSingleTask(task) {
   editTask.classList.add("edit-task");
 
   editTask.addEventListener("click", async function (event) {
-    titleTask.disabled = false;
-    titleTask.focus();
+    titleTask.disabled = false; // Даем возможность редактировать
+    titleTask.focus(); // Фокус на поле ввода
 
     titleTask.addEventListener("input", function () {
+      // Ограничение по длине названия задачи
       if (titleTask.value.length > maxLength) {
         titleTask.value = titleTask.value.substring(0, maxLength);
       }
     });
 
     titleTask.addEventListener("keydown", async function (event) {
-      if (event.key === "Enter" && titleTask.value.trim() !== "") {
+      const newTitle = titleTask.value.trim();
+
+      if (event.key === "Enter" && newTitle !== "") {
+        const existingTask = [...taskList.querySelectorAll(".title-task")]
+          .filter((input) => input !== titleTask)
+          .map((input) => input.value.trim().toLowerCase())
+          .includes(newTitle.toLowerCase());
+
+        if (existingTask) {
+          alert("Задача с таким названием уже существует!");
+          titleTask.value = task.title;
+          titleTask.disabled = true;
+          event.preventDefault();
+          return;
+        }
+
         const listId = details.getAttribute("data-id");
         const taskId = Number(menuTask.getAttribute("data-task-id"));
-        const newTitle = titleTask.value.trim();
 
         await EditTask(taskId, listId, newTitle);
 
