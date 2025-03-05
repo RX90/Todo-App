@@ -187,7 +187,6 @@ async function sendTask(listId, taskTitle) {
     return result;
   } catch (error) {
     console.error("Ошибка:", error);
-    alert("Не удалось отправить данные задачи " + error);
   }
 }
 
@@ -286,7 +285,6 @@ async function toggleTaskState(taskId, isDone, listId) {
     return updatedTask;
   } catch (error) {
     console.error("Error in toggleTaskState:", error);
-    alert("Failed to update task: " + error.message);
     return null;
   }
 }

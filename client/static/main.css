@@ -18,6 +18,11 @@ body {
   src: url(/src/font/Rubik-Medium.ttf);
 }
 
+@font-face {
+  font-family: "Papa";
+  src: url(/src/font/papyrus-pixel.ttf);
+}
+
 .header {
   display: flex;
   justify-content: center;
@@ -35,14 +40,41 @@ body {
   justify-content: center;
   gap: 5%;
   width: 20%;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  -khtml-user-select: none;
 }
 
 .todo-name {
   color: white;
   margin-left: 5%;
-  font-family: "Rubik Medium";
-  font-size: 20px;
+  font-family: "Papa";
+  font-size: 30px;
   width: 10%;
+  cursor: pointer;
+}
+
+.ugly-logo {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -ms-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+  -khtml-user-select: none;
 }
 
 .menu {
@@ -61,7 +93,6 @@ body {
   align-items: center;
   justify-content: start;
   margin-left: 5%;
-  gap: 3%;
   font-family: "Rubik Regular";
   cursor: pointer;
   position: relative;
@@ -202,11 +233,11 @@ body {
   right: 12%;
   font-family: "Rubik Regular";
   border-radius: 5px;
-  padding: 11px;
+  padding: 5px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 13px;
   border: none;
-  width: 80px;
+  width: 100px;
 }
 
 #task-button:active {
@@ -400,7 +431,7 @@ body {
   flex-direction: column;
   width: 60%;
   min-height: 30%;
-  gap: 30px;
+  gap: 20px;
 }
 
 .first-input-signup {
@@ -589,7 +620,7 @@ body {
 
 #login-button-logout {
   padding: 7px;
-  background-color: #cb3e3e;
+  background-color: #4c4a4f;
   width: 30%;
   font-family: "Rubik Regular";
   border-radius: 5px;

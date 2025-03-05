@@ -126,8 +126,16 @@ signupSendData.addEventListener("click", async function () {
   errorUser.textContent = "";
   errorMessage.textContent = "";
 
+  if (/[а-яА-ЯёЁ]/.test(pass)) {
+    console.log("Пароль содержит русские буквы!");
+    errorMessage.textContent =
+      "Пароль должен содержать только английские буквы"; /*!import*/
+    isValid = false;
+  }
+
   if (user.length < 3 || user.length > 32) {
     console.log("Имя от 3 до 32 символов");
+    errorUser.textContent = "Лоигн должен содежать минимум 3 символа";
     isValid = false;
   }
 
@@ -137,22 +145,20 @@ signupSendData.addEventListener("click", async function () {
     isValid = false;
   }
 
-  if (/[а-яА-ЯёЁ]/.test(pass)) {
-    console.log("Пароль содержит русские буквы!");
-    errorMessage.textContent =
-      "Пароль должен содержать только английские буквы";
-    isValid = false;
+  if (!isValid) {
+    return; // Если есть ошибки, прекращаем выполнение
   }
 
-  letterLabel.style.color = "white";
-  numberLabel.style.color = "white";
-  lengthLabel.style.color = "white";
+  // letterLabel.style.color = "white";
+  // numberLabel.style.color = "white";
+  // lengthLabel.style.color = "white";
 
   if (/[\d]/.test(pass)) {
     numberLabel.style.color = "white";
     numberCheckbox.src = "../src/img/violet-checkbox.svg";
   } else {
     numberLabel.style.color = "red";
+    errorMessage.textContent = "Добавь еще одну цифру";
     isValid = false;
   }
 
@@ -161,6 +167,7 @@ signupSendData.addEventListener("click", async function () {
     letterCheckbox.src = "../src/img/violet-checkbox.svg";
   } else {
     letterLabel.style.color = "red";
+    errorMessage.textContent = "Забыл про большую и маленькую букву";
     isValid = false;
   }
 
@@ -169,6 +176,7 @@ signupSendData.addEventListener("click", async function () {
     lengthCheckbox.src = "../src/img/violet-checkbox.svg";
   } else {
     lengthLabel.style.color = "red";
+    errorMessage.textContent = "Пароль должен содежать минимум 8 символов";
     isValid = false;
   }
 
@@ -367,7 +375,6 @@ function renderSingleTask(task) {
         }
       }, 0);
     } else {
-      alert("Ошибка при удалении задачи!");
     }
   });
 
@@ -444,7 +451,6 @@ createList.addEventListener("keydown", async function (event) {
       }
     } catch (error) {
       console.error("Ошибка при создании листа:", error);
-      alert("Не удалось создать лист: " + error.message);
     }
     createList.value = "";
   }
@@ -504,7 +510,6 @@ async function createTask() {
     }
   } catch (error) {
     console.error("Ошибка при создании задачи:", error);
-    alert("Не удалось создать задачу: " + error.message);
   }
 }
 
