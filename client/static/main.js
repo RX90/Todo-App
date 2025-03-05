@@ -369,7 +369,6 @@ function renderSingleTask(task) {
           .includes(newTitle.toLowerCase());
 
         if (existingTask) {
-          alert("Задача с таким названием уже существует!");
           titleTask.value = task.title;
           titleTask.disabled = true;
           event.preventDefault();
