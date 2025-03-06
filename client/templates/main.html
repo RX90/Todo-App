@@ -3,7 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Todo App</title>
+    <link rel="icon" href="../src//img/ugly-logo.png">
     <link rel="stylesheet" href="/static/main.css" />
   </head>
   <body>
@@ -51,11 +52,13 @@
           <div class="first-input-signin">
             <label class="signin-label">Логин</label>
             <input type="text" class="signin-name-input" required>
+            <p id="signin-error" style="display: none;"></p>
           </div>
 
           <div class="second-input-signin">
             <label class="signin-label">Пароль</label>
             <input type="password" class="signin-password-input" required>
+            <p id="signin-error2" style="display: none;"></p>
           </div>
         </div>
 
@@ -75,7 +78,7 @@
           <div class="first-input-signup">
             <label class="signup-label">Логин</label>
             <input type="text" class="signup-name-input" required>
-            <p id="error-user-message"></p>
+            <p id="error-user-message" ></p>
           </div>
 
           <div class="second-input-signup">

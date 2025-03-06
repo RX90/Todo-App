@@ -1,4 +1,9 @@
 let userid = document.getElementById("userid");
+let signinError = document.getElementById("signin-error");
+let signinError2 = document.getElementById("signin-error2");
+
+let signinInputName = document.querySelector(".signin-name-input");
+let signinInputPassword = document.querySelector(".signin-password-input");
 
 const isDone = false;
 // const UserList = {
@@ -61,6 +66,22 @@ async function signIn(username, password) {
 
     if (!response.ok) {
       const errorData = await response.json();
+
+      if (response.status === 400) {
+        console.log("Бугагага");
+        signinError.textContent = "Не коректно введенные данные";
+        signinError.style.display = "block";
+
+        signinError2.textContent = "Не коректно введенные данные";
+        signinError2.style.display = "block";
+
+        signinInputName.style.outline = "3px solid red";
+        signinInputPassword.style.outline = "3px solid red";
+
+        signinInputName.blur();
+        signinInputPassword.blur();
+      }
+
       throw new Error(errorData.err || "Unknown error occurred");
     }
 

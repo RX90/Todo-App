@@ -133,27 +133,26 @@ signupSendData.addEventListener("click", async function () {
     errorMessage.textContent =
       "Пароль должен содержать только английские буквы"; /*!import*/
     isValid = false;
+    passwordRegister.style.outline = "3px solid red";
   }
 
   if (user.length < 3 || user.length > 32) {
     console.log("Имя от 3 до 32 символов");
     errorUser.textContent = "Лоигн должен содежать минимум 3 символа";
     isValid = false;
+    usernameRegister.style.outline = "3px solid red";
   }
 
   if (/[а-яА-ЯёЁ]/.test(user)) {
     console.log("Логин содержит русские буквы!");
     errorUser.textContent = "Логин должен содержать только английские буквы";
     isValid = false;
+    usernameRegister.style.outline = "3px solid red";
   }
 
   if (!isValid) {
     return; // Если есть ошибки, прекращаем выполнение
   }
-
-  // letterLabel.style.color = "white";
-  // numberLabel.style.color = "white";
-  // lengthLabel.style.color = "white";
 
   if (/[\d]/.test(pass)) {
     numberLabel.style.color = "white";
@@ -162,6 +161,7 @@ signupSendData.addEventListener("click", async function () {
     numberLabel.style.color = "red";
     errorMessage.textContent = "Добавь еще одну цифру";
     isValid = false;
+    passwordRegister.style.outline = "3px solid red";
   }
 
   if (/[a-z]/.test(pass) && /[A-Z]/.test(pass)) {
@@ -171,6 +171,7 @@ signupSendData.addEventListener("click", async function () {
     letterLabel.style.color = "red";
     errorMessage.textContent = "Забыл про большую и маленькую букву";
     isValid = false;
+    passwordRegister.style.outline = "3px solid red";
   }
 
   if (pass.length >= 8 && pass.length <= 32) {
@@ -180,6 +181,7 @@ signupSendData.addEventListener("click", async function () {
     lengthLabel.style.color = "red";
     errorMessage.textContent = "Пароль должен содежать минимум 8 символов";
     isValid = false;
+    passwordRegister.style.outline = "3px solid red";
   }
 
   if (!isValid) {
