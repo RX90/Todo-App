@@ -159,7 +159,7 @@ signupSendData.addEventListener("click", async function () {
     numberCheckbox.src = "../src/img/violet-checkbox.svg";
   } else {
     numberLabel.style.color = "red";
-    errorMessage.textContent = "Добавь еще одну цифру";
+    errorMessage.textContent = "Добавьте еще одну цифру";
     isValid = false;
     passwordRegister.style.outline = "3px solid red";
   }

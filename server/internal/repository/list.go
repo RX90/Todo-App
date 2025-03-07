@@ -63,7 +63,7 @@ func (r *ListDB) Create(userId string, list todo.List) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if count >= 20 {
+	if count >= 10 {
 		return "", fmt.Errorf("reached the limit of lists")
 	}
 

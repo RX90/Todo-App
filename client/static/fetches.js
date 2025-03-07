@@ -195,7 +195,7 @@ async function sendTask(listId, taskTitle) {
           console.log("Token expired, refreshing token...");
           await refreshToken();
           console.log("Retrying send list");
-          await sendTask(listId, title);
+          await sendTask(listId, taskTitle);
         } else {
           showPopupSignin();
         }
