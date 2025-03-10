@@ -67,7 +67,7 @@ async function signIn(username, password) {
     if (!response.ok) {
       const errorData = await response.json();
 
-      if (response.status === 400) {
+      if (response.status === 400 || response.status === 401) {
         console.log("Бугагага");
         signinError.textContent = "Не коректно введенные данные";
         signinError.style.display = "block";
