@@ -36,6 +36,18 @@ async function signUp(username, password) {
 
     if (!response.ok) {
       const errorData = await response.json();
+      const errorMessage = errorData.message || errorData.err;
+
+      if (
+        errorMessage ===
+          "Error during sign up: can't create user: username is already taken" &&
+        response.status === 500
+      ) {
+        console.log("Такой пользователь уже есть");
+        signinError.textContent = "Пользователь с таким логином уже существует";
+        signinError.style.display = "block";
+      }
+
       throw new Error(errorData.err || "Unknown error occurred");
     }
 
@@ -81,7 +93,6 @@ async function signIn(username, password) {
         signinInputName.blur();
         signinInputPassword.blur();
       }
-
       throw new Error(errorData.err || "Unknown error occurred");
     }
 

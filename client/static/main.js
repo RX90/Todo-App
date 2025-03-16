@@ -274,6 +274,7 @@ function renderSingleList(listid, title) {
     dotsEdit.addEventListener("click", function () {
       addList.disabled = false;
       addList.focus();
+      addList.setSelectionRange(addList.value.length, addList.value.length);
 
       addList.addEventListener("keydown", async function (event) {
         if (event.key === "Enter") {
