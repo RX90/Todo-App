@@ -138,7 +138,7 @@ signupSendData.addEventListener("click", async function () {
 
   if (user.length < 3 || user.length > 32) {
     console.log("Имя от 3 до 32 символов");
-    errorUser.textContent = "Лоигн должен содежать минимум 3 символа";
+    errorUser.textContent = "Логин должен содежать минимум 3 символа";
     isValid = false;
     usernameRegister.style.outline = "3px solid red";
   }
