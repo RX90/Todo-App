@@ -21,7 +21,6 @@ let signupSendData = document.getElementById("signup-button");
 let usernameLogin = document.querySelector(".signin-name-input");
 let passwordLogin = document.querySelector(".signin-password-input");
 
-let usernameRegister = document.querySelector(".signup-name-input");
 let passwordRegister = document.querySelector(".signup-password-input");
 
 let moveToRegistr = document.getElementById("move-to-registr");
@@ -121,7 +120,6 @@ signupSendData.addEventListener("click", async function () {
   let lengthCheckbox = document.getElementById("checkbox-length");
 
   let errorMessage = document.getElementById("error-message");
-  let errorUser = document.getElementById("error-user-message");
 
   let isValid = true;
 
@@ -138,7 +136,7 @@ signupSendData.addEventListener("click", async function () {
 
   if (user.length < 3 || user.length > 32) {
     console.log("Имя от 3 до 32 символов");
-    errorUser.textContent = "Лоигн должен содежать минимум 3 символа";
+    errorUser.textContent = "Логин должен содежать минимум 3 символа";
     isValid = false;
     usernameRegister.style.outline = "3px solid red";
   }

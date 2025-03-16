@@ -33,7 +33,7 @@ func (r *AuthDB) CreateUser(user todo.User) error {
 		return err
 	}
 	if isTaken {
-		return fmt.Errorf("username '%s' is already taken", user.Username)
+		return fmt.Errorf("username is already taken")
 	}
 
 	query := fmt.Sprintf("INSERT INTO %s (username, password_hash) values ($1, $2)", usersTable)

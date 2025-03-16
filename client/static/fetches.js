@@ -5,6 +5,9 @@ let signinError2 = document.getElementById("signin-error2");
 let signinInputName = document.querySelector(".signin-name-input");
 let signinInputPassword = document.querySelector(".signin-password-input");
 
+let errorUser = document.getElementById("error-user-message");
+let usernameRegister = document.querySelector(".signup-name-input");
+
 const isDone = false;
 // const UserList = {
 //   Id: "",
@@ -36,16 +39,15 @@ async function signUp(username, password) {
 
     if (!response.ok) {
       const errorData = await response.json();
-      const errorMessage = errorData.message || errorData.err;
-
+      console.log("еррор дата", errorData);
       if (
-        errorMessage ===
-          "Error during sign up: can't create user: username is already taken" &&
+        errorData.err === "can't create user: username is already taken" &&
         response.status === 500
       ) {
         console.log("Такой пользователь уже есть");
-        signinError.textContent = "Пользователь с таким логином уже существует";
-        signinError.style.display = "block";
+        errorUser.textContent = "Пользователь с таким логином уже существует";
+        errorUser.style.display = "block";
+        usernameRegister.style.outline = "3px solid red";
       }
 
       throw new Error(errorData.err || "Unknown error occurred");
@@ -81,10 +83,10 @@ async function signIn(username, password) {
 
       if (response.status === 400 || response.status === 401) {
         console.log("Бугагага");
-        signinError.textContent = "Не коректно введенные данные";
+        signinError.textContent = "Некорректно введённые данные";
         signinError.style.display = "block";
 
-        signinError2.textContent = "Не коректно введенные данные";
+        signinError2.textContent = "Некорректно введённые данные";
         signinError2.style.display = "block";
 
         signinInputName.style.outline = "3px solid red";
