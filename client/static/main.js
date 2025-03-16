@@ -125,6 +125,7 @@ signupSendData.addEventListener("click", async function () {
 
   errorUser.textContent = "";
   errorMessage.textContent = "";
+  passwordRegister.style.outline = "";
 
   if (/[а-яА-ЯёЁ]/.test(pass)) {
     console.log("Пароль содержит русские буквы!");
@@ -143,7 +144,8 @@ signupSendData.addEventListener("click", async function () {
 
   if (/[а-яА-ЯёЁ]/.test(user)) {
     console.log("Логин содержит русские буквы!");
-    errorUser.textContent = "Логин должен содержать только английские буквы";
+    errorUser.textContent =
+      "Логин должен содержать только латинские символы, цифры, дефисы (-) и нижние подчёркивания (_)";
     isValid = false;
     usernameRegister.style.outline = "3px solid red";
   }
@@ -287,14 +289,17 @@ function renderSingleList(listid, title) {
             addList.value = title;
             addList.disabled = true;
             event.preventDefault();
+            dotsPanel.remove();
             return;
           }
 
           if (newTitleList !== "" && newTitleList !== title) {
             await EditList(listid, newTitleList);
             title = newTitleList;
+            dotsPanel.remove();
           }
           addList.disabled = true;
+          dotsPanel.remove();
         }
       });
     });
