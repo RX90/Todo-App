@@ -13,8 +13,16 @@
 ### First launch:
 
 ```
+$ go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+$ export PATH=$PATH:$(go env GOPATH)/bin
+
 $ make build
 $ make run
+```
+
+#### After this you can go to 
+```
+localhost:8000
 ```
 
 ### Re-launch:
