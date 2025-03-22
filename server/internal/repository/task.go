@@ -51,6 +51,7 @@ func (r *TaskDB) Create(listId string, task todo.Task) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer tx.Rollback()
 
 	exists, err := r.isTitleExistsInTasks(listId, task.Title)
 	if err != nil {
@@ -72,14 +73,12 @@ func (r *TaskDB) Create(listId string, task todo.Task) (string, error) {
 
 	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", tasksTable)
 	if err = tx.QueryRow(query, task.Title).Scan(&taskId); err != nil {
-		tx.Rollback()
 		return "", err
 	}
 
 	query = fmt.Sprintf("INSERT INTO %s (list_id, task_id) VALUES ($1, $2)", listsTasksTable)
 	_, err = tx.Exec(query, listId, taskId)
 	if err != nil {
-		tx.Rollback()
 		return "", err
 	}
 

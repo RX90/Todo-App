@@ -50,6 +50,7 @@ func (r *ListDB) Create(userId string, list todo.List) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	defer tx.Rollback()
 
 	exists, err := r.isTitleExistsInLists(userId, list.Title)
 	if err != nil {
@@ -71,14 +72,12 @@ func (r *ListDB) Create(userId string, list todo.List) (string, error) {
 
 	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", listsTable)
 	if err := tx.QueryRow(query, list.Title).Scan(&listId); err != nil {
-		tx.Rollback()
 		return "", err
 	}
 
 	query = fmt.Sprintf("INSERT INTO %s (user_id, list_id) VALUES ($1, $2)", usersListsTable)
 	_, err = tx.Exec(query, userId, listId)
 	if err != nil {
-		tx.Rollback()
 		return "", err
 	}
 
@@ -142,6 +141,7 @@ func (r *ListDB) Delete(userId, listId string) error {
 	if err != nil {
 		return err
 	}
+	defer tx.Rollback()
 
 	// Deleting all tasks from list
 	query := fmt.Sprintf(`
@@ -154,7 +154,6 @@ func (r *ListDB) Delete(userId, listId string) error {
 
 	_, err = r.db.Exec(query, userId, listId)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 
@@ -168,7 +167,6 @@ func (r *ListDB) Delete(userId, listId string) error {
 
 	_, err = r.db.Exec(query, userId, listId)
 	if err != nil {
-		tx.Rollback()
 		return err
 	}
 

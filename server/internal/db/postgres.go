@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 )
@@ -16,15 +17,21 @@ type Config struct {
 }
 
 func NewPostgresDB(cfg Config) (*sqlx.DB, error) {
-	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
-		cfg.Host, cfg.Port, cfg.Username, cfg.DBName, cfg.Password, cfg.SSLMode))
+	dataSourceName := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s",
+		cfg.Host, cfg.Port, cfg.Username, cfg.DBName, cfg.Password, cfg.SSLMode)
+
+	db, err := sqlx.Open("postgres", dataSourceName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open database: %s", err.Error())
 	}
+
+	db.SetConnMaxLifetime(5 * time.Minute)
+	db.SetConnMaxIdleTime(1 * time.Minute)
 
 	err = db.Ping()
 	if err != nil {
-		return nil, err
+		db.Close()
+		return nil, fmt.Errorf("failed to ping database: %s", err.Error())
 	}
 
 	return db, nil
