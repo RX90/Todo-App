@@ -495,7 +495,7 @@ createList.addEventListener("keydown", async function (event) {
     } catch (error) {
       console.error("Ошибка при создании листа:", error);
     }
-
+    renderSingleList(newTitleList);
     createList.value = "";
   }
 });

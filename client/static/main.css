@@ -93,12 +93,13 @@ body {
 .menu-item {
   display: flex;
   align-items: center;
-  justify-content: start;
+  position: relative;
+  justify-content: space-between;
   margin-left: 5%;
   font-family: "Rubik Regular";
   cursor: pointer;
   position: relative;
-  width: 85%;
+  width: 90%;
   height: 1%;
   background-color: #1b1b1b;
   padding: 3px;
@@ -575,7 +576,6 @@ body {
 }
 
 .dots {
-  position: absolute;
   left: 88%;
   opacity: 0;
   transition: opacity 0.3s;
@@ -687,8 +687,27 @@ body {
   object-position: center;
   z-index: 9999;
 }
+
 @media (max-width: 1024px) {
   .fullscreen-image {
-    display: block;
+    display: block !important;
   }
+
+  .mobile-text {
+    display: block !important;
+  }
+}
+
+.mobile-text {
+  display: none;
+  position: fixed;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100vw;
+  text-align: center;
+  color: white;
+  font-size: 18px;
+  z-index: 10000;
+  font-family: "Rubik Regular";
 }
