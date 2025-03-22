@@ -491,12 +491,13 @@ createList.addEventListener("keydown", async function (event) {
       if (listId) {
         renderSingleList(listId, title);
         openPanel(listId, title);
+        createList.value = "";
       }
     } catch (error) {
       console.error("Ошибка при создании листа:", error);
+      createList.preventDefault();
     }
     renderSingleList(newTitleList);
-    createList.value = "";
   }
 });
 
@@ -508,7 +509,7 @@ plusList.addEventListener("click", async function () {
   const currentListsCount = document.querySelectorAll(".menu-item").length;
   if (currentListsCount > maxList) {
     console.log("Достигнуто максимальное количество листов");
-    createList.value = "";
+    createList.preventDefault();
     return;
   }
 
@@ -529,11 +530,12 @@ plusList.addEventListener("click", async function () {
     if (listId) {
       renderSingleList(listId, title);
       openPanel(listId, title);
+      createList.value = "";
     }
   } catch (error) {
     console.error("Ошибка при создании листа:", error);
+    createList.preventDefault();
   }
-  createList.value = "";
 });
 
 function openPanel(listId, listName) {
@@ -586,10 +588,11 @@ async function createTask() {
 
       console.log("New TASK:", newTask);
       renderSingleTask(newTask);
-      taskInput.value = ""; // Очищаем поле после успешного создания
+      taskInput.value = "";
     }
   } catch (error) {
     console.error("Ошибка при создании задачи:", error);
+    taskInput.preventDefault();
   }
 }
 

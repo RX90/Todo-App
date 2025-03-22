@@ -11,7 +11,7 @@
   <body>
     <header>
       <img class="fullscreen-image" src="/src/img/sorry.jpg" alt="Fullscreen Image">
-      <h3 class="mobile-text">TODOAPP временно не доступен на мобильных устройствах</h3>
+      <h3 class="mobile-text"><span style="font-family: 'Papa'">TODOAPP</span>  временно недоступен на мобильных устройствах</h3>
       
       <div class="header">
         <div class="header-logo">
@@ -119,6 +119,13 @@
     </div>
 
   </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll("input[type=password]").forEach(input => {
+            input.setAttribute("autocomplete", "new-password");
+        });
+    });
+    </script>
 
   <script src="/static/fetches.js"></script>
   <script src="/static/main.js"></script>
