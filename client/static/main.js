@@ -27,6 +27,13 @@ let moveToRegistr = document.getElementById("move-to-registr");
 
 let activePanel = null;
 
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape") {
+    hiddenPopupSignin();
+    hiddenPopupSignUp();
+  }
+});
+
 if (
   !localStorage.getItem("accessToken") ||
   localStorage.getItem("accessToken").trim() === ""
@@ -470,7 +477,6 @@ createList.addEventListener("keydown", async function (event) {
     const currentListsCount = document.querySelectorAll(".menu-item").length;
     if (currentListsCount > maxList) {
       console.log("Достигнуто максимальное количество листов");
-      createList.value = "";
       return;
     }
 
