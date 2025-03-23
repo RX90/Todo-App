@@ -15,8 +15,8 @@ import (
 const (
 	salt       = "f3by1efb08y1f0b8"
 	signingKey = "vr3urn93u1dnwi00"
-	accessTTL  = 30 * time.Minute    // 30 Minutes
-	RefreshTTL = 30 * 24 * time.Hour // 30 Days
+	accessTTL  = 30 * time.Second    // 30 Minutes
+	RefreshTTL = 1 * 1 * time.Minute // 30 Days
 )
 
 type AuthService struct {

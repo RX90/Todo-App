@@ -134,7 +134,7 @@ async function sendList(title) {
           console.log("Token expired, refreshing token...");
           await refreshToken();
           console.log("Retrying send list");
-          await sendList(title);
+          return await sendList(title);
         } else {
           showPopupSignin();
         }
@@ -169,7 +169,7 @@ async function getAllLists() {
           console.log("Token expired, refreshing token...");
           await refreshToken();
           console.log("Retrying send list");
-          await getAllLists();
+          return await getAllLists();
         }
       }
       throw new Error(errorResponse.message || "Error get all lists");
@@ -208,7 +208,7 @@ async function sendTask(listId, taskTitle) {
           console.log("Token expired, refreshing token...");
           await refreshToken();
           console.log("Retrying send list");
-          await sendTask(listId, taskTitle);
+          return await sendTask(listId, taskTitle);
         } else {
           showPopupSignin();
         }
@@ -249,7 +249,7 @@ async function getAllTasks(listId) {
           console.log("Token expired, refreshing token...");
           await refreshToken();
           console.log("Retrying send list");
-          await getAllTasks(listId);
+          return await getAllTasks(listId);
         } else {
           showPopupSignin();
         }
@@ -306,7 +306,7 @@ async function toggleTaskState(taskId, isDone, listId) {
           console.log("Token expired, refreshing token...");
           await refreshToken();
           console.log("Retrying send list");
-          await sendTask(taskId, listId, isDone);
+          return await toggleTaskState(taskId, isDone, listId);
         } else {
           showPopupSignin();
         }
@@ -365,7 +365,7 @@ async function logout() {
           console.log("Token expired, refreshing token...");
           await refreshToken();
           console.log("Retrying send list");
-          await logout();
+          return await logout();
         } else {
           showPopupSignin();
         }
@@ -397,7 +397,7 @@ async function DeleteTask(listId, taskId) {
           console.log("Token expired, refreshing token...");
           await refreshToken();
           console.log("Retrying delete task");
-          await logout();
+          return await DeleteTask(listId, taskId);
         } else {
           showPopupSignin();
         }
@@ -430,7 +430,7 @@ async function EditTask(taskId, listId, newTitle) {
           console.log("Token expired, refreshing token...");
           await refreshToken();
           console.log("Retrying edit task");
-          await logout();
+          return await EditTask(taskId, listId, newTitle);
         } else {
           showPopupSignin();
         }
@@ -461,7 +461,7 @@ async function DeleteList(listId) {
           console.log("Token expired, refreshing token...");
           await refreshToken();
           console.log("Retrying delete list");
-          await logout();
+          return await DeleteList(listId);
         } else {
           showPopupSignin();
         }
@@ -494,7 +494,7 @@ async function EditList(listId, newTitleList) {
           console.log("Token expired, refreshing token...");
           await refreshToken();
           console.log("Retrying edit title");
-          await logout();
+          return await EditList(listId, newTitleList);
         } else {
           showPopupSignin();
         }
