@@ -30,14 +30,14 @@
     <main class="menu">
       <div class="menu-item">
         <img src="/src/img/plus.svg" class="plus-icon" alt="" />
-        <input type="text" id="new-list" style="font-size: 16px;" placeholder="Создать список" />
+        <input type="text" id="new-list" style="font-size: 16px;" placeholder="Создать список" required maxlength="32"/>
       </div>
     </main>
 
     <div id="details">
       <h2 id="title"></h2>
       <div class="task-creation">
-        <input id="task-input" type="text" placeholder="Создать задачу" />
+        <input id="task-input" type="text" placeholder="Создать задачу" required maxlength="255"/>
         <button id="task-button">Добавить задачу</button>
       </div>
       <div class="task-list"></div>
