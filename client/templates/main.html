@@ -80,13 +80,14 @@
         <div class="input-signup-block">
           <div class="first-input-signup">
             <label class="signup-label">Логин</label>
-            <input type="text" class="signup-name-input" required>
+            <!-- <input type="text" class="signup-name-input" required> -->
+            <input type="text" id="signup-username" class="signup-name-input" required maxlength="32">
             <p id="error-user-message" ></p>
           </div>
 
           <div class="second-input-signup">
             <label class="signup-label">Пароль</label>
-            <input type="password" class="signup-password-input" required>
+            <input type="password" class="signup-password-input" required maxlength="32">
             <p id="error-message"></p>
             <p class="signin-condition">Ваш пароль должен содержать как минимум:</p>
 
@@ -125,7 +126,56 @@
             input.setAttribute("autocomplete", "new-password");
         });
     });
-    </script>
+  </script>
+  <!-- <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const usernameInput = document.getElementById("signup-username");
+    
+        usernameInput.addEventListener("input", function() {
+            this.value = this.value.replace(/[^A-Za-z0-9_-]/g, '');
+        });
+    
+        usernameInput.addEventListener("keydown", function(event) {
+            const allowedKeys = /^[A-Za-z0-9_-]$/;
+            if (!allowedKeys.test(event.key) && event.key !== "Backspace" && event.key !== "Tab") {
+                event.preventDefault();
+            }
+        });
+    });
+    </script> -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          const allowedRegex = /^[A-Za-z0-9_-]$/;
+          
+          // Дополнительные клавиши, которые разрешаем для навигации
+          const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Home", "End"];
+          
+          // Функция для фильтрации введённого текста
+          function filterInput(input) {
+              input.value = input.value.replace(/[^A-Za-z0-9_-]/g, '');
+          }
+          
+          // Получаем оба поля
+          const usernameInput = document.getElementById("signup-username");
+          const passwordInput = document.querySelector(".signup-password-input");
+          
+          // Фильтруем значение при вставке или вводе символов
+          [usernameInput, passwordInput].forEach(input => {
+              input.addEventListener("input", function() {
+                  filterInput(this);
+              });
+              
+              input.addEventListener("keydown", function(event) {
+                  // Разрешаем клавиши навигации
+                  if (allowedKeys.includes(event.key)) return;
+                  // Если введённый символ не соответствует шаблону – предотвращаем его ввод
+                  if (!allowedRegex.test(event.key)) {
+                      event.preventDefault();
+                  }
+              });
+          });
+      });
+      </script>
 
   <script src="/static/fetches.js"></script>
   <script src="/static/main.js"></script>
