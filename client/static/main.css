@@ -184,7 +184,7 @@ body {
 }
 
 #title {
-  padding: 10px 150px;
+  padding: 10px 185px;
   font-size: 20px;
   font-family: "Rubik Regular";
   color: #9146ff;
@@ -195,11 +195,10 @@ body {
   color: white;
   padding-left: 2%;
   font-size: 15px;
-  /* border: 1px solid white; */
   border-radius: 5px;
   width: 65%;
   height: 35px;
-  margin-left: 13%;
+  margin-left: 12vw;
   outline: none;
   position: relative;
   outline: none;
@@ -360,6 +359,43 @@ body {
   color: white;
 }
 
+.signin-view-svg {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 92%;
+  bottom: 25%;
+  cursor: pointer;
+}
+
+.signin-hide-svg {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 92%;
+  bottom: 25%;
+  cursor: pointer;
+  display: none;
+}
+
+.signup-view-svg {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 92%;
+  bottom: 54%;
+  cursor: pointer;
+}
+
+.signup-hide-svg {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  left: 92%;
+  bottom: 54%;
+  cursor: pointer;
+}
+
 .signin-password-input:focus {
   outline: 3px solid #9146ff;
 }
@@ -412,12 +448,11 @@ body {
 }
 
 #signup-block {
-  position: absolute;
+  position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 40%;
-  height: 80%;
+
   background-color: #2f2f2f;
   display: flex;
   justify-content: center;
@@ -425,9 +460,17 @@ body {
   border-radius: 12px;
   font-family: "Rubik Regular";
   user-select: none;
+
+  width: 40vw; /* Процент экрана */
+  max-width: 500px; /* Максимальная ширина */
+  min-width: 300px; /* Минимальная ширина */
+
+  height: 75vh; /* Высота зависит от экрана */
+  max-height: 80%; /* Максимальная высота */
 }
 
 .title-signup {
+  font-size: clamp(18px, 2vw, 24px);
   height: 5%;
   color: white;
 }
@@ -611,7 +654,8 @@ body {
 #login-button-signin {
   padding: 7px;
   background-color: #4c4a4f;
-  width: 30%;
+  min-width: 30%;
+  max-width: 40%;
   font-family: "Rubik Regular";
   border-radius: 5px;
   color: white;
@@ -627,7 +671,8 @@ body {
 #login-button-signup {
   padding: 7px;
   background-color: #9146ff;
-  width: 50%;
+  min-width: 50%;
+  max-width: 60%;
   font-family: "Rubik Regular";
   border-radius: 5px;
   color: white;
@@ -643,7 +688,8 @@ body {
 #login-button-logout {
   padding: 7px;
   background-color: #4c4a4f;
-  width: 30%;
+  max-width: 200px;
+  min-width: 100px;
   font-family: "Rubik Regular";
   border-radius: 5px;
   color: white;
@@ -733,3 +779,9 @@ body {
   z-index: 10000;
   font-family: "Battle-font";
 }
+
+/* @media (min-width: 512px) {
+  #login-button-logout {
+    width: 50%;
+  }
+} */

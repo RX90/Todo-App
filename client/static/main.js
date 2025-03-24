@@ -27,6 +27,38 @@ let moveToRegistr = document.getElementById("move-to-registr");
 
 let activePanel = null;
 
+let signinViewSvg = document.querySelector(".signin-view-svg");
+let signinHiddenSvg = document.querySelector(".signin-hide-svg");
+
+let signupViewSvg = document.querySelector(".signup-view-svg");
+let signupHiddenSvg = document.querySelector(".signup-hide-svg");
+
+//Скрыть/Показать пароль у логина
+signinViewSvg.addEventListener("click", function () {
+  passwordLogin.type = "text";
+  signinViewSvg.style.display = "none";
+  signinHiddenSvg.style.display = "block";
+});
+
+signinHiddenSvg.addEventListener("click", function () {
+  passwordLogin.type = "password";
+  signinHiddenSvg.style.display = "none";
+  signinViewSvg.style.display = "block";
+});
+
+//Скрыть/Показать пароль у регистрации
+signupViewSvg.addEventListener("click", function () {
+  passwordRegister.type = "text";
+  signupViewSvg.style.display = "none";
+  signupHiddenSvg.style.display = "block";
+});
+
+signupHiddenSvg.addEventListener("click", function () {
+  passwordRegister.type = "password";
+  signupHiddenSvg.style.display = "none";
+  signupViewSvg.style.display = "block";
+});
+
 document.addEventListener("keydown", function (event) {
   if (event.key === "Escape") {
     hiddenPopupSignin();
@@ -286,6 +318,7 @@ function renderSingleList(listid, title) {
       addList.addEventListener("keydown", async function (event) {
         if (event.key === "Enter") {
           const newTitleList = addList.value.trim();
+          const maxLength = 32;
 
           const existingList = [...menu.querySelectorAll(".add-list")]
             .filter((list) => list !== addList)
@@ -301,9 +334,13 @@ function renderSingleList(listid, title) {
           }
 
           if (newTitleList !== "" && newTitleList !== title) {
-            await EditList(listid, newTitleList);
-            title = newTitleList;
-            dotsPanel.remove();
+            if (addList.value.length > maxLength) {
+              addList.value = addList.value.substring(0, maxLength);
+              console.log("Больше 32 символов");
+              await EditList(listid, newTitleList);
+              title = newTitleList;
+              dotsPanel.remove();
+            }
           }
           addList.disabled = true;
           dotsPanel.remove();
