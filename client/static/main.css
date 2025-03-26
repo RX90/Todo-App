@@ -594,14 +594,13 @@ body {
   margin: 0;
   color: red !important;
   font-size: 13px;
-  min-height: 20px;
+  min-height: 10px;
 }
 
 #signin-error2 {
   margin: 0;
-
   font-size: 13px;
-  min-height: 20px;
+  min-height: 10px;
   color: red !important;
 }
 

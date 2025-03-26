@@ -84,10 +84,10 @@ async function signIn(username, password) {
       if (response.status === 400 || response.status === 401) {
         console.log("Бугагага");
         signinError.textContent = "Некорректно введённые данные";
-        signinError.style.display = "block";
+        signinError.style.visibility = "visible";
 
         signinError2.textContent = "Некорректно введённые данные";
-        signinError2.style.display = "block";
+        signinError2.style.visibility = "visible";
 
         signinInputName.style.outline = "3px solid red";
         signinInputPassword.style.outline = "3px solid red";

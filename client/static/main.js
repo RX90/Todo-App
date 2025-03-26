@@ -33,7 +33,7 @@ let signinHiddenSvg = document.querySelector(".signin-hide-svg");
 let signupViewSvg = document.querySelector(".signup-view-svg");
 let signupHiddenSvg = document.querySelector(".signup-hide-svg");
 
-//Скрыть/Показать пароль у логина
+// Скрыть/Показать пароль у логина
 signinViewSvg.addEventListener("click", function () {
   passwordLogin.type = "text";
   signinViewSvg.style.display = "none";
@@ -94,6 +94,14 @@ async function logoutLocalStorage() {
 //Логинизация
 function showPopupSignin() {
   panelSignin.style.display = "block";
+  usernameLogin.value = "";
+  passwordLogin.value = "";
+
+  usernameLogin.style.outline = "";
+  passwordLogin.style.outline = "";
+
+  signinError.textContent = "";
+  signinError2.textContent = "";
 }
 
 function hiddenPopupSignin() {
@@ -113,6 +121,7 @@ signinSendData.addEventListener("click", async function () {
     console.log("Вход прошел успешно");
     hiddenPopupSignin();
 
+    clearRenderedLists();
     const lists = await getAllLists();
     if (lists && Array.isArray(lists)) {
       lists.forEach((list) => renderSingleList(list.id, list.title));
@@ -243,6 +252,7 @@ signupSendData.addEventListener("click", async function () {
       hiddenPopupSignUp();
     }
 
+    clearRenderedLists();
     const lists = await getAllLists();
     if (lists && Array.isArray(lists)) {
       lists.forEach((list) => renderSingleList(list.id, list.title));
@@ -334,13 +344,13 @@ function renderSingleList(listid, title) {
           }
 
           if (newTitleList !== "" && newTitleList !== title) {
-            if (addList.value.length > maxLength) {
-              addList.value = addList.value.substring(0, maxLength);
+            if (newTitleList.length > maxLength) {
+              newTitleList = newTitleList.substring(0, maxLength);
+              addList.value = newTitleList;
               console.log("Больше 32 символов");
-              await EditList(listid, newTitleList);
-              title = newTitleList;
-              dotsPanel.remove();
             }
+            await EditList(listid, newTitleList);
+            title = newTitleList;
           }
           addList.disabled = true;
           dotsPanel.remove();
@@ -649,9 +659,29 @@ taskButton.addEventListener("click", async function () {
   await createTask();
 });
 
+//Фикс бага с дюпом листов
+function clearRenderedLists() {
+  const menu = document.querySelector(".menu");
+  if (menu) {
+    const newListInputContainer =
+      menu.querySelector("#new-list")?.parentElement;
+
+    menu.innerHTML = "";
+
+    if (newListInputContainer) {
+      menu.appendChild(newListInputContainer);
+    }
+  }
+
+  const details = document.getElementById("details");
+  if (details) details.style.display = "none";
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
   if (localStorage.getItem("accessToken")) {
     console.log("Токен найден, загружаем списки...");
+
+    clearRenderedLists();
     const lists = await getAllLists();
     if (lists && Array.isArray(lists)) {
       lists.forEach((list) => {
