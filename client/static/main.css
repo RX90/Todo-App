@@ -4,7 +4,7 @@ body {
   padding: 0;
   width: 100%;
   background-color: #171616;
-  height: 100vh; /* Высота всей страницы */
+  /* height: 100vh; Высота всей страницы */
   margin: 0;
 }
 
@@ -324,10 +324,13 @@ body {
 }
 
 .second-input-signin {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
 }
 
 .signin-label {
@@ -357,14 +360,15 @@ body {
   font-size: 15px;
   border-radius: 5px;
   color: white;
+  max-width: 400px;
 }
 
 .signin-view-svg {
   position: absolute;
   width: 20px;
   height: 20px;
-  left: 92%;
-  bottom: 25%;
+  right: 3%;
+  bottom: 32%;
   cursor: pointer;
 }
 
@@ -372,8 +376,8 @@ body {
   position: absolute;
   width: 20px;
   height: 20px;
-  left: 92%;
-  bottom: 25%;
+  right: 3%;
+  bottom: 32%;
   cursor: pointer;
   display: none;
 }
@@ -382,8 +386,8 @@ body {
   position: absolute;
   width: 20px;
   height: 20px;
-  left: 92%;
-  bottom: 54%;
+  top: 39%;
+  right: 3%;
   cursor: pointer;
 }
 
@@ -391,9 +395,10 @@ body {
   position: absolute;
   width: 20px;
   height: 20px;
-  left: 92%;
-  bottom: 54%;
+  top: 39%;
+  right: 3%;
   cursor: pointer;
+  display: none;
 }
 
 .signin-password-input:focus {
@@ -462,15 +467,15 @@ body {
   user-select: none;
 
   width: 40vw; /* Процент экрана */
-  max-width: 500px; /* Максимальная ширина */
-  min-width: 300px; /* Минимальная ширина */
+  max-width: 700px; /* Максимальная ширина */
+  min-width: 400px; /* Минимальная ширина */
 
   height: 75vh; /* Высота зависит от экрана */
   max-height: 80%; /* Максимальная высота */
 }
 
 .title-signup {
-  font-size: clamp(18px, 2vw, 24px);
+  font-size: 20px;
   height: 5%;
   color: white;
 }
@@ -488,15 +493,18 @@ body {
 .first-input-signup {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
   width: 100%;
 }
 
 .second-input-signup {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 10px;
   width: 100%;
+  max-width: 450px;
+  margin: 0 auto;
 }
 
 .signup-label {
@@ -556,7 +564,6 @@ body {
 .signin-condition {
   font-size: 14px;
   color: white;
-  margin: 1;
 }
 
 .validation-item {
@@ -566,7 +573,7 @@ body {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 5px 0;
+  padding: 1px 0;
 }
 
 #checkbox-length,
@@ -605,7 +612,8 @@ body {
 }
 
 #signup-button {
-  margin-top: 2%;
+  margin-top: 8%;
+  max-height: 50px;
 }
 
 .delete-task {
@@ -671,7 +679,7 @@ body {
   padding: 7px;
   background-color: #9146ff;
   min-width: 50%;
-  max-width: 60%;
+  max-width: 70%;
   font-family: "Rubik Regular";
   border-radius: 5px;
   color: white;
@@ -755,16 +763,6 @@ body {
   z-index: 9999;
 }
 
-@media screen and (max-device-width: 1024px) {
-  .fullscreen-image {
-    display: block !important;
-  }
-
-  .mobile-text {
-    display: block !important;
-  }
-}
-
 .mobile-text {
   display: none;
   position: fixed;
@@ -779,8 +777,56 @@ body {
   font-family: "Battle-font";
 }
 
-/* @media (min-width: 512px) {
-  #login-button-logout {
-    width: 50%;
+@media (max-height: 700px) {
+  #signin-block {
+    height: 65%;
   }
-} */
+
+  .signin-label {
+    font-size: 14px;
+  }
+
+  .validation-item {
+    padding: 1px;
+    font-size: 14px;
+  }
+
+  .signin-condition {
+    margin: 1px;
+  }
+
+  #signup-block {
+    height: 90vh;
+  }
+
+  .input-signup-block {
+    gap: 13px;
+    top: 14%;
+  }
+
+  .signup-label {
+    font-size: 13px;
+  }
+
+  .title-signup {
+    font-size: 15px;
+  }
+
+  #signup-button {
+    margin-top: 2%;
+  }
+}
+
+@media (max-height: 550px) {
+  .validation-item {
+    padding: 2px;
+  }
+
+  .input-signup-block {
+    gap: 10px;
+  }
+
+  #signup-button {
+    margin-top: 13%;
+  }
+}

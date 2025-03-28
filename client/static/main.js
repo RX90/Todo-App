@@ -33,30 +33,42 @@ let signinHiddenSvg = document.querySelector(".signin-hide-svg");
 let signupViewSvg = document.querySelector(".signup-view-svg");
 let signupHiddenSvg = document.querySelector(".signup-hide-svg");
 
-// Скрыть/Показать пароль у логина
-signinViewSvg.addEventListener("click", function () {
-  passwordLogin.type = "text";
-  signinViewSvg.style.display = "none";
-  signinHiddenSvg.style.display = "block";
-});
+passwordLogin.type = "password";
+signinViewSvg.style.display = "none";
+signinHiddenSvg.style.display = "block";
 
+passwordRegister.type = "password";
+signupViewSvg.style.display = "none";
+signupHiddenSvg.style.display = "block";
+
+// Скрыть/Показать пароль у логина
 signinHiddenSvg.addEventListener("click", function () {
-  passwordLogin.type = "password";
+  passwordLogin.type = "text";
   signinHiddenSvg.style.display = "none";
   signinViewSvg.style.display = "block";
+  console.log("Сделал текст видимым");
 });
 
-//Скрыть/Показать пароль у регистрации
-signupViewSvg.addEventListener("click", function () {
-  passwordRegister.type = "text";
-  signupViewSvg.style.display = "none";
-  signupHiddenSvg.style.display = "block";
+signinViewSvg.addEventListener("click", function () {
+  passwordLogin.type = "password";
+  signinViewSvg.style.display = "none";
+  signinHiddenSvg.style.display = "block";
+  console.log("Сделал текст точками");
 });
 
+// Скрыть/Показать пароль у регистрации
 signupHiddenSvg.addEventListener("click", function () {
-  passwordRegister.type = "password";
+  passwordRegister.type = "text";
   signupHiddenSvg.style.display = "none";
   signupViewSvg.style.display = "block";
+  console.log("Сделал текст видимым");
+});
+
+signupViewSvg.addEventListener("click", function () {
+  passwordRegister.type = "password";
+  signupViewSvg.style.display = "none";
+  signupHiddenSvg.style.display = "block";
+  console.log("Сделал текст точками");
 });
 
 document.addEventListener("keydown", function (event) {
@@ -75,7 +87,6 @@ if (
     showPopupSignin();
   });
 } else {
-  console.log("Токен получен", localStorage.getItem("accessToken"));
   hiddenPopupSignin();
 }
 
