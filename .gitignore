@@ -1,2 +1,5 @@
-.txt
+*.txt
+*.crt
+*.key
+
 /deploy

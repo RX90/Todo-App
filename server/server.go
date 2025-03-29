@@ -14,7 +14,7 @@ func NewServer() *Server {
 	return &Server{}
 }
 
-func (s *Server) Run(port string, handler http.Handler) error {
+func (s *Server) Run(port, certFile, keyFile string, handler http.Handler) error {
 	s.httpServer = &http.Server{
 		Addr:           ":" + port,
 		Handler:        handler,
@@ -22,7 +22,7 @@ func (s *Server) Run(port string, handler http.Handler) error {
 		ReadTimeout:    10 * time.Second,
 		WriteTimeout:   10 * time.Second,
 	}
-	return s.httpServer.ListenAndServe()
+	return s.httpServer.ListenAndServeTLS(certFile, keyFile)
 }
 
 func (s *Server) Shutdown(ctx context.Context) error {

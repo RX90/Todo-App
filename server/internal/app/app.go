@@ -64,7 +64,12 @@ func NewApp() (*App, error) {
 
 func (a *App) Run() error {
 	go func() {
-		a.server.Run(viper.GetString("server.port"), a.handlers.InitRoutes())
+		a.server.Run(
+			viper.GetString("server.port"),
+			"server/certs/cert.crt",
+			"server/certs/cert.key",
+			a.handlers.InitRoutes(),
+		)
 	}()
 
 	log.Println("TodoApp Started")

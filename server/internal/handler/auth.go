@@ -79,6 +79,7 @@ func (h *Handler) signIn(c *gin.Context) {
 		Domain:   "localhost",
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
+		Secure: true,
 	}
 
 	http.SetCookie(c.Writer, cookie)
@@ -137,6 +138,7 @@ func (h *Handler) refreshTokens(c *gin.Context) {
 		Domain:   "localhost",
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
+		Secure: true,
 	}
 
 	http.SetCookie(c.Writer, cookie)
