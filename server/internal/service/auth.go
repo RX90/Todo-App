@@ -16,7 +16,7 @@ const (
 	salt       = "f3by1efb08y1f0b8"
 	signingKey = "vr3urn93u1dnwi00"
 	accessTTL  = 30 * time.Minute    // 30 Minutes
-	RefreshTTL = 30 * 24 * time.Hour // 30 Days
+	RefreshTTL = 1 * 1 * time.Minute // 30 Days
 )
 
 type AuthService struct {
@@ -39,18 +39,7 @@ func generatePasswordHash(password string) string {
 	return fmt.Sprintf("%x", hash.Sum([]byte(salt)))
 }
 
-func isPasswordOK(password string) error {
-	if len(password) < 8 || len(password) > 32 {
-		return errors.New("invalid length of password")
-	}
-
-	return nil
-}
-
 func (s *AuthService) CreateUser(user todo.User) error {
-	if err := isPasswordOK(user.Password); err != nil {
-		return err
-	}
 	user.Password = generatePasswordHash(user.Password)
 	return s.repos.CreateUser(user)
 }
@@ -115,12 +104,12 @@ func (s *AuthService) ParseAccessToken(accessToken string) (string, error) {
 		return "", err
 	}
 
+	if !token.Valid {
+		return "", errors.New("token is invalid")
+	}
 	claims, ok := token.Claims.(*TokenClaims)
 	if !ok {
 		return "", errors.New("token claims are not of type *TokenClaims")
-	}
-	if !token.Valid {
-		return "", errors.New("token is invalid")
 	}
 
 	return claims.UserId, nil
@@ -130,6 +119,6 @@ func (s *AuthService) CheckRefreshToken(userId, refreshToken string) error {
 	return s.repos.CheckRefreshToken(userId, refreshToken)
 }
 
-func (s *AuthService) DeleteRefreshToken(userId, refreshToken string) error {
-	return s.repos.DeleteRefreshToken(userId, refreshToken)
+func (s *AuthService) DeleteRefreshToken(userId string) error {
+	return s.repos.DeleteRefreshToken(userId)
 }

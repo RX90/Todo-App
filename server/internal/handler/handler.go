@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"net/http"
+
 	"github.com/RX90/Todo-App/server/internal/service"
 	"github.com/gin-gonic/gin"
 )
@@ -16,6 +18,14 @@ func NewHandler(services *service.Service) *Handler {
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.Default()
 
+	router.Static("/static", "./client/static")
+	router.Static("/src", "./client/src")
+	router.LoadHTMLGlob("./client/templates/*.html")
+
+	router.GET("/", func(c *gin.Context) {
+		c.HTML(http.StatusOK, "main.html", nil)
+	})
+
 	api := router.Group("/api")
 	{
 		auth := api.Group("/auth")
@@ -30,20 +40,16 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		{
 			lists.POST("/", h.createList)
 			lists.GET("/", h.getAllLists)
-			lists.PUT("/:id", h.updateList)
-			lists.DELETE("/:id", h.deleteList)
+			lists.PUT("/:listId", h.updateList)
+			lists.DELETE("/:listId", h.deleteList)
 
-			tasks := lists.Group(":id/tasks")
+			tasks := lists.Group(":listId/tasks")
 			{
 				tasks.POST("/", h.createTask)
 				tasks.GET("/", h.getAllTasks)
+				tasks.PUT("/:taskId", h.updateTask)
+				tasks.DELETE("/:taskId", h.deleteTask)
 			}
-		}
-
-		tasks := api.Group("/tasks", h.userIdentity)
-		{
-			tasks.PUT("/:id", h.updateTask)
-			tasks.DELETE("/:id", h.deleteTask)
 		}
 	}
 

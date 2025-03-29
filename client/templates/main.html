@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Todo App</title>
+    <link rel="icon" href="../src/img/logo.ico">
+    <link rel="stylesheet" href="/static/main.css" />
+    <script src="https://rawgit.com/WeiChiaChang/Easter-egg/master/easter-eggs-collection.js"></script>
+  </head>
+  <body>
+    <header>
+      <img class="fullscreen-image" src="/src/img/sorry.jpg" alt="Fullscreen Image">
+      <h3 class="mobile-text"><span style="font-family: 'Papa'">TODOAPP</span>  временно недоступен на мобильных устройствах</h3>
+      
+      <div class="header">
+        <div class="header-logo">
+          <img src="../src/img/ugly_logo_negate.png" class="ugly-logo" alt="">
+          <p class="todo-name">TODOAPP</p>
+        </div>
+
+        <div class="button-group">
+          <button id="login-button-signin">Войти</button>
+          <button id="login-button-signup">Зарегистрироваться</button>
+          <button id="login-button-logout" style="display: none;">Выйти</button>
+        </div>
+        
+    </header>
+
+    <main class="menu">
+      <div class="menu-item">
+        <img src="/src/img/plus.svg" class="plus-icon" alt="" />
+        <input type="text" id="new-list" style="font-size: 16px;" placeholder="Создать список" required maxlength="32"/>
+      </div>
+    </main>
+
+    <div id="details">
+      <h2 id="title"></h2>
+      <div class="task-creation">
+        <input id="task-input" type="text" placeholder="Создать задачу" required maxlength="255"/>
+        <button id="task-button">Добавить задачу</button>
+      </div>
+      <div class="task-list"></div>
+      
+        <h2 class="title-completed">Выполнено</h2>
+        <div class="completed"></div>
+      </div>
+    </div>
+
+    <div class="background-sign-in">
+      <div id="signin-block">
+        <h3 class="title-signin">Войти</h3>
+
+        <div class="input-signin-block">
+          <div class="first-input-signin">
+            <label class="signin-label">Логин</label>
+            <input type="text" class="signin-name-input" required maxlength="32">
+            <p id="signin-error" style="visibility: hidden;"></p>
+          </div>
+
+          <div class="second-input-signin">
+            <label class="signin-label">Пароль</label>
+            <input type="password" class="signin-password-input" required maxlength="32">
+            <img src="../src/img/view.svg" class="signin-view-svg" alt="Показать пароль">
+            <img src="../src//img//hide.svg" class="signin-hide-svg" alt="Скрыть пароль">
+            <p id="signin-error2" style="visibility: hidden;"></p>
+          </div>
+        </div>
+
+        <div class="signin-down-block">
+          <button id="signin-button">Войти</button>
+          <span id="move-to-registr">Регистрация</span>
+         
+        </div>
+      </div>
+    </div>
+
+    <div class="background-sign-up">
+      <div id="signup-block">
+        <h3 class="title-signup">Регистрация</h3>
+
+        <div class="input-signup-block">
+          <div class="first-input-signup">
+            <label class="signup-label">Логин</label>
+            <input type="text" id="signup-username" class="signup-name-input" required maxlength="32">
+            <p id="error-user-message"></p>
+          </div>
+
+          <div class="second-input-signup">
+            <label class="signup-label">Пароль</label>
+            <input type="password" class="signup-password-input" required maxlength="32">
+            <img src="../src/img/view.svg" class="signup-view-svg" alt="Показать пароль">
+            <img src="../src//img//hide.svg" class="signup-hide-svg" alt="Скрыть пароль">
+
+            <p id="error-message"></p>
+          </div>
+            <p class="signin-condition">Ваш пароль должен содержать как минимум:</p>
+
+            <div class="validation-item">
+              <!-- <input type="checkbox" id="length-check" disabled> -->
+              <img src="../src/img/checkbox.svg" id="checkbox-length" alt="">
+              <label for="length-check" id="length-label">8 символов</label>
+            </div>
+
+            <div class="validation-item">
+              <!-- <input type="checkbox" id="number-check" disabled> -->
+              <img src="../src/img/checkbox.svg" id="checkbox-number" alt="">
+              <label for="number-check" id="number-label">1 цифру</label>
+            </div>
+
+            <div class="validation-item">
+              <!-- <input type="checkbox" id="letter-check" disabled> -->
+              <img src="../src/img/checkbox.svg" id="checkbox-letter" alt="">
+              <label for="letter-check" id="letter-label">1 большую и маленькую букву</label>
+            </div>
+        </div>
+
+        <div class="signup-down-block">
+          <button id="signup-button">Зарегистрироваться</button>
+          
+          
+        </div>
+      </div>
+    </div>
+
+  </body>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.querySelectorAll("input[type=password]").forEach(input => {
+            input.setAttribute("autocomplete", "new-password");
+        });
+    });
+  </script>
+  <!-- <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const usernameInput = document.getElementById("signup-username");
+    
+        usernameInput.addEventListener("input", function() {
+            this.value = this.value.replace(/[^A-Za-z0-9_-]/g, '');
+        });
+    
+        usernameInput.addEventListener("keydown", function(event) {
+            const allowedKeys = /^[A-Za-z0-9_-]$/;
+            if (!allowedKeys.test(event.key) && event.key !== "Backspace" && event.key !== "Tab") {
+                event.preventDefault();
+            }
+        });
+    });
+    </script> -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+          const allowedRegex = /^[A-Za-z0-9_-]$/;
+          
+          // Дополнительные клавиши, которые разрешаем для навигации
+          const allowedKeys = ["Backspace", "Tab", "ArrowLeft", "ArrowRight", "Delete", "Home", "End"];
+          
+          // Функция для фильтрации введённого текста
+          function filterInput(input) {
+              input.value = input.value.replace(/[^A-Za-z0-9_-]/g, '');
+          }
+          
+          // Получаем оба поля
+          const usernameInput = document.getElementById("signup-username");
+          const passwordInput = document.querySelector(".signup-password-input");
+          
+          // Фильтруем значение при вставке или вводе символов
+          [usernameInput, passwordInput].forEach(input => {
+              input.addEventListener("input", function() {
+                  filterInput(this);
+              });
+              
+              input.addEventListener("keydown", function(event) {
+                  // Разрешаем клавиши навигации
+                  if (allowedKeys.includes(event.key)) return;
+                  // Если введённый символ не соответствует шаблону – предотвращаем его ввод
+                  if (!allowedRegex.test(event.key)) {
+                      event.preventDefault();
+                  }
+              });
+          });
+      });
+      </script>
+
+  <script src="/static/fetches.js"></script>
+  <script src="/static/main.js"></script>
+  
+</html>

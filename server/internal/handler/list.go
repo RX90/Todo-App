@@ -4,17 +4,14 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"unicode/utf8"
 
 	"github.com/RX90/Todo-App/server/internal/todo"
 	"github.com/gin-gonic/gin"
 )
 
 func (h *Handler) createList(c *gin.Context) {
-	userId, err := getUserCtx(c)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't get user id from context: %s", err.Error())})
-		return
-	}
+	userId := getUserCtx(c)
 
 	var input todo.List
 
@@ -23,8 +20,13 @@ func (h *Handler) createList(c *gin.Context) {
 		return
 	}
 
-	if err := inputValidate(input.Title); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+	l := utf8.RuneCountInString(input.Title)
+
+	if l == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "list title is empty"})
+		return
+	} else if l > 32 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "list title exceeds 32 characters"})
 		return
 	}
 
@@ -38,11 +40,7 @@ func (h *Handler) createList(c *gin.Context) {
 }
 
 func (h *Handler) getAllLists(c *gin.Context) {
-	userId, err := getUserCtx(c)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't get user id from context: %s", err.Error())})
-		return
-	}
+	userId := getUserCtx(c)
 
 	lists, err := h.services.TodoList.GetAll(userId)
 	if err != nil {
@@ -54,14 +52,10 @@ func (h *Handler) getAllLists(c *gin.Context) {
 }
 
 func (h *Handler) updateList(c *gin.Context) {
-	userId, err := getUserCtx(c)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't get user id from context: %s", err.Error())})
-		return
-	}
+	userId := getUserCtx(c)
 
-	listId := c.Param("id")
-	_, err = strconv.Atoi(listId)
+	listId := c.Param("listId")
+	_, err := strconv.Atoi(listId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get list id: %s", err.Error())})
 		return
@@ -74,8 +68,13 @@ func (h *Handler) updateList(c *gin.Context) {
 		return
 	}
 
-	if err := inputValidate(input.Title); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": err.Error()})
+	l := utf8.RuneCountInString(input.Title)
+
+	if l == 0 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "list title is empty"})
+		return
+	} else if l > 32 {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": "list title exceeds 32 characters"})
 		return
 	}
 
@@ -88,14 +87,10 @@ func (h *Handler) updateList(c *gin.Context) {
 }
 
 func (h *Handler) deleteList(c *gin.Context) {
-	userId, err := getUserCtx(c)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"err": fmt.Sprintf("can't get user id from context: %s", err.Error())})
-		return
-	}
+	userId := getUserCtx(c)
 
-	listId := c.Param("id")
-	_, err = strconv.Atoi(listId)
+	listId := c.Param("listId")
+	_, err := strconv.Atoi(listId)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"err": fmt.Sprintf("can't get list id: %s", err.Error())})
 		return

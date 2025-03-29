@@ -22,7 +22,7 @@ type Authorization interface {
 	GetUserId(user todo.User) (string, error)
 	NewRefreshToken(token, userId string, expiresAt time.Time) error
 	CheckRefreshToken(userId, refreshToken string) error
-	DeleteRefreshToken(userId, refreshToken string) error
+	DeleteRefreshToken(userId string) error
 }
 
 type TodoList interface {
@@ -36,8 +36,8 @@ type TodoList interface {
 type TodoTask interface {
 	Create(listId string, task todo.Task) (string, error)
 	GetAll(userId, listId string) ([]todo.Task, error)
-	Update(userId, taskId string, task todo.Task) error
-	Delete(userId, listId string) error
+	Update(userId, listId, taskId string, task todo.UpdateTaskInput) error
+	Delete(userId, listId, taskId string) error
 }
 
 type Repository struct {

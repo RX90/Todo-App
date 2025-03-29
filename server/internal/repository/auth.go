@@ -33,7 +33,7 @@ func (r *AuthDB) CreateUser(user todo.User) error {
 		return err
 	}
 	if isTaken {
-		return fmt.Errorf("username '%s' is already taken", user.Username)
+		return fmt.Errorf("username is already taken")
 	}
 
 	query := fmt.Sprintf("INSERT INTO %s (username, password_hash) values ($1, $2)", usersTable)
@@ -63,6 +63,7 @@ func (r *AuthDB) NewRefreshToken(token, userId string, expiresAt time.Time) erro
 	if err != nil {
 		return err
 	}
+	defer tx.Rollback()
 
 	var existingTokenId string
 
@@ -75,7 +76,6 @@ func (r *AuthDB) NewRefreshToken(token, userId string, expiresAt time.Time) erro
 	)
 	err = tx.QueryRow(query, userId).Scan(&existingTokenId)
 	if err != nil && err != sql.ErrNoRows {
-		tx.Rollback()
 		return err
 	}
 
@@ -87,14 +87,12 @@ func (r *AuthDB) NewRefreshToken(token, userId string, expiresAt time.Time) erro
 		var tokenId string
 
 		if err := row.Scan(&tokenId); err != nil {
-			tx.Rollback()
 			return err
 		}
 
 		query = fmt.Sprintf("INSERT INTO %s (user_id, token_id) values ($1, $2)", usersTokensTable)
 		_, err = tx.Exec(query, userId, tokenId)
 		if err != nil {
-			tx.Rollback()
 			return err
 		}
 	} else {
@@ -102,7 +100,6 @@ func (r *AuthDB) NewRefreshToken(token, userId string, expiresAt time.Time) erro
 		query = fmt.Sprintf("UPDATE %s SET refresh_token = $1, expires_at = $2 WHERE id = $3", tokensTable)
 		_, err = tx.Exec(query, token, expiresAt, existingTokenId)
 		if err != nil {
-			tx.Rollback()
 			return err
 		}
 	}
@@ -138,17 +135,14 @@ func (r *AuthDB) CheckRefreshToken(userId, refreshToken string) error {
 	return nil
 }
 
-func (r *AuthDB) DeleteRefreshToken(userId, refreshToken string) error {
+func (r *AuthDB) DeleteRefreshToken(userId string) error {
 	query := fmt.Sprintf(`
 		DELETE FROM %s t
 		USING %s ut
-		WHERE t.id = ut.token_id AND ut.user_id = $1 AND t.refresh_token = $2`,
+		WHERE t.id = ut.token_id AND ut.user_id = $1`,
 		tokensTable, usersTokensTable,
 	)
-	_, err := r.db.Exec(query, userId, refreshToken)
-	if err != nil {
-		return err
-	}
+	_, err := r.db.Exec(query, userId)
 
-	return nil
+	return err
 }

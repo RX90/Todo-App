@@ -27,10 +27,10 @@ func (s *TaskService) GetAll(userId, listId string) ([]todo.Task, error) {
 	return s.repos.GetAll(userId, listId)
 }
 
-func (s *TaskService) Update(userId, taskId string, task todo.Task) error {
-	return s.repos.Update(userId, taskId, task)
+func (s *TaskService) Update(userId, listId, taskId string, task todo.UpdateTaskInput) error {
+	return s.repos.Update(userId, listId, taskId, task)
 }
 
-func (s *TaskService) Delete(userId, listId string) error {
-	return s.repos.Delete(userId, listId)
+func (s *TaskService) Delete(userId, listId, taskId string) error {
+	return s.repos.Delete(userId, listId, taskId)
 }

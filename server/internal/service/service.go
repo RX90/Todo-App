@@ -5,6 +5,8 @@ import (
 	"github.com/RX90/Todo-App/server/internal/todo"
 )
 
+//go:generate mockgen -source=service.go -destination=mocks/mock.go
+
 type Authorization interface {
 	CreateUser(user todo.User) error
 	GetUserId(user todo.User) (string, error)
@@ -12,7 +14,7 @@ type Authorization interface {
 	NewRefreshToken(userId string) (string, error)
 	ParseAccessToken(token string) (string, error)
 	CheckRefreshToken(userId, refreshToken string) error
-	DeleteRefreshToken(userId, refreshToken string) error
+	DeleteRefreshToken(userId string) error
 }
 
 type TodoList interface {
@@ -25,8 +27,8 @@ type TodoList interface {
 type TodoTask interface {
 	Create(userId, listId string, task todo.Task) (string, error)
 	GetAll(userId, listId string) ([]todo.Task, error)
-	Update(userId, taskId string, task todo.Task) error
-	Delete(userId, listId string) error
+	Update(userId, listId, taskId string, task todo.UpdateTaskInput) error
+	Delete(userId, listId, taskId string) error
 }
 
 type Service struct {
