@@ -422,8 +422,8 @@ function renderSingleTask(task) {
   editTask.classList.add("edit-task");
 
   editTask.addEventListener("click", async function (event) {
-    titleTask.disabled = false; // Даем возможность редактировать
-    titleTask.focus(); // Фокус на поле ввода
+    titleTask.disabled = false;
+    titleTask.focus();
 
     titleTask.addEventListener("input", function () {
       // Ограничение по длине названия задачи
