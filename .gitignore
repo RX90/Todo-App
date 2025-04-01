@@ -1,5 +1,4 @@
 *.txt
 *.crt
 *.key
-
-/deploy
+*.database
