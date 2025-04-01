@@ -670,6 +670,12 @@ taskButton.addEventListener("click", async function () {
   await createTask();
 });
 
+taskInput.addEventListener("input", function () {
+  if (this.value.length > 60) {
+    this.value = this.value.substring(0, 60);
+  }
+});
+
 //Фикс бага с дюпом листов
 function clearRenderedLists() {
   const menu = document.querySelector(".menu");
