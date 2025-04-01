@@ -1,10 +1,18 @@
-run:
-	docker start todo-db
-	go run server/cmd/main.go
 build:
-	docker run --name=todo-db -e POSTGRES_PASSWORD='password' -p 5432:5432 -d postgres
-	sleep 10
-	migrate -path ./server/migrations -database "postgres://postgres:password@localhost:5432/postgres?sslmode=disable" up
+	docker-compose build 
+
+up:
+	docker-compose up -d
+
+down:
+	docker-compose down -v
+
+start:
+	docker-compose start
+
+stop:
+	docker-compose stop
+
 test:
 	go clean -testcache
 	go test -v ./...
