@@ -219,7 +219,7 @@ func TestList_Create(t *testing.T) {
 					FROM users_lists
 					WHERE user_id = $1`,
 				)
-				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(10)
+				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(5)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
 				query = regexp.QuoteMeta(`INSERT INTO lists (title) VALUES ($1) RETURNING id`)
@@ -298,7 +298,7 @@ func TestList_Create(t *testing.T) {
 					FROM users_lists
 					WHERE user_id = $1`,
 				)
-				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(20)
+				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(10)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 			},
 			wantErr: true,
@@ -355,7 +355,7 @@ func TestList_Create(t *testing.T) {
 					FROM users_lists
 					WHERE user_id = $1`,
 				)
-				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(10)
+				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(5)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
 				query = regexp.QuoteMeta(`INSERT INTO lists (title) VALUES ($1) RETURNING id`)
@@ -389,7 +389,7 @@ func TestList_Create(t *testing.T) {
 					FROM users_lists
 					WHERE user_id = $1`,
 				)
-				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(10)
+				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(5)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
 				query = regexp.QuoteMeta(`INSERT INTO lists (title) VALUES ($1) RETURNING id`)
