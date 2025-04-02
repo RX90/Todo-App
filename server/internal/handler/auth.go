@@ -76,11 +76,21 @@ func (h *Handler) signIn(c *gin.Context) {
 		Value:    refreshToken,
 		Expires:  time.Now().Add(service.RefreshTTL),
 		Path:     "/",
-		Domain:   "todoapp.ru",
+		Domain:   "localhost",
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
-		Secure: true,
 	}
+
+	// cookie := &http.Cookie{
+	// 	Name:     refresh,
+	// 	Value:    refreshToken,
+	// 	Expires:  time.Now().Add(service.RefreshTTL),
+	// 	Path:     "/",
+	// 	Domain:   "todoapp.ru",
+	// 	HttpOnly: true,
+	// 	SameSite: http.SameSiteStrictMode,
+	// 	Secure: true,
+	// }
 
 	http.SetCookie(c.Writer, cookie)
 
@@ -135,11 +145,21 @@ func (h *Handler) refreshTokens(c *gin.Context) {
 		Value:    refreshToken,
 		Expires:  time.Now().Add(service.RefreshTTL),
 		Path:     "/",
-		Domain:   "todoapp.ru",
+		Domain:   "localhost",
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
-		Secure: true,
 	}
+
+	// cookie := &http.Cookie{
+	// 	Name:     refresh,
+	// 	Value:    refreshToken,
+	// 	Expires:  time.Now().Add(service.RefreshTTL),
+	// 	Path:     "/",
+	// 	Domain:   "todoapp.ru",
+	// 	HttpOnly: true,
+	// 	SameSite: http.SameSiteStrictMode,
+	// 	Secure: true,
+	// }
 
 	http.SetCookie(c.Writer, cookie)
 
