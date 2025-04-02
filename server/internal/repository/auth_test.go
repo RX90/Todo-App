@@ -272,7 +272,7 @@ func TestAuth_NewRefreshToken(t *testing.T) {
 				query := regexp.QuoteMeta(`
 					SELECT ut.token_id
 					FROM users_tokens ut
-					INNER JOIN users t ON ut.token_id = t.id
+					INNER JOIN tokens t ON ut.token_id = t.id
 					WHERE ut.user_id = $1`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(sql.ErrNoRows)
@@ -299,7 +299,7 @@ func TestAuth_NewRefreshToken(t *testing.T) {
 				query := regexp.QuoteMeta(`
 					SELECT ut.token_id
 					FROM users_tokens ut
-					INNER JOIN users t ON ut.token_id = t.id
+					INNER JOIN tokens t ON ut.token_id = t.id
 					WHERE ut.user_id = $1`,
 				)
 				rows := sqlmock.NewRows([]string{"token_id"}).AddRow("12")
@@ -323,7 +323,7 @@ func TestAuth_NewRefreshToken(t *testing.T) {
 				query := regexp.QuoteMeta(`
 					SELECT ut.token_id
 					FROM users_tokens ut
-					INNER JOIN users t ON ut.token_id = t.id
+					INNER JOIN tokens t ON ut.token_id = t.id
 					WHERE ut.user_id = $1`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(errors.New("db error"))
@@ -343,7 +343,7 @@ func TestAuth_NewRefreshToken(t *testing.T) {
 				query := regexp.QuoteMeta(`
 					SELECT ut.token_id
 					FROM users_tokens ut
-					INNER JOIN users t ON ut.token_id = t.id
+					INNER JOIN tokens t ON ut.token_id = t.id
 					WHERE ut.user_id = $1`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(sql.ErrNoRows)
@@ -366,7 +366,7 @@ func TestAuth_NewRefreshToken(t *testing.T) {
 				query := regexp.QuoteMeta(`
 					SELECT ut.token_id
 					FROM users_tokens ut
-					INNER JOIN users t ON ut.token_id = t.id
+					INNER JOIN tokens t ON ut.token_id = t.id
 					WHERE ut.user_id = $1`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(sql.ErrNoRows)
@@ -393,7 +393,7 @@ func TestAuth_NewRefreshToken(t *testing.T) {
 				query := regexp.QuoteMeta(`
 					SELECT ut.token_id
 					FROM users_tokens ut
-					INNER JOIN users t ON ut.token_id = t.id
+					INNER JOIN tokens t ON ut.token_id = t.id
 					WHERE ut.user_id = $1`,
 				)
 				rows := sqlmock.NewRows([]string{"token_id"}).AddRow("12")

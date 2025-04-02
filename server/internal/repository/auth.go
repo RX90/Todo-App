@@ -72,7 +72,7 @@ func (r *AuthDB) NewRefreshToken(token, userId string, expiresAt time.Time) erro
 		FROM %s ut
 		INNER JOIN %s t ON ut.token_id = t.id
 		WHERE ut.user_id = $1`,
-		usersTokensTable, usersTable,
+		usersTokensTable, tokensTable,
 	)
 	err = tx.QueryRow(query, userId).Scan(&existingTokenId)
 	if err != nil && err != sql.ErrNoRows {
