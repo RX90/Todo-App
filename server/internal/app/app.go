@@ -33,7 +33,15 @@ func NewApp() (*App, error) {
 		return nil, err
 	}
 
+	if err := checkConfig(); err != nil {
+		return nil, err
+	}
+
 	if err := godotenv.Load(); err != nil {
+		return nil, err
+	}
+
+	if err := checkEnv(); err != nil {
 		return nil, err
 	}
 
@@ -99,4 +107,49 @@ func initConfig() error {
 	viper.AddConfigPath("server/configs")
 	viper.SetConfigName("config")
 	return viper.ReadInConfig()
+}
+
+func checkConfig() error {
+    required := []string{
+        "server.port",
+        "db.username",
+        "db.host",
+        "db.port",
+        "db.dbname",
+        "db.sslmode",
+    }
+    missing := []string{}
+
+    for _, key := range required {
+        if viper.GetString(key) == "" {
+            missing = append(missing, key)
+        }
+    }
+
+    if len(missing) > 0 {
+        return fmt.Errorf("missing required config values: %v", missing)
+    }
+
+    return nil
+}
+
+func checkEnv() error {
+    required := []string{
+        "DB_PASSWORD",
+        "SERVICE_SALT",
+        "SERVICE_KEY",
+    }
+    missing := []string{}
+
+    for _, key := range required {
+        if os.Getenv(key) == "" {
+            missing = append(missing, key)
+        }
+    }
+
+    if len(missing) > 0 {
+        return fmt.Errorf("missing required environment variables: %v", missing)
+    }
+
+    return nil
 }
