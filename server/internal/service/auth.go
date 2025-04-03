@@ -5,6 +5,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"os"
 	"time"
 
 	"github.com/RX90/Todo-App/server/internal/repository"
@@ -12,9 +13,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-const (
-	salt       = "f3by1efb08y1f0b8"
-	signingKey = "vr3urn93u1dnwi00"
+var (
+	salt       = os.Getenv("SERVICE_SALT")
+	signingKey = os.Getenv("SERVICE_KEY")
 	accessTTL  = 15 * time.Minute    // 15 Minutes
 	RefreshTTL = 15 * 24 * time.Hour // 15 Days
 )
