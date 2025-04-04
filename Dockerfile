@@ -1,6 +1,4 @@
-FROM golang:1.22
-
-RUN apt-get update && apt-get -y install postgresql-client
+FROM golang:1.22 AS builder
 
 WORKDIR /app
 
@@ -9,7 +7,16 @@ RUN go mod download
 
 COPY . .
 
+RUN CGO_ENABLED=0 GOOS=linux go build -o todo-app ./server/cmd/main.go
+
+FROM alpine:latest
+
+RUN apk add --no-cache postgresql-client bash
+
+WORKDIR /app
+
+COPY --from=builder /app .
+
 RUN chmod +x wait-for-postgres.sh
-RUN go build -o todo-app ./server/cmd/main.go
 
 CMD ["./todo-app"]
