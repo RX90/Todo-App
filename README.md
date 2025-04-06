@@ -23,7 +23,7 @@
    $ make build
    ```
 
-3. **Open in browser**: [http://localhost:8000](http://localhost:8000)
+3. <strong>Open in browser</strong>: <a href="http://localhost:8000" target="_blank">http://localhost:8000</a>
 
 # Makefile Commands
 
