@@ -81,17 +81,6 @@ func (h *Handler) signIn(c *gin.Context) {
 		SameSite: http.SameSiteStrictMode,
 	}
 
-	// cookie := &http.Cookie{
-	// 	Name:     refresh,
-	// 	Value:    refreshToken,
-	// 	Expires:  time.Now().Add(service.RefreshTTL),
-	// 	Path:     "/",
-	// 	Domain:   "todoapp.ru",
-	// 	HttpOnly: true,
-	// 	SameSite: http.SameSiteStrictMode,
-	// 	Secure: true,
-	// }
-
 	http.SetCookie(c.Writer, cookie)
 
 	c.JSON(http.StatusOK, gin.H{"token": accessToken})
@@ -149,17 +138,6 @@ func (h *Handler) refreshTokens(c *gin.Context) {
 		HttpOnly: true,
 		SameSite: http.SameSiteStrictMode,
 	}
-
-	// cookie := &http.Cookie{
-	// 	Name:     refresh,
-	// 	Value:    refreshToken,
-	// 	Expires:  time.Now().Add(service.RefreshTTL),
-	// 	Path:     "/",
-	// 	Domain:   "todoapp.ru",
-	// 	HttpOnly: true,
-	// 	SameSite: http.SameSiteStrictMode,
-	// 	Secure: true,
-	// }
 
 	http.SetCookie(c.Writer, cookie)
 
