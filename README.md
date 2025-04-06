@@ -2,6 +2,7 @@
 
 # Requirements
 
+- `git`
 - `docker`
 - `docker-compose` (or Docker with Compose V2 support via `docker compose`)
 - `make` (optional)
