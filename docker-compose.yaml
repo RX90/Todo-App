@@ -16,8 +16,10 @@ services:
     image: postgres:15-alpine
     restart: on-failure
     volumes:
-      - ./.database/postgres/data:/var/lib/postgresql/data
+      - todo-db-data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=password
-    ports:
-      - 5432:5432
+      - POSTGRES_DB=todoapp
+
+volumes:
+  todo-db-data:
