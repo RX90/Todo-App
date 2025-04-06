@@ -126,4 +126,4 @@
     │  └─ server.go
     └─ wait-for-postgres.sh
 
-Made by **[RX90](https://github.com/RX90)** && **[Mafiozich](https://github.com/Mafiozich)**
+Made by **[RX90](https://github.com/RX90)** && **[Mafiozich](https://github.com/Cho-Nah)**
