@@ -2,6 +2,7 @@ services:
   todo-web:
     container_name: todo-web
     image: rx90/todo-app
+    restart: on-failure
     build: ./
     command: ./wait-for-postgres.sh db ./todo-app
     depends_on:
