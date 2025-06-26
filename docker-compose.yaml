@@ -4,23 +4,7 @@ services:
     image: rx90/todo-app
     restart: on-failure
     build: ./
-    command: ./wait-for-postgres.sh db ./todo-app
-    depends_on:
-      - db
-    environment:
-      - DB_PASSWORD=password
     ports:
       - 8000:8000
-
-  db:
-    container_name: todo-db
-    image: postgres:15-alpine
-    restart: on-failure
     volumes:
-      - todo-db-data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=todoapp
-
-volumes:
-  todo-db-data:
+      - ./data:/app/data
