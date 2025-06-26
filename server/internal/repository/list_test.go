@@ -35,10 +35,11 @@ func TestList_isTitleExistsInLists(t *testing.T) {
 			mockFunc: func(mock sqlmock.Sqlmock, userId, title string) {
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 				mock.ExpectQuery(query).WithArgs(userId, title).WillReturnRows(rows)
@@ -53,10 +54,11 @@ func TestList_isTitleExistsInLists(t *testing.T) {
 			mockFunc: func(mock sqlmock.Sqlmock, userId, title string) {
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(userId, title).WillReturnRows(rows)
@@ -71,10 +73,11 @@ func TestList_isTitleExistsInLists(t *testing.T) {
 			mockFunc: func(mock sqlmock.Sqlmock, userId, title string) {
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId, title).WillReturnError(errors.New("db error"))
 			},
@@ -123,7 +126,7 @@ func TestList_countUserLists(t *testing.T) {
 				query := regexp.QuoteMeta(`
 					SELECT COUNT(*) AS lists_count
 					FROM users_lists
-					WHERE user_id = $1`,
+					WHERE user_id = ?`,
 				)
 				rows := sqlmock.NewRows([]string{"lists_count"}).AddRow(14)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
@@ -138,7 +141,7 @@ func TestList_countUserLists(t *testing.T) {
 				query := regexp.QuoteMeta(`
 					SELECT COUNT(*) AS lists_count
 					FROM users_lists
-					WHERE user_id = $1`,
+					WHERE user_id = ?`,
 				)
 				rows := sqlmock.NewRows([]string{"lists_count"}).AddRow(20)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
@@ -153,7 +156,7 @@ func TestList_countUserLists(t *testing.T) {
 				query := regexp.QuoteMeta(`
 					SELECT COUNT(*) AS lists_count
 					FROM users_lists
-					WHERE user_id = $1`,
+					WHERE user_id = ?`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(errors.New("db error"))
 			},
@@ -206,10 +209,11 @@ func TestList_Create(t *testing.T) {
 
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
@@ -217,16 +221,16 @@ func TestList_Create(t *testing.T) {
 				query = regexp.QuoteMeta(`
 					SELECT COUNT(*) AS lists_count
 					FROM users_lists
-					WHERE user_id = $1`,
+					WHERE user_id = ?`,
 				)
 				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(5)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta(`INSERT INTO lists (title) VALUES ($1) RETURNING id`)
+				query = regexp.QuoteMeta(`INSERT INTO lists (title) VALUES (?) RETURNING id`)
 				rows = sqlmock.NewRows([]string{"id"}).AddRow("5")
 				mock.ExpectQuery(query).WithArgs(list.Title).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta(`INSERT INTO users_lists (user_id, list_id) VALUES ($1, $2)`)
+				query = regexp.QuoteMeta(`INSERT INTO users_lists (user_id, list_id) VALUES (?, ?)`)
 				mock.ExpectExec(query).WithArgs(userId, "5").WillReturnResult(sqlmock.NewResult(1, 1))
 
 				mock.ExpectCommit()
@@ -244,10 +248,11 @@ func TestList_Create(t *testing.T) {
 
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
@@ -265,10 +270,11 @@ func TestList_Create(t *testing.T) {
 
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnError(errors.New("db error"))
 			},
@@ -285,10 +291,11 @@ func TestList_Create(t *testing.T) {
 
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
@@ -296,7 +303,7 @@ func TestList_Create(t *testing.T) {
 				query = regexp.QuoteMeta(`
 					SELECT COUNT(*) AS lists_count
 					FROM users_lists
-					WHERE user_id = $1`,
+					WHERE user_id = ?`,
 				)
 				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(10)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
@@ -314,10 +321,11 @@ func TestList_Create(t *testing.T) {
 
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
@@ -325,7 +333,7 @@ func TestList_Create(t *testing.T) {
 				query = regexp.QuoteMeta(`
 					SELECT COUNT(*) AS lists_count
 					FROM users_lists
-					WHERE user_id = $1`,
+					WHERE user_id = ?`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(errors.New("db error"))
 			},
@@ -342,10 +350,11 @@ func TestList_Create(t *testing.T) {
 
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
@@ -353,12 +362,12 @@ func TestList_Create(t *testing.T) {
 				query = regexp.QuoteMeta(`
 					SELECT COUNT(*) AS lists_count
 					FROM users_lists
-					WHERE user_id = $1`,
+					WHERE user_id = ?`,
 				)
 				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(5)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta(`INSERT INTO lists (title) VALUES ($1) RETURNING id`)
+				query = regexp.QuoteMeta(`INSERT INTO lists (title) VALUES (?) RETURNING id`)
 				mock.ExpectQuery(query).WithArgs(list.Title).WillReturnError(errors.New("db error"))
 
 				mock.ExpectRollback()
@@ -376,10 +385,11 @@ func TestList_Create(t *testing.T) {
 
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
@@ -387,16 +397,16 @@ func TestList_Create(t *testing.T) {
 				query = regexp.QuoteMeta(`
 					SELECT COUNT(*) AS lists_count
 					FROM users_lists
-					WHERE user_id = $1`,
+					WHERE user_id = ?`,
 				)
 				rows = sqlmock.NewRows([]string{"lists_count"}).AddRow(5)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta(`INSERT INTO lists (title) VALUES ($1) RETURNING id`)
+				query = regexp.QuoteMeta(`INSERT INTO lists (title) VALUES (?) RETURNING id`)
 				rows = sqlmock.NewRows([]string{"id"}).AddRow("5")
 				mock.ExpectQuery(query).WithArgs(list.Title).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta(`INSERT INTO users_lists (user_id, list_id) VALUES ($1, $2)`)
+				query = regexp.QuoteMeta(`INSERT INTO users_lists (user_id, list_id) VALUES (?, ?)`)
 				mock.ExpectExec(query).WithArgs(userId, "5").WillReturnError(errors.New("db error"))
 
 				mock.ExpectRollback()
@@ -447,7 +457,7 @@ func TestListDB_GetAll(t *testing.T) {
 					SELECT l.id, l.title
 					FROM lists l
 					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1
+					WHERE ul.user_id = ?
 					ORDER BY l.id`,
 				)
 				rows := sqlmock.NewRows([]string{"id", "title"}).
@@ -475,7 +485,7 @@ func TestListDB_GetAll(t *testing.T) {
 					SELECT l.id, l.title
 					FROM lists l
 					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1
+					WHERE ul.user_id = ?
 					ORDER BY l.id`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(sqlmock.NewRows([]string{"id", "title"}))
@@ -491,7 +501,7 @@ func TestListDB_GetAll(t *testing.T) {
 					SELECT l.id, l.title
 					FROM lists l
 					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1
+					WHERE ul.user_id = ?
 					ORDER BY l.id`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(errors.New("db error"))
@@ -544,7 +554,7 @@ func TestListDB_GetById(t *testing.T) {
 					SELECT l.id, l.title
 					FROM lists l
 					INNER JOIN users_lists ul on l.id = ul.list_id
-					WHERE ul.user_id = $1 AND ul.list_id = $2`,
+					WHERE ul.user_id = ? AND ul.list_id = ?`,
 				)
 				rows := sqlmock.NewRows([]string{"id", "title"}).AddRow("2", "Shopping list")
 				mock.ExpectQuery(query).WithArgs(userId, listId).WillReturnRows(rows)
@@ -561,7 +571,7 @@ func TestListDB_GetById(t *testing.T) {
 					SELECT l.id, l.title
 					FROM lists l
 					INNER JOIN users_lists ul on l.id = ul.list_id
-					WHERE ul.user_id = $1 AND ul.list_id = $2`,
+					WHERE ul.user_id = ? AND ul.list_id = ?`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId, listId).WillReturnError(sql.ErrNoRows)
 			},
@@ -577,7 +587,7 @@ func TestListDB_GetById(t *testing.T) {
 					SELECT l.id, l.title
 					FROM lists l
 					INNER JOIN users_lists ul on l.id = ul.list_id
-					WHERE ul.user_id = $1 AND ul.list_id = $2`,
+					WHERE ul.user_id = ? AND ul.list_id = ?`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId, listId).WillReturnError(errors.New("db error"))
 			},
@@ -630,19 +640,23 @@ func TestList_Update(t *testing.T) {
 			mockFunc: func(mock sqlmock.Sqlmock, userId, listId string, list todo.List) {
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
 
 				query = regexp.QuoteMeta(`
-					UPDATE lists l
-					SET title = $1
-					FROM users_lists ul
-					WHERE l.id = ul.list_id AND ul.list_id = $2 AND ul.user_id = $3`,
+					UPDATE lists
+					SET title = ?
+					WHERE id = (
+						SELECT list_id
+						FROM users_lists
+						WHERE list_id = ? AND user_id = ?
+					)`,
 				)
 				mock.ExpectExec(query).WithArgs(list.Title, listId, userId).WillReturnResult(sqlmock.NewResult(0, 1))
 			},
@@ -658,10 +672,11 @@ func TestList_Update(t *testing.T) {
 			mockFunc: func(mock sqlmock.Sqlmock, userId, listId string, list todo.List) {
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
@@ -678,10 +693,11 @@ func TestList_Update(t *testing.T) {
 			mockFunc: func(mock sqlmock.Sqlmock, userId, listId string, list todo.List) {
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnError(errors.New("db error"))
 			},
@@ -697,19 +713,23 @@ func TestList_Update(t *testing.T) {
 			mockFunc: func(mock sqlmock.Sqlmock, userId, listId string, list todo.List) {
 				query := regexp.QuoteMeta(`
 					SELECT EXISTS(
-					SELECT 1
-					FROM lists l
-					INNER JOIN users_lists ul ON l.id = ul.list_id
-					WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+						SELECT 1
+						FROM lists l
+						INNER JOIN users_lists ul ON l.id = ul.list_id
+						WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+					)`,
 				)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(userId, list.Title).WillReturnRows(rows)
 
 				query = regexp.QuoteMeta(`
-					UPDATE lists l
-					SET title = $1
-					FROM users_lists ul
-					WHERE l.id = ul.list_id AND ul.list_id = $2 AND ul.user_id = $3`,
+					UPDATE lists
+					SET title = ?
+					WHERE id = (
+						SELECT list_id
+						FROM users_lists
+						WHERE list_id = ? AND user_id = ?
+					)`,
 				)
 				mock.ExpectExec(query).WithArgs(list.Title, listId, userId).WillReturnError(errors.New("db error"))
 			},
@@ -753,23 +773,32 @@ func TestList_Delete(t *testing.T) {
 			name:   "Successful list deletion",
 			userId: "1",
 			listId: "2",
-			mockFunc: func(mock sqlmock.Sqlmock, userId, listId string) {
+			mockFunc: func(mock sqlmock.Sqlmock, listId, userId string) {
 				mock.ExpectBegin()
 
 				query := regexp.QuoteMeta(`
-					DELETE FROM tasks t
-					USING lists_tasks lt
-					INNER JOIN users_lists ul ON lt.list_id = ul.list_id
-					WHERE t.id = lt.task_id AND ul.user_id = $1 AND lt.list_id = $2`,
+					DELETE FROM tasks
+					WHERE id IN (
+						SELECT task_id
+						FROM lists_tasks lt
+						WHERE lt.list_id = ? AND EXISTS (
+							SELECT 1
+							FROM users_lists ul
+							WHERE ul.user_id = ? AND ul.list_id = lt.list_id
+						)
+					)`,
 				)
-				mock.ExpectExec(query).WithArgs(userId, listId).WillReturnResult(sqlmock.NewResult(0, 3))
+				mock.ExpectExec(query).WithArgs(listId, userId).WillReturnResult(sqlmock.NewResult(0, 3))
 
 				query = regexp.QuoteMeta(`
-					DELETE FROM lists l
-					USING users_lists ul
-					WHERE l.id = ul.list_id AND ul.user_id = $1 AND ul.list_id = $2`,
+					DELETE FROM lists
+					WHERE id = ? AND EXISTS (
+						SELECT 1
+						FROM users_lists ul
+						WHERE ul.user_id = ? AND ul.list_id = id
+					)`,
 				)
-				mock.ExpectExec(query).WithArgs(userId, listId).WillReturnResult(sqlmock.NewResult(0, 1))
+				mock.ExpectExec(query).WithArgs(listId, userId).WillReturnResult(sqlmock.NewResult(0, 1))
 
 				mock.ExpectCommit()
 			},
@@ -779,23 +808,32 @@ func TestList_Delete(t *testing.T) {
 			name:   "List does not exist / List does not belong to user",
 			userId: "1",
 			listId: "2",
-			mockFunc: func(mock sqlmock.Sqlmock, userId, listId string) {
+			mockFunc: func(mock sqlmock.Sqlmock, listId, userId string) {
 				mock.ExpectBegin()
 
 				query := regexp.QuoteMeta(`
-					DELETE FROM tasks t
-					USING lists_tasks lt
-					INNER JOIN users_lists ul ON lt.list_id = ul.list_id
-					WHERE t.id = lt.task_id AND ul.user_id = $1 AND lt.list_id = $2`,
+					DELETE FROM tasks
+					WHERE id IN (
+						SELECT task_id
+						FROM lists_tasks lt
+						WHERE lt.list_id = ? AND EXISTS (
+							SELECT 1
+							FROM users_lists ul
+							WHERE ul.user_id = ? AND ul.list_id = lt.list_id
+						)
+					)`,
 				)
-				mock.ExpectExec(query).WithArgs(userId, listId).WillReturnResult(sqlmock.NewResult(0, 0))
+				mock.ExpectExec(query).WithArgs(listId, userId).WillReturnResult(sqlmock.NewResult(0, 0))
 
 				query = regexp.QuoteMeta(`
-					DELETE FROM lists l
-					USING users_lists ul
-					WHERE l.id = ul.list_id AND ul.user_id = $1 AND ul.list_id = $2`,
+					DELETE FROM lists
+					WHERE id = ? AND EXISTS (
+						SELECT 1
+						FROM users_lists ul
+						WHERE ul.user_id = ? AND ul.list_id = id
+					)`,
 				)
-				mock.ExpectExec(query).WithArgs(userId, listId).WillReturnResult(sqlmock.NewResult(0, 0))
+				mock.ExpectExec(query).WithArgs(listId, userId).WillReturnResult(sqlmock.NewResult(0, 0))
 
 				mock.ExpectCommit()
 			},
@@ -805,16 +843,22 @@ func TestList_Delete(t *testing.T) {
 			name:   "DB error on tasks deletion",
 			userId: "1",
 			listId: "2",
-			mockFunc: func(mock sqlmock.Sqlmock, userId, listId string) {
+			mockFunc: func(mock sqlmock.Sqlmock, listId, userId string) {
 				mock.ExpectBegin()
 
 				query := regexp.QuoteMeta(`
-					DELETE FROM tasks t
-					USING lists_tasks lt
-					INNER JOIN users_lists ul ON lt.list_id = ul.list_id
-					WHERE t.id = lt.task_id AND ul.user_id = $1 AND lt.list_id = $2`,
+					DELETE FROM tasks
+					WHERE id IN (
+						SELECT task_id
+						FROM lists_tasks lt
+						WHERE lt.list_id = ? AND EXISTS (
+							SELECT 1
+							FROM users_lists ul
+							WHERE ul.user_id = ? AND ul.list_id = lt.list_id
+						)
+					)`,
 				)
-				mock.ExpectExec(query).WithArgs(userId, listId).WillReturnError(errors.New("db error"))
+				mock.ExpectExec(query).WithArgs(listId, userId).WillReturnError(errors.New("db error"))
 
 				mock.ExpectRollback()
 			},
@@ -824,23 +868,32 @@ func TestList_Delete(t *testing.T) {
 			name:   "DB error on list deletion",
 			userId: "1",
 			listId: "2",
-			mockFunc: func(mock sqlmock.Sqlmock, userId, listId string) {
+			mockFunc: func(mock sqlmock.Sqlmock, listId, userId string) {
 				mock.ExpectBegin()
 
 				query := regexp.QuoteMeta(`
-					DELETE FROM tasks t
-					USING lists_tasks lt
-					INNER JOIN users_lists ul ON lt.list_id = ul.list_id
-					WHERE t.id = lt.task_id AND ul.user_id = $1 AND lt.list_id = $2`,
+					DELETE FROM tasks
+					WHERE id IN (
+						SELECT task_id
+						FROM lists_tasks lt
+						WHERE lt.list_id = ? AND EXISTS (
+							SELECT 1
+							FROM users_lists ul
+							WHERE ul.user_id = ? AND ul.list_id = lt.list_id
+						)
+					)`,
 				)
-				mock.ExpectExec(query).WithArgs(userId, listId).WillReturnResult(sqlmock.NewResult(0, 3))
+				mock.ExpectExec(query).WithArgs(listId, userId).WillReturnResult(sqlmock.NewResult(0, 3))
 
 				query = regexp.QuoteMeta(`
-					DELETE FROM lists l
-					USING users_lists ul
-					WHERE l.id = ul.list_id AND ul.user_id = $1 AND ul.list_id = $2`,
+					DELETE FROM lists
+					WHERE id = ? AND EXISTS (
+						SELECT 1
+						FROM users_lists ul
+						WHERE ul.user_id = ? AND ul.list_id = id
+					)`,
 				)
-				mock.ExpectExec(query).WithArgs(userId, listId).WillReturnError(errors.New("db error"))
+				mock.ExpectExec(query).WithArgs(listId, userId).WillReturnError(errors.New("db error"))
 
 				mock.ExpectRollback()
 			},
@@ -852,7 +905,7 @@ func TestList_Delete(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			testCase.mockFunc(mock, testCase.userId, testCase.listId)
 
-			err := repo.Delete(testCase.userId, testCase.listId)
+			err := repo.Delete(testCase.listId, testCase.userId)
 
 			if testCase.wantErr {
 				assert.Error(t, err)

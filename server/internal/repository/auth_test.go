@@ -32,7 +32,7 @@ func TestAuth_isUsernameTaken(t *testing.T) {
 			name:     "Username exists",
 			username: "Test_Username",
 			mockFunc: func(mock sqlmock.Sqlmock, username string) {
-				query := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER($1))`)
+				query := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER(?))`)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 				mock.ExpectQuery(query).WithArgs(username).WillReturnRows(rows)
 			},
@@ -43,7 +43,7 @@ func TestAuth_isUsernameTaken(t *testing.T) {
 			name:     "Username does not exist",
 			username: "New_Username",
 			mockFunc: func(mock sqlmock.Sqlmock, username string) {
-				query := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER($1))`)
+				query := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER(?))`)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(username).WillReturnRows(rows)
 			},
@@ -54,7 +54,7 @@ func TestAuth_isUsernameTaken(t *testing.T) {
 			name:     "DB error",
 			username: "New_Username",
 			mockFunc: func(mock sqlmock.Sqlmock, username string) {
-				query := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER($1))`)
+				query := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER(?))`)
 				mock.ExpectQuery(query).WithArgs(username).WillReturnError(errors.New("db error"))
 			},
 			wantExists: false,
@@ -101,11 +101,11 @@ func TestAuth_CreateUser(t *testing.T) {
 				Password: "hashed_passw0rd",
 			},
 			mockFunc: func(mock sqlmock.Sqlmock, username, password string) {
-				query := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER($1))`)
+				query := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER(?))`)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(query).WithArgs(username).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta(`INSERT INTO users (username, password_hash) values ($1, $2)`)
+				query = regexp.QuoteMeta(`INSERT INTO users (username, password_hash) VALUES (?, ?)`)
 				mock.ExpectExec(query).WithArgs(username, password).WillReturnResult(sqlmock.NewResult(1, 1))
 			},
 			wantErr: false,
@@ -117,7 +117,7 @@ func TestAuth_CreateUser(t *testing.T) {
 				Password: "hashed_passw0rd",
 			},
 			mockFunc: func(mock sqlmock.Sqlmock, username, password string) {
-				queryExists := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER($1))`)
+				queryExists := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER(?))`)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(true)
 				mock.ExpectQuery(queryExists).WithArgs(username).WillReturnRows(rows)
 			},
@@ -130,7 +130,7 @@ func TestAuth_CreateUser(t *testing.T) {
 				Password: "hashed_passw0rd",
 			},
 			mockFunc: func(mock sqlmock.Sqlmock, username, password string) {
-				queryExists := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER($1))`)
+				queryExists := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER(?))`)
 				mock.ExpectQuery(queryExists).WithArgs(username).WillReturnError(errors.New("db error"))
 			},
 			wantErr: true,
@@ -142,11 +142,11 @@ func TestAuth_CreateUser(t *testing.T) {
 				Password: "hashed_passw0rd",
 			},
 			mockFunc: func(mock sqlmock.Sqlmock, username, password string) {
-				queryExists := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER($1))`)
+				queryExists := regexp.QuoteMeta(`SELECT EXISTS(SELECT 1 FROM users WHERE LOWER(username) = LOWER(?))`)
 				rows := sqlmock.NewRows([]string{"exists"}).AddRow(false)
 				mock.ExpectQuery(queryExists).WithArgs(username).WillReturnRows(rows)
 
-				queryInsert := regexp.QuoteMeta(`INSERT INTO users (username, password_hash) values ($1, $2)`)
+				queryInsert := regexp.QuoteMeta(`INSERT INTO users (username, password_hash) VALUES (?, ?)`)
 				mock.ExpectExec(queryInsert).WithArgs(username, password).WillReturnError(errors.New("insert error"))
 			},
 			wantErr: true,
@@ -192,7 +192,7 @@ func TestAuth_GetUserId(t *testing.T) {
 				Password: "hashed_passw0rd",
 			},
 			mockFunc: func(mock sqlmock.Sqlmock, username, password string) {
-				query := regexp.QuoteMeta("SELECT id FROM users WHERE username = $1 AND password_hash = $2")
+				query := regexp.QuoteMeta("SELECT id FROM users WHERE username = ? AND password_hash = ?")
 				rows := sqlmock.NewRows([]string{"id"}).AddRow("21")
 				mock.ExpectQuery(query).WithArgs(username, password).WillReturnRows(rows)
 			},
@@ -206,7 +206,7 @@ func TestAuth_GetUserId(t *testing.T) {
 				Password: "hashed_passw0rd",
 			},
 			mockFunc: func(mock sqlmock.Sqlmock, username, password string) {
-				query := regexp.QuoteMeta("SELECT id FROM users WHERE username = $1 AND password_hash = $2")
+				query := regexp.QuoteMeta("SELECT id FROM users WHERE username = ? AND password_hash = ?")
 				mock.ExpectQuery(query).WithArgs(username, password).WillReturnError(sql.ErrNoRows)
 			},
 			expectedID: "",
@@ -219,7 +219,7 @@ func TestAuth_GetUserId(t *testing.T) {
 				Password: "hashed_passw0rd",
 			},
 			mockFunc: func(mock sqlmock.Sqlmock, username, password string) {
-				query := regexp.QuoteMeta("SELECT id FROM users WHERE username = $1 AND password_hash = $2")
+				query := regexp.QuoteMeta("SELECT id FROM users WHERE username = ? AND password_hash = ?")
 				mock.ExpectQuery(query).WithArgs(username, password).WillReturnError(errors.New("db error"))
 			},
 			expectedID: "",
@@ -273,15 +273,15 @@ func TestAuth_NewRefreshToken(t *testing.T) {
 					SELECT ut.token_id
 					FROM users_tokens ut
 					INNER JOIN tokens t ON ut.token_id = t.id
-					WHERE ut.user_id = $1`,
+					WHERE ut.user_id = ?`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(sql.ErrNoRows)
 
-				query = regexp.QuoteMeta("INSERT INTO tokens (refresh_token, expires_at) values ($1, $2) RETURNING id")
+				query = regexp.QuoteMeta("INSERT INTO tokens (refresh_token, expires_at) VALUES (?, ?) RETURNING id")
 				rows := sqlmock.NewRows([]string{"id"}).AddRow("12")
 				mock.ExpectQuery(query).WithArgs(token, expiresAt).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta("INSERT INTO users_tokens (user_id, token_id) values ($1, $2)")
+				query = regexp.QuoteMeta("INSERT INTO users_tokens (user_id, token_id) VALUES (?, ?)")
 				mock.ExpectExec(query).WithArgs(userId, "12").WillReturnResult(sqlmock.NewResult(1, 1))
 
 				mock.ExpectCommit()
@@ -300,12 +300,12 @@ func TestAuth_NewRefreshToken(t *testing.T) {
 					SELECT ut.token_id
 					FROM users_tokens ut
 					INNER JOIN tokens t ON ut.token_id = t.id
-					WHERE ut.user_id = $1`,
+					WHERE ut.user_id = ?`,
 				)
 				rows := sqlmock.NewRows([]string{"token_id"}).AddRow("12")
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta("UPDATE tokens SET refresh_token = $1, expires_at = $2 WHERE id = $3")
+				query = regexp.QuoteMeta("UPDATE tokens SET refresh_token = ?, expires_at = ? WHERE id = ?")
 				mock.ExpectExec(query).WithArgs(token, expiresAt, "12").WillReturnResult(sqlmock.NewResult(0, 1))
 
 				mock.ExpectCommit()
@@ -324,7 +324,7 @@ func TestAuth_NewRefreshToken(t *testing.T) {
 					SELECT ut.token_id
 					FROM users_tokens ut
 					INNER JOIN tokens t ON ut.token_id = t.id
-					WHERE ut.user_id = $1`,
+					WHERE ut.user_id = ?`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(errors.New("db error"))
 
@@ -344,11 +344,11 @@ func TestAuth_NewRefreshToken(t *testing.T) {
 					SELECT ut.token_id
 					FROM users_tokens ut
 					INNER JOIN tokens t ON ut.token_id = t.id
-					WHERE ut.user_id = $1`,
+					WHERE ut.user_id = ?`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(sql.ErrNoRows)
 
-				query = regexp.QuoteMeta("INSERT INTO tokens (refresh_token, expires_at) values ($1, $2) RETURNING id")
+				query = regexp.QuoteMeta("INSERT INTO tokens (refresh_token, expires_at) VALUES (?, ?) RETURNING id")
 				mock.ExpectQuery(query).WithArgs(token, expiresAt).WillReturnError(errors.New("insert error"))
 
 				mock.ExpectRollback()
@@ -367,15 +367,15 @@ func TestAuth_NewRefreshToken(t *testing.T) {
 					SELECT ut.token_id
 					FROM users_tokens ut
 					INNER JOIN tokens t ON ut.token_id = t.id
-					WHERE ut.user_id = $1`,
+					WHERE ut.user_id = ?`,
 				)
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(sql.ErrNoRows)
 
-				query = regexp.QuoteMeta("INSERT INTO tokens (refresh_token, expires_at) values ($1, $2) RETURNING id")
+				query = regexp.QuoteMeta("INSERT INTO tokens (refresh_token, expires_at) VALUES (?, ?) RETURNING id")
 				rows := sqlmock.NewRows([]string{"id"}).AddRow("12")
 				mock.ExpectQuery(query).WithArgs(token, expiresAt).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta("INSERT INTO users_tokens (user_id, token_id) values ($1, $2)")
+				query = regexp.QuoteMeta("INSERT INTO users_tokens (user_id, token_id) VALUES (?, ?)")
 				mock.ExpectExec(query).WithArgs(userId, "12").WillReturnError(errors.New("insert error"))
 
 				mock.ExpectRollback()
@@ -394,12 +394,12 @@ func TestAuth_NewRefreshToken(t *testing.T) {
 					SELECT ut.token_id
 					FROM users_tokens ut
 					INNER JOIN tokens t ON ut.token_id = t.id
-					WHERE ut.user_id = $1`,
+					WHERE ut.user_id = ?`,
 				)
 				rows := sqlmock.NewRows([]string{"token_id"}).AddRow("12")
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta("UPDATE tokens SET refresh_token = $1, expires_at = $2 WHERE id = $3")
+				query = regexp.QuoteMeta("UPDATE tokens SET refresh_token = ?, expires_at = ? WHERE id = ?")
 				mock.ExpectExec(query).WithArgs(token, expiresAt, "12").WillReturnError(errors.New("update error"))
 
 				mock.ExpectRollback()
@@ -445,11 +445,11 @@ func TestAuth_CheckRefreshToken(t *testing.T) {
 			userId:       "1",
 			refreshToken: "refresh_token",
 			mockFunc: func(mock sqlmock.Sqlmock, userId, refreshToken string) {
-				query := regexp.QuoteMeta("SELECT ut.token_id FROM users_tokens ut WHERE ut.user_id = $1")
+				query := regexp.QuoteMeta("SELECT ut.token_id FROM users_tokens ut WHERE ut.user_id = ?")
 				rows := sqlmock.NewRows([]string{"token_id"}).AddRow("123")
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta("SELECT t.refresh_token, t.expires_at FROM tokens t WHERE t.id = $1")
+				query = regexp.QuoteMeta("SELECT t.refresh_token, t.expires_at FROM tokens t WHERE t.id = ?")
 				rows = sqlmock.NewRows([]string{"refresh_token", "expires_at"}).AddRow(refreshToken, time.Now().Add(30*24*time.Hour))
 				mock.ExpectQuery(query).WithArgs("123").WillReturnRows(rows)
 			},
@@ -460,7 +460,7 @@ func TestAuth_CheckRefreshToken(t *testing.T) {
 			userId:       "1",
 			refreshToken: "refresh_token",
 			mockFunc: func(mock sqlmock.Sqlmock, userId, refreshToken string) {
-				query := regexp.QuoteMeta("SELECT ut.token_id FROM users_tokens ut WHERE ut.user_id = $1")
+				query := regexp.QuoteMeta("SELECT ut.token_id FROM users_tokens ut WHERE ut.user_id = ?")
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnError(errors.New("no token_id in db"))
 			},
 			wantErr: true,
@@ -470,11 +470,11 @@ func TestAuth_CheckRefreshToken(t *testing.T) {
 			userId:       "1",
 			refreshToken: "refresh_token",
 			mockFunc: func(mock sqlmock.Sqlmock, userId, refreshToken string) {
-				query := regexp.QuoteMeta("SELECT ut.token_id FROM users_tokens ut WHERE ut.user_id = $1")
+				query := regexp.QuoteMeta("SELECT ut.token_id FROM users_tokens ut WHERE ut.user_id = ?")
 				rows := sqlmock.NewRows([]string{"token_id"}).AddRow("123")
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta("SELECT t.refresh_token, t.expires_at FROM tokens t WHERE t.id = $1")
+				query = regexp.QuoteMeta("SELECT t.refresh_token, t.expires_at FROM tokens t WHERE t.id = ?")
 				mock.ExpectQuery(query).WithArgs("123").WillReturnError(errors.New("no token in db"))
 			},
 			wantErr: true,
@@ -484,11 +484,11 @@ func TestAuth_CheckRefreshToken(t *testing.T) {
 			userId:       "1",
 			refreshToken: "refresh_token",
 			mockFunc: func(mock sqlmock.Sqlmock, userId, refreshToken string) {
-				query := regexp.QuoteMeta("SELECT ut.token_id FROM users_tokens ut WHERE ut.user_id = $1")
+				query := regexp.QuoteMeta("SELECT ut.token_id FROM users_tokens ut WHERE ut.user_id = ?")
 				rows := sqlmock.NewRows([]string{"token_id"}).AddRow("123")
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta("SELECT t.refresh_token, t.expires_at FROM tokens t WHERE t.id = $1")
+				query = regexp.QuoteMeta("SELECT t.refresh_token, t.expires_at FROM tokens t WHERE t.id = ?")
 				rows = sqlmock.NewRows([]string{"refresh_token", "expires_at"}).AddRow("another_refresh_token", time.Now().Add(30*24*time.Hour))
 				mock.ExpectQuery(query).WithArgs("123").WillReturnRows(rows)
 			},
@@ -499,11 +499,11 @@ func TestAuth_CheckRefreshToken(t *testing.T) {
 			userId:       "1",
 			refreshToken: "refresh_token",
 			mockFunc: func(mock sqlmock.Sqlmock, userId, refreshToken string) {
-				query := regexp.QuoteMeta("SELECT ut.token_id FROM users_tokens ut WHERE ut.user_id = $1")
+				query := regexp.QuoteMeta("SELECT ut.token_id FROM users_tokens ut WHERE ut.user_id = ?")
 				rows := sqlmock.NewRows([]string{"token_id"}).AddRow("123")
 				mock.ExpectQuery(query).WithArgs(userId).WillReturnRows(rows)
 
-				query = regexp.QuoteMeta("SELECT t.refresh_token, t.expires_at FROM tokens t WHERE t.id = $1")
+				query = regexp.QuoteMeta("SELECT t.refresh_token, t.expires_at FROM tokens t WHERE t.id = ?")
 				rows = sqlmock.NewRows([]string{"refresh_token", "expires_at"}).AddRow(refreshToken, time.Now().Add(-24*time.Hour))
 				mock.ExpectQuery(query).WithArgs("123").WillReturnRows(rows)
 			},
@@ -546,7 +546,14 @@ func TestAuth_DeleteRefreshToken(t *testing.T) {
 			name:         "Successful deletion",
 			userId:       "1",
 			mockFunc: func(mock sqlmock.Sqlmock, userId string) {
-				query := regexp.QuoteMeta("DELETE FROM tokens t USING users_tokens ut WHERE t.id = ut.token_id AND ut.user_id = $1")
+				query := regexp.QuoteMeta(`
+					DELETE FROM tokens
+					WHERE id IN (
+						SELECT token_id
+						FROM users_tokens
+						WHERE user_id = ?
+					)`,
+				)
 				mock.ExpectExec(query).WithArgs(userId).WillReturnResult(sqlmock.NewResult(0, 1))
 			},
 			wantErr: false,
@@ -555,7 +562,14 @@ func TestAuth_DeleteRefreshToken(t *testing.T) {
 			name:         "DB error on deletion",
 			userId:       "1",
 			mockFunc: func(mock sqlmock.Sqlmock, userId string) {
-				query := regexp.QuoteMeta("DELETE FROM tokens t USING users_tokens ut WHERE t.id = ut.token_id AND ut.user_id = $1")
+				query := regexp.QuoteMeta(`
+					DELETE FROM tokens
+					WHERE id IN (
+						SELECT token_id
+						FROM users_tokens
+						WHERE user_id = ?
+					)`,
+				)
 				mock.ExpectExec(query).WithArgs(userId).WillReturnError(errors.New("db error"))
 			},
 			wantErr: true,
