@@ -45,14 +45,7 @@ func NewApp() (*App, error) {
 		return nil, err
 	}
 
-	db, err := db.NewPostgresDB(db.Config{
-		Host:     viper.GetString("db.host"),
-		Port:     viper.GetString("db.port"),
-		Username: viper.GetString("db.username"),
-		DBName:   viper.GetString("db.dbname"),
-		SSLMode:  viper.GetString("db.sslmode"),
-		Password: os.Getenv("DB_PASSWORD"),
-	})
+	db, err := db.NewSQLiteDB()
 	if err != nil {
 		return nil, err
 	}
@@ -106,11 +99,6 @@ func initConfig() error {
 func checkConfig() error {
     required := []string{
         "server.port",
-        "db.username",
-        "db.host",
-        "db.port",
-        "db.dbname",
-        "db.sslmode",
     }
     missing := []string{}
 
@@ -129,7 +117,6 @@ func checkConfig() error {
 
 func checkEnv() error {
     required := []string{
-        "DB_PASSWORD",
         "SERVICE_SALT",
         "SERVICE_KEY",
     }

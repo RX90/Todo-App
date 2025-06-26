@@ -1,2 +1,2 @@
-*.txt
-*.database
+.txt
+/data/
