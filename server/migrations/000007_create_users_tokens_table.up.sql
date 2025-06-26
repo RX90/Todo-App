@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS users_tokens (
+    id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id  INTEGER NOT NULL,
+    token_id INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (token_id) REFERENCES tokens(id) ON DELETE CASCADE
+);
