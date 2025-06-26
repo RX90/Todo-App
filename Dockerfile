@@ -1,4 +1,6 @@
-FROM golang:1.22 AS builder
+FROM golang:1.22-alpine AS builder
+
+RUN apk add --no-cache build-base sqlite-dev
 
 WORKDIR /app
 
@@ -7,16 +9,17 @@ RUN go mod download
 
 COPY . .
 
-RUN CGO_ENABLED=0 GOOS=linux go build -o todo-app ./server/cmd/main.go
+ENV CGO_ENABLED=1
+ENV GOOS=linux
+
+RUN go build -o todo-app ./server/cmd/main.go
 
 FROM alpine:latest
 
-RUN apk add --no-cache postgresql-client bash
+RUN apk add --no-cache sqlite bash
 
 WORKDIR /app
 
 COPY --from=builder /app .
-
-RUN chmod +x wait-for-postgres.sh
 
 CMD ["./todo-app"]
