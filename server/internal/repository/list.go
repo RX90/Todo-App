@@ -20,10 +20,11 @@ func (r *ListDB) isTitleExistsInLists(userId, title string) (bool, error) {
 
 	query := fmt.Sprintf(`
 		SELECT EXISTS(
-		SELECT 1
-		FROM %s l
-		INNER JOIN %s ul ON l.id = ul.list_id
-		WHERE ul.user_id = $1 AND LOWER(l.title) = LOWER($2))`,
+			SELECT 1
+			FROM %s l
+			INNER JOIN %s ul ON l.id = ul.list_id
+			WHERE ul.user_id = ? AND LOWER(l.title) = LOWER(?)
+		)`,
 		listsTable, usersListsTable,
 	)
 	err := r.db.QueryRow(query, userId, title).Scan(&exists)
@@ -37,7 +38,7 @@ func (r *ListDB) countUserLists(userId string) (int, error) {
 	query := fmt.Sprintf(`
 		SELECT COUNT(*) AS lists_count
 		FROM %s
-		WHERE user_id = $1`,
+		WHERE user_id = ?`,
 		usersListsTable,
 	)
 	err := r.db.QueryRow(query, userId).Scan(&count)
@@ -70,12 +71,12 @@ func (r *ListDB) Create(userId string, list todo.List) (string, error) {
 
 	var listId string
 
-	query := fmt.Sprintf("INSERT INTO %s (title) VALUES ($1) RETURNING id", listsTable)
+	query := fmt.Sprintf("INSERT INTO %s (title) VALUES (?) RETURNING id", listsTable)
 	if err := tx.QueryRow(query, list.Title).Scan(&listId); err != nil {
 		return "", err
 	}
 
-	query = fmt.Sprintf("INSERT INTO %s (user_id, list_id) VALUES ($1, $2)", usersListsTable)
+	query = fmt.Sprintf("INSERT INTO %s (user_id, list_id) VALUES (?, ?)", usersListsTable)
 	_, err = tx.Exec(query, userId, listId)
 	if err != nil {
 		return "", err
@@ -91,7 +92,7 @@ func (r *ListDB) GetAll(userId string) ([]todo.List, error) {
 		SELECT l.id, l.title
 		FROM %s l
 		INNER JOIN %s ul ON l.id = ul.list_id
-		WHERE ul.user_id = $1
+		WHERE ul.user_id = ?
 		ORDER BY l.id`,
 		listsTable, usersListsTable,
 	)
@@ -107,7 +108,7 @@ func (r *ListDB) GetById(userId, listId string) (todo.List, error) {
 		SELECT l.id, l.title
 		FROM %s l
 		INNER JOIN %s ul on l.id = ul.list_id
-		WHERE ul.user_id = $1 AND ul.list_id = $2`,
+		WHERE ul.user_id = ? AND ul.list_id = ?`,
 		listsTable, usersListsTable,
 	)
 	err := r.db.Get(&list, query, userId, listId)
@@ -125,10 +126,13 @@ func (r *ListDB) Update(userId, listId string, list todo.List) error {
 	}
 
 	query := fmt.Sprintf(`
-		UPDATE %s l
-		SET title = $1
-		FROM %s ul
-		WHERE l.id = ul.list_id AND ul.list_id = $2 AND ul.user_id = $3`,
+		UPDATE %s
+		SET title = ?
+		WHERE id = (
+			SELECT list_id
+			FROM %s
+			WHERE list_id = ? AND user_id = ?
+		)`,
 		listsTable, usersListsTable,
 	)
 	_, err = r.db.Exec(query, list.Title, listId, userId)
@@ -145,27 +149,35 @@ func (r *ListDB) Delete(userId, listId string) error {
 
 	// Deleting all tasks from list
 	query := fmt.Sprintf(`
-		DELETE FROM %s t
-		USING %s lt
-		INNER JOIN %s ul ON lt.list_id = ul.list_id
-		WHERE t.id = lt.task_id AND ul.user_id = $1 AND lt.list_id = $2`,
+		DELETE FROM %s
+		WHERE id IN (
+			SELECT task_id
+			FROM %s lt
+			WHERE lt.list_id = ? AND EXISTS (
+				SELECT 1
+				FROM %s ul
+				WHERE ul.user_id = ? AND ul.list_id = lt.list_id
+			)
+		)`,
 		tasksTable, listsTasksTable, usersListsTable,
 	)
 
-	_, err = r.db.Exec(query, userId, listId)
+	_, err = r.db.Exec(query, listId, userId)
 	if err != nil {
 		return err
 	}
 
 	// Deleting list
 	query = fmt.Sprintf(`
-		DELETE FROM %s l
-		USING %s ul
-		WHERE l.id = ul.list_id AND ul.user_id = $1 AND ul.list_id = $2`,
+		DELETE FROM %s
+		WHERE id = ? AND EXISTS (
+			SELECT 1
+			FROM %s ul
+			WHERE ul.user_id = ? AND ul.list_id = id
+		)`,
 		listsTable, usersListsTable,
 	)
-
-	_, err = r.db.Exec(query, userId, listId)
+	_, err = r.db.Exec(query, listId, userId)
 	if err != nil {
 		return err
 	}
