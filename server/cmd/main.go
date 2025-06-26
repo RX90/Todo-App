@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/RX90/Todo-App/server/internal/app"
-	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
